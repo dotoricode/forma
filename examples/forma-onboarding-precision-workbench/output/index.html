@@ -79,8 +79,8 @@
     --font-sans: "Geist", "IBM Plex Sans KR", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
     --font-mono: "Geist Mono", ui-monospace, "SFMono-Regular", Consolas, "Liberation Mono", monospace;
 
-    --measure-prose: 70ch;
-    --measure-wide: min(100%, 96ch);
+    --measure-prose: 42rem;
+    --measure-wide: min(100%, 64rem);
 
     --space-1: 0.25rem; --space-2: 0.5rem; --space-3: 0.75rem;
     --space-4: 1rem; --space-5: 1.5rem; --space-6: 2rem;
@@ -150,7 +150,7 @@
     outline: 2px solid var(--color-accent);
     outline-offset: 2px;
   }
-  ::selection { background: color-mix(in oklch, var(--color-accent) 25%, transparent); }
+  ::selection { background: color-mix(in oklab, var(--color-accent) 25%, transparent); }
 
   @media (prefers-reduced-motion: reduce) {
     *, *::before, *::after {
@@ -171,6 +171,16 @@
   .doc[data-density="compact"] .section { padding-block: var(--space-5); }
   .doc[data-density="comfortable"] .section { padding-block: var(--space-7); }
 
+  /* The theme toggle ships with [hidden] and is revealed by the init
+     script, so the header grew from 0 to the button's height after paint
+     and shoved the whole document down — the only measured layout shift
+     on the page. Reserving the row up front costs nothing when JS is off. */
+  header.doc {
+    display: flex;
+    justify-content: flex-end;
+    min-block-size: 2rem;
+  }
+
   main { display: block; }
 
   .section {
@@ -182,13 +192,18 @@
   }
   .section:last-of-type { border-block-end: none; }
 
+  /* Width constraints only — never centering. Coupling "cap the width" to
+     "center the result" meant the few blocks that cap (narrative, finding,
+     source-note) started 100-240px further right than every block around
+     them, reading as a random centered fragment. All content shares one
+     left baseline; only long prose ends earlier on the right. */
   .measure {
     max-width: var(--measure-prose);
-    margin-inline: auto;
+    margin-inline: 0;
   }
   .breakout {
-    max-width: min(100%, 92ch);
-    margin-inline: auto;
+    max-width: min(100%, 58rem);
+    margin-inline: 0;
   }
 
   .toc {
@@ -335,7 +350,7 @@
   }
 
   /* annotated-code */
-  .blk-code { max-width: var(--measure-wide); margin-inline: auto; }
+  .blk-code { max-width: 100%; }
   .blk-code__title { font-size: 1rem; margin-block-end: var(--space-3); color: var(--color-text-muted); }
   .blk-code__frame {
     display: grid;
@@ -352,7 +367,7 @@
   .blk-code pre { margin: 0; padding: var(--space-4); font-size: 0.875rem; line-height: 1.65; }
   .blk-code__line { display: block; }
   .blk-code__line[data-highlight="true"] {
-    background: color-mix(in oklch, var(--color-accent) 12%, transparent);
+    background: color-mix(in oklab, var(--color-accent) 12%, transparent);
     margin-inline: calc(-1 * var(--space-4));
     padding-inline: var(--space-4);
   }
@@ -385,7 +400,7 @@
   }
 
   /* diff */
-  .blk-diff { max-width: var(--measure-wide); margin-inline: auto; }
+  .blk-diff { max-width: 100%; }
   .blk-diff__title { font-size: 1rem; margin-block-end: var(--space-3); color: var(--color-text-muted); }
   .blk-diff__frame {
     border: 1px solid var(--color-border);
@@ -402,11 +417,11 @@
   .blk-diff__row { display: flex; }
   .blk-diff__ln { flex: 0 0 3rem; text-align: end; padding-inline-end: var(--space-2); color: var(--color-text-muted); user-select: none; }
   .blk-diff__code { flex: 1; white-space: pre; padding-inline-end: var(--space-4); }
-  .blk-diff__row[data-op="add"] { background: color-mix(in oklch, var(--color-success) 12%, transparent); }
-  .blk-diff__row[data-op="del"] { background: color-mix(in oklch, var(--color-danger) 10%, transparent); }
+  .blk-diff__row[data-op="add"] { background: color-mix(in oklab, var(--color-success) 12%, transparent); }
+  .blk-diff__row[data-op="del"] { background: color-mix(in oklab, var(--color-danger) 10%, transparent); }
 
   /* diagram canvas (flow / sequence / timeline / architecture) */
-  .blk-diagram { max-width: var(--measure-wide); margin-inline: auto; }
+  .blk-diagram { max-width: 100%; }
   .blk-diagram__title { font-size: 1rem; margin-block-end: var(--space-4); color: var(--color-text-muted); }
   .blk-diagram__canvas { width: 100%; overflow-x: auto; }
   /* max-width (not width): the SVG's intrinsic size (set via real width/
@@ -454,13 +469,13 @@
   .comparison__col li:first-child { border-block-start: none; padding-block-start: 0; }
 
   /* test-summary */
-  .blk-test-summary { max-width: var(--measure-wide); margin-inline: auto; }
+  .blk-test-summary { max-width: 100%; }
   .test-band { display: flex; flex-wrap: wrap; gap: var(--space-6); align-items: baseline; padding-block: var(--space-2); }
   /* .test-band__stat and its tone variants are defined once, near the
      bottom of this function, using native CSS nesting. */
 
   /* test-matrix */
-  .blk-test-matrix { max-width: var(--measure-wide); margin-inline: auto; }
+  .blk-test-matrix { max-width: 100%; }
   .test-matrix__scroll { overflow-x: auto; border: 1px solid var(--color-border); border-radius: var(--radius-md); }
   table.test-matrix__table { border-collapse: collapse; width: 100%; font-size: 0.875rem; }
   .test-matrix__table th, .test-matrix__table td { padding: var(--space-2) var(--space-3); border-block-end: 1px solid var(--color-border); text-align: start; white-space: nowrap; }
@@ -472,14 +487,13 @@
   .test-matrix__cell[data-status="skip"] { color: var(--color-text-muted); }
 
   /* chart */
-  .blk-chart { max-width: var(--measure-wide); margin-inline: auto; }
+  .blk-chart { max-width: 100%; }
   .blk-chart__title { font-size: 1rem; margin-block-end: var(--space-4); color: var(--color-text-muted); }
   .blk-chart svg text { font-family: var(--font-sans); fill: var(--color-text-muted); font-size: 0.75rem; }
   .blk-chart .chart-bar { fill: var(--color-accent); }
   .blk-chart .chart-axis { stroke: var(--color-border); }
 
   /* finding / risk / decision */
-  .blk-finding, .blk-risk, .blk-decision { max-width: var(--measure-prose); }
   .blk-finding__badge, .blk-risk__badge {
     font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.03em;
     color: var(--color-text-muted);
@@ -515,7 +529,7 @@
   .blk-glossary dd { margin-inline-start: 0; color: var(--color-text-muted); }
 
   /* source-note */
-  .blk-source-note { max-width: var(--measure-prose); font-size: 0.8125rem; color: var(--color-text-muted); }
+  .blk-source-note { font-size: 0.8125rem; color: var(--color-text-muted); }
   .blk-source-note ul { display: grid; gap: var(--space-1); list-style: none; }
   .blk-source-note__title { font-size: 1rem; color: var(--color-text); margin-block-end: var(--space-3); }
 
@@ -530,7 +544,7 @@
     &[data-confidence="unknown"] {
       color: var(--color-text);
       border-color: var(--color-warning);
-      background: color-mix(in oklch, var(--color-warning) 18%, var(--color-surface));
+      background: color-mix(in oklab, var(--color-warning) 18%, var(--color-surface));
     }
   }
 
@@ -625,17 +639,30 @@
     max-width: none;
     align-items: stretch;
   }
+  /* The dark rail spans the whole page, and the nav inside it sticks.
+     Sticking the <aside> itself with height:100vh made the black band stop
+     one viewport down, leaving the canvas showing for the rest of the
+     scroll — a dashboard sidebar that ends a quarter of the way down the
+     page reads as a rendering bug, not a design. */
   :root[data-design="precision-workbench"] .layout > .side-toc {
     order: -1;
-    position: sticky;
-    inset-block-start: 0;
-    align-self: start;
-    height: 100vh;
-    overflow-y: auto;
+    align-self: stretch;
+    position: static;
+    /* Both reset the >=1280px sticky-rail rule in @layer layout, which
+       otherwise capped the rail at one viewport (100vh - 2rem = 868px on
+       a 900px-tall window) no matter how long the page was. */
+    max-height: none;
+    overflow: visible;
     background: oklch(13% 0.004 90);
     border-block-end: none;
     padding: var(--space-6) var(--space-4);
     margin-inline-start: calc(-1 * var(--space-5));
+  }
+  :root[data-design="precision-workbench"] .side-toc .toc {
+    position: sticky;
+    inset-block-start: var(--space-5);
+    max-height: calc(100vh - var(--space-8));
+    overflow-y: auto;
   }
   :root[data-design="precision-workbench"] .side-toc .toc {
     flex-direction: column;
@@ -687,10 +714,10 @@
     padding-inline-start: var(--space-3);
     margin-inline-start: calc(-1 * var(--space-3) - 2px);
   }
-  :root[data-design="developer-docs"] .measure { max-width: 62ch; }
+  :root[data-design="developer-docs"] .measure { max-width: 38rem; }
   :root[data-design="developer-docs"] .blk-finding,
   :root[data-design="developer-docs"] .blk-decision .decision-strip {
-    background: color-mix(in oklch, var(--color-accent) 6%, var(--color-surface));
+    background: color-mix(in oklab, var(--color-accent) 6%, var(--color-surface));
     border-radius: var(--radius-md);
     padding: var(--space-4) var(--space-5);
   }
@@ -702,16 +729,24 @@
   :root[data-design="editorial-magazine"] {
     --font-serif: Georgia, "Nanum Myeongjo", serif;
   }
-  :root[data-design="editorial-magazine"] .doc { max-width: 44rem; }
+  /* 44rem (704px) sat just under the 720px container-query threshold, so
+     the comparison block's two columns silently never went side by side
+     and stacked instead. 52rem clears it while staying magazine-narrow;
+     body text is still held to --measure-prose by .measure. */
+  :root[data-design="editorial-magazine"] .doc { max-width: 52rem; }
   :root[data-design="editorial-magazine"] h1,
   :root[data-design="editorial-magazine"] h2,
+  :root[data-design="editorial-magazine"] h3,
   :root[data-design="editorial-magazine"] .blk-cover__title,
   :root[data-design="editorial-magazine"] .blk-narrative__question {
     font-family: var(--font-serif);
     font-weight: 400;
   }
   :root[data-design="editorial-magazine"] .blk-cover__title { font-size: clamp(2rem, 1.3rem + 3vw, 3.5rem); }
-  :root[data-design="editorial-magazine"] .blk-narrative__question { font-style: italic; }
+  /* No italic here: Korean has no true italic, so browsers synthesise a
+     slant that reads as a different, worse typeface next to the roman
+     text around it. Size and serif face carry the emphasis instead. */
+  :root[data-design="editorial-magazine"] .blk-narrative__question { font-size: 1.5rem; }
   :root[data-design="editorial-magazine"] .blk-narrative__summary p:first-of-type::first-letter {
     font-family: var(--font-serif);
     font-size: 3.4em;
@@ -723,7 +758,6 @@
   :root[data-design="editorial-magazine"] .blk-takeaways {
     font-family: var(--font-serif);
     font-size: 1.0625rem;
-    font-style: italic;
     border-block: 1px solid var(--color-text);
     padding-block: var(--space-4);
   }

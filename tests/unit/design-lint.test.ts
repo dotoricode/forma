@@ -36,4 +36,55 @@ describe("lintCss", () => {
     const css = `.blk-timeline__item::before { content: ""; position: absolute; border-radius: 50%; }`;
     expect(lintCss(css)).toEqual([]);
   });
+
+  describe("centered-width-cap", () => {
+    it("flags a block that caps its width and centres itself", () => {
+      const css = `.blk-finding { max-width: 42rem; margin-inline: auto; }`;
+      expect(lintCss(css).some((f) => f.rule === "centered-width-cap")).toBe(true);
+    });
+
+    it("does not flag a width cap without centering", () => {
+      const css = `.measure { max-width: 42rem; margin-inline: 0; }`;
+      expect(lintCss(css).some((f) => f.rule === "centered-width-cap")).toBe(false);
+    });
+
+    it("allows the shared page column to centre itself", () => {
+      const css = `.doc { max-width: 64rem; margin-inline: auto; }
+        .layout { max-width: 64rem; margin-inline: auto; }
+        :root[data-design="editorial-magazine"] .doc { max-width: 52rem; margin-inline: auto; }`;
+      expect(lintCss(css).some((f) => f.rule === "centered-width-cap")).toBe(false);
+    });
+
+    it("does not mistake an at-rule prelude for a centering selector", () => {
+      const css = `@layer layout { .doc { max-width: 64rem; margin-inline: auto; } }`;
+      expect(lintCss(css).some((f) => f.rule === "centered-width-cap")).toBe(false);
+    });
+
+    it("does not mistake a preceding comment for the rule's selector", () => {
+      const css = `/* the shared page column */ .doc { max-width: 64rem; margin-inline: auto; }`;
+      expect(lintCss(css).some((f) => f.rule === "centered-width-cap")).toBe(false);
+    });
+  });
+
+  describe("ch-measure", () => {
+    it("flags a reading measure sized in ch", () => {
+      expect(lintCss(`.measure { max-width: 70ch; }`).some((f) => f.rule === "ch-measure")).toBe(true);
+    });
+
+    it("accepts a reading measure sized in rem", () => {
+      expect(lintCss(`.measure { max-width: 42rem; }`).some((f) => f.rule === "ch-measure")).toBe(false);
+    });
+  });
+
+  describe("oklch-color-mix-hue-shift", () => {
+    it("flags color-mix in oklch, which interpolates hue toward the neutral's hue 0", () => {
+      const css = `.tint { background: color-mix(in oklch, var(--color-accent) 6%, var(--color-surface)); }`;
+      expect(lintCss(css).some((f) => f.rule === "oklch-color-mix-hue-shift")).toBe(true);
+    });
+
+    it("accepts color-mix in oklab", () => {
+      const css = `.tint { background: color-mix(in oklab, var(--color-accent) 6%, var(--color-surface)); }`;
+      expect(lintCss(css).some((f) => f.rule === "oklch-color-mix-hue-shift")).toBe(false);
+    });
+  });
 });

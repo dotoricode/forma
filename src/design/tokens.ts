@@ -64,9 +64,20 @@ export const motion = {
   easeStandard: "cubic-bezier(0.2, 0, 0, 1)",
 } as const;
 
+/**
+ * Reading widths, in rem rather than ch.
+ *
+ * `ch` is the advance width of the "0" glyph, which makes it wrong here
+ * twice over. It scales with the element's own font-size, so the same
+ * `70ch` resolved to 743px on body text but only 603px inside the
+ * smaller-typed source-note, giving each block a different width for no
+ * design reason. And CJK glyphs are roughly twice as wide as "0", so a
+ * measure tuned for English fits about half as much Korean per line.
+ * rem is font-size independent and behaves the same in both scripts.
+ */
 export const measure = {
-  prose: "70ch",
-  wide: "min(100%, 96ch)",
+  prose: "42rem", // ~672px: comfortable for both Latin and Hangul body text
+  wide: "min(100%, 64rem)", // ~1024px: tables, code, diagrams
 };
 
 /**

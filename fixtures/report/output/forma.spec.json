@@ -7,6 +7,7 @@
     "audience": "manager",
     "language": "ko",
     "theme": "light",
+    "designSystem": "quiet-editorial",
     "density": "comfortable",
     "confidentiality": "internal"
   },

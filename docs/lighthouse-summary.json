@@ -1,9 +1,9 @@
 {
   "explain": {
-    "performance": 0.99,
+    "performance": 0.98,
     "accessibility": 1,
     "bestPractices": 1,
-    "cls": 0.02471110686562138,
+    "cls": 0.007287596127153477,
     "tbt": 0
   },
   "review": {
@@ -14,17 +14,17 @@
     "tbt": 0
   },
   "test": {
-    "performance": 0.98,
-    "accessibility": 1,
-    "bestPractices": 1,
-    "cls": 0.03777832684119448,
-    "tbt": 111
-  },
-  "report": {
     "performance": 0.99,
     "accessibility": 1,
     "bestPractices": 1,
-    "cls": 0.03777832684119448,
+    "cls": 0,
+    "tbt": 75.5
+  },
+  "report": {
+    "performance": 1,
+    "accessibility": 1,
+    "bestPractices": 1,
+    "cls": 0,
     "tbt": 0
   }
 }
