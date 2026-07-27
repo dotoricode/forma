@@ -736,6 +736,19 @@ function componentCss(): string {
   /* source-note */
   .blk-source-note { font-size: 0.8125rem; color: var(--color-text-muted); }
   .blk-source-note ul { display: grid; gap: var(--space-1); list-style: none; }
+  .blk-source-note li { display: grid; gap: 0.15rem; }
+  .blk-source-note__link {
+    color: var(--color-accent);
+    text-decoration-line: underline;
+    text-decoration-thickness: 0.08em;
+    text-underline-offset: 0.18em;
+  }
+  .blk-source-note__locator {
+    color: var(--color-text-muted);
+    font-size: 0.75rem;
+    overflow-wrap: anywhere;
+    white-space: normal;
+  }
   .blk-source-note__title { font-size: 1rem; color: var(--color-text); margin-block-end: var(--space-3); }
 
   /* confidence marker — shared across blocks. Native CSS nesting groups

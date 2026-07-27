@@ -61,7 +61,7 @@ program
         console.log(`forma: design lint — ${findings.length} finding(s):`);
         for (const f of findings) console.log(`  - [${f.rule}] ${f.message}`);
       }
-      console.log("forma: run `pnpm qa` for the full Playwright/axe/Lighthouse gate");
+      console.log(`forma: run \`forma qa ${opts.out}\` for the full browser/axe gate`);
     } catch (error) {
       exitWithError(error);
     }
@@ -89,6 +89,26 @@ program
     server.listen(port, () => {
       console.log(`forma: preview server at http://localhost:${port}/index.html (Ctrl+C to stop)`);
     });
+  });
+
+program
+  .command("qa <htmlOrDir>")
+  .description("Run browser, accessibility, responsive, and offline checks on a rendered output")
+  .option("--out <dir>", "QA artifact directory (defaults to <output>/qa)")
+  .action(async (target: string, opts: { out?: string }) => {
+    try {
+      const { formatQaResult, runBrowserQa } = await import("../qa/browser-qa.js");
+      const result = await runBrowserQa({
+        target,
+        ...(opts.out ? { qaDir: opts.out } : {}),
+      });
+      console.log(`forma qa: ${result.htmlPath}`);
+      console.log(`  ${formatQaResult(result)}`);
+      console.log(`  artifacts: ${result.qaDir}`);
+      if (!result.passed) process.exitCode = 1;
+    } catch (error) {
+      exitWithError(error);
+    }
   });
 
 program

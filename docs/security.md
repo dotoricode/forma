@@ -56,6 +56,11 @@ no Google Fonts CSS API call (which would leak document text via the
 `text=` query parameter — see `skills/forma/references/typography.md`),
 no analytics/tracking. `file://` works with no server.
 
+`forma qa <html|dir>` records and aborts every non-`file:` browser request
+before transmission. A URL Source may render as a user-activated external
+link, but loading the Rendered Output never follows that link automatically;
+the link uses `noopener`, `noreferrer`, and a no-referrer policy.
+
 ## Code execution
 
 Forma never executes analyzed source code. Code/diff content is only ever

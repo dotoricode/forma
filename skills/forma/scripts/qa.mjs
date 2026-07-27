@@ -4,7 +4,9 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 
 const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../../..");
-const result = spawnSync("pnpm", ["qa", ...process.argv.slice(2)], {
+const targets = process.argv.slice(2);
+const command = targets.length > 0 ? ["forma", "qa", ...targets] : ["qa"];
+const result = spawnSync("pnpm", command, {
   cwd: repoRoot,
   stdio: "inherit",
 });

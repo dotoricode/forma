@@ -5,7 +5,12 @@
  * DOM or invents its own escaping — see security/sanitize.ts.
  */
 import type { FormaBlock, FormaSource } from "../spec/schema.js";
-import { escapeHtml, renderInlineMarkdown, sanitizeSvg } from "../security/sanitize.js";
+import {
+  escapeHtml,
+  renderInlineMarkdown,
+  sanitizeSvg,
+  sanitizeUrl,
+} from "../security/sanitize.js";
 import { highlightLines } from "./highlight.js";
 import { parseUnifiedDiff, renderDiffHunksHtml } from "./diff-view.js";
 import {
@@ -90,11 +95,26 @@ function sourceNoteList(block: FormaBlock, ctx: RenderContext): string {
   const items = refs
     .map((id) => {
       const source = ctx.sourcesById.get(id);
-      const label = source ? source.label : id;
-      return `<li>${escapeHtml(label)}</li>`;
+      return renderSourceListItem(source, id);
     })
     .join("");
   return `<div class="blk-source-note" aria-label="${STRINGS[ctx.language].sources}"><ul>${items}</ul></div>`;
+}
+
+function renderSourceListItem(source: FormaSource | undefined, fallbackId: string): string {
+  if (!source) return `<li><span class="blk-source-note__label">${escapeHtml(fallbackId)}</span></li>`;
+
+  const label = escapeHtml(source.label);
+  if (!source.path) {
+    return `<li><span class="blk-source-note__label">${label}</span></li>`;
+  }
+
+  const safeUrl = sanitizeUrl(source.path);
+  const isLinkedUrl = source.kind === "url" && safeUrl !== "#";
+  const renderedLabel = isLinkedUrl
+    ? `<a class="blk-source-note__link" href="${escapeHtml(safeUrl)}" target="_blank" rel="noopener noreferrer" referrerpolicy="no-referrer">${label}</a>`
+    : `<span class="blk-source-note__label">${label}</span>`;
+  return `<li>${renderedLabel}<code class="blk-source-note__locator">${escapeHtml(source.path)}</code></li>`;
 }
 
 export async function renderBlock(block: FormaBlock, ctx: RenderContext): Promise<string> {
@@ -459,6 +479,6 @@ function renderSourceNote(
 function renderAllSources(ctx: RenderContext): string {
   const sources = Array.from(ctx.sourcesById.values());
   if (sources.length === 0) return "";
-  const items = sources.map((s) => `<li>${escapeHtml(s.label)}</li>`).join("");
+  const items = sources.map((source) => renderSourceListItem(source, source.id)).join("");
   return `<ul>${items}</ul>`;
 }

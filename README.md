@@ -36,6 +36,7 @@ pnpm install
 pnpm build
 
 pnpm forma render fixtures/review/forma.spec.json --out fixtures/review/output
+pnpm forma qa fixtures/review/output
 pnpm forma preview fixtures/review/output
 # → http://localhost:4173/index.html
 ```
@@ -50,6 +51,7 @@ rendered `output/` (HTML + QA screenshots).
 forma init                      # write a starter forma.spec.json
 forma validate <spec>           # schema-check a spec
 forma render <spec> --out <dir> # spec → self-contained HTML
+forma qa <html|dir>             # browser/axe/responsive/offline checks
 forma preview <dir>             # serve rendered output over localhost
 forma build <spec>              # render + static design lint
 forma install-skills            # sync skills/forma/ → Codex + Claude Code
@@ -61,7 +63,8 @@ forma doctor                    # check the local environment
 Full QA (Playwright + axe-core + Lighthouse, needs a browser):
 
 ```bash
-pnpm qa           # 4 viewports × 4 fixtures, console/axe/overflow checks
+forma qa <dir>    # deep QA for one rendered output
+pnpm qa           # the same QA Module across all 4 canonical fixtures
 pnpm lighthouse   # performance/accessibility/best-practices scores
 pnpm lint:design  # static generic-AI-pattern CSS lint
 pnpm test         # unit tests

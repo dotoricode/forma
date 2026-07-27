@@ -14,6 +14,14 @@ const DO_NOT_EDIT_HEADER =
   "<!-- GENERATED COPY — do not edit directly. Source of truth: skills/forma/. Run `pnpm forma install-skills` after editing the source. -->\n";
 const CHECKSUM_FILE = ".forma-skill-checksum.json";
 
+function addDoNotEditHeader(skillMd: string): string {
+  const frontmatter = skillMd.match(/^---\r?\n[\s\S]*?\r?\n---\r?\n/);
+  if (!frontmatter) {
+    throw new Error(`${CANONICAL_SKILL_DIR}/SKILL.md must start with YAML frontmatter`);
+  }
+  return `${frontmatter[0]}${DO_NOT_EDIT_HEADER}${skillMd.slice(frontmatter[0].length)}`;
+}
+
 async function listFilesRecursive(dir: string): Promise<string[]> {
   const entries = await readdir(dir, { withFileTypes: true });
   const files: string[] = [];
@@ -57,7 +65,7 @@ export async function installSkills(cwd: string): Promise<InstallResult> {
     const skillMdPath = path.join(targetDir, "SKILL.md");
     const existing = await readFile(skillMdPath, "utf-8").catch(() => "");
     if (existing && !existing.startsWith(DO_NOT_EDIT_HEADER)) {
-      await writeFile(skillMdPath, DO_NOT_EDIT_HEADER + existing, "utf-8");
+      await writeFile(skillMdPath, addDoNotEditHeader(existing), "utf-8");
     }
     await writeFile(
       path.join(targetDir, CHECKSUM_FILE),

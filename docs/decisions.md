@@ -75,12 +75,14 @@ reversed.
 ## CLI surface
 
 - Implemented the union of the two v2 documents' CLI commands: `init`,
-  `validate`, `render`, `preview`, `build`, `qa` (via `pnpm qa`),
+  `validate`, `render`, `preview`, `build`, `qa`,
   `install-skills`, `verify-skills`, `doctor`, `generate` (scaffold-only,
   documented as not calling any LLM), plus `schema`.
 - `forma build` runs render + the static (non-browser) design lint only.
-  The full Playwright/axe/Lighthouse gate is `pnpm qa` / `pnpm lighthouse`
-  — kept separate so `build` stays fast and doesn't require a browser.
+  `forma qa <html|dir>` runs the reusable browser/axe/responsive/offline
+  gate for one Rendered Output; `pnpm qa` adapts that Module across the
+  four canonical fixtures. Lighthouse remains separate so `build` stays
+  fast and doesn't require a browser.
 
 ## Design direction
 
