@@ -325,37 +325,29 @@ function designSystemCss(): string {
   return `
   /* Precision Workbench — dark sidebar nav (reusing .side-toc/.toc), each
      .section becomes a raised card instead of a full-bleed divided band. */
-  /* Theme-aware via token overrides, not raw primitives. Hardcoding the
-     page background and the rail colour meant dark mode kept a light
-     canvas (muted footer text failed contrast at 2.41:1) while the rail
-     landed on exactly the same value as --color-surface, so the sidebar
-     and the cards became one indistinguishable dark mass. The rail wants
-     to sit *behind* the cards in both themes, which is a relationship
-     between tokens, not a fixed colour. */
+  /* One background plane, one raised plane. The rail and the content area
+     share the canvas; the cards are the only thing that floats. Only
+     --color-canvas flips per theme — everything else is derived from it,
+     so the rail can never drift out of step with the page again. */
   :root[data-design="precision-workbench"] {
     --shadow: 0 1px 2px oklch(0% 0 0 / 0.05), 0 4px 16px oklch(0% 0 0 / 0.08);
     /* Light: grey canvas so the white cards lift off it. */
     --color-canvas: ${primitiveColor.neutral100};
-    --wb-rail: ${primitiveColor.neutral900};
-    --wb-rail-border: transparent;
-    /* The rail is dark in both themes, so its own text scale is fixed
-       rather than following --color-text (which flips with the theme). */
-    --wb-rail-text: ${primitiveColor.neutral400};
-    --wb-rail-text-strong: ${primitiveColor.neutral0};
-    --wb-rail-active: ${primitiveColor.neutral800};
+    --wb-rail: var(--color-canvas);
+    --wb-rail-border: var(--color-border);
+    /* The rail now sits on the page background, so its text follows the
+       ordinary text tokens instead of a fixed light-on-dark scale. */
+    --wb-rail-text: var(--color-text-muted);
+    --wb-rail-text-strong: var(--color-text);
+    /* The current item reads as a small chip lifted onto the card plane. */
+    --wb-rail-active: var(--color-surface);
   }
-  /* Dark: the rail recedes to the canvas and the cards (--color-surface,
-     neutral900) are the raised layer. A hairline keeps the edge readable. */
   [data-theme="dark"]:root[data-design="precision-workbench"] {
     --color-canvas: ${primitiveColor.neutral950};
-    --wb-rail: ${primitiveColor.neutral950};
-    --wb-rail-border: ${primitiveColor.neutral800};
   }
   @media (prefers-color-scheme: dark) {
     :root[data-design="precision-workbench"]:not([data-theme="light"]) {
       --color-canvas: ${primitiveColor.neutral950};
-      --wb-rail: ${primitiveColor.neutral950};
-      --wb-rail-border: ${primitiveColor.neutral800};
     }
   }
   :root[data-design="precision-workbench"] .layout {
@@ -400,9 +392,11 @@ function designSystemCss(): string {
     border-radius: var(--radius-sm);
   }
   :root[data-design="precision-workbench"] .side-toc .toc a:hover { color: var(--wb-rail-text-strong); }
+  /* Colour is left to the base rule (accent + 600) so the current item
+     still reads as current; this only adds the chip behind it. */
   :root[data-design="precision-workbench"] .side-toc .toc a[aria-current="true"] {
     background: var(--wb-rail-active);
-    color: var(--wb-rail-text-strong);
+    box-shadow: var(--shadow);
   }
   :root[data-design="precision-workbench"] .layout > .doc { padding-block: var(--space-6); }
   :root[data-design="precision-workbench"] .section {
