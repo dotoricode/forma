@@ -25,12 +25,23 @@ _Avoid_: Source, citation
 The self-contained `index.html` and its companion spec, manifest, and QA artifacts.
 _Avoid_: Page, export, build
 
+**Mode**:
+The narrative purpose of a **Forma Spec**: `explain`, `review`, `test`,
+`report`, or `manual`.
+_Avoid_: Template
+
+**Theme**:
+The visual composition treatment of a **Rendered Output**: `simple`,
+`workspace`, `guide`, or `magazine`.
+_Avoid_: Mode, skin
+
 ## Relationships
 
 - A **Forma Spec** describes exactly one **Rendered Output**
 - A **Forma Spec** contains zero or more **Sources**
 - A semantic block carries **Evidence** by referring to zero or more **Sources**
 - A **Source** identifies one item of **Source Material**
+- A **Mode** determines narrative order; a **Theme** determines visual composition
 
 ## Example dialogue
 

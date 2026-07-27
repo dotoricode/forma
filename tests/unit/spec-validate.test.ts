@@ -60,4 +60,21 @@ describe("validateFormaSpec", () => {
     const result = validateFormaSpec(broken);
     expect(result.ok).toBe(false);
   });
+
+  it("accepts manual as a document mode", () => {
+    const manual = structuredClone(STARTER_SPEC);
+    manual.meta.mode = "manual";
+    const result = validateFormaSpec(manual);
+    expect(result.ok).toBe(true);
+  });
+
+  it("normalizes legacy design-system names to everyday theme names", () => {
+    const legacy = structuredClone(STARTER_SPEC) as unknown as {
+      meta: { designSystem: string };
+    };
+    legacy.meta.designSystem = "developer-docs";
+    const result = validateFormaSpec(legacy);
+    expect(result.ok).toBe(true);
+    if (result.ok) expect(result.spec.meta.designSystem).toBe("guide");
+  });
 });

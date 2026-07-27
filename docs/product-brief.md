@@ -33,15 +33,17 @@ generates a webpage" (inconsistent, often generic-looking) and "AI writes
 structured content, a real compiler renders it" (consistent, accessible,
 fast, always on-brand).
 
-## Four modes
+## Five modes and four themes
 
 - `explain` — architecture/code/design understanding
 - `review` — PR/change review meetings
 - `test` — test result communication
 - `report` — stakeholder reporting
+- `manual` — ordered procedures with verification and recovery
 
-Same tokens, same 20 blocks, same renderer — only composition (which
-blocks, what order) changes per mode.
+Modes determine the narrative job. The `simple`, `workspace`, `guide`, and
+`magazine` themes determine visual composition. They share the same tokens,
+20 semantic blocks, renderer, accessibility rules, and offline guarantee.
 
 ## Non-goals for this MVP
 

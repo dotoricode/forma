@@ -25,41 +25,35 @@
 </head>
 <body>
 <div class="shell">
-  <h1>온보딩 문서 디자인 5안</h1>
-  <p class="lead">"Forma 스킬 처음 사용하기" 문서를 다섯 가지 디자인 방향으로 만들었습니다. 같은 내용, 다른 레이아웃 문법입니다. 링크를 열어 비교한 뒤 어떤 방향이 좋을지 알려주세요.</p>
+  <h1>현재 테마 4가지와 초기 시안</h1>
+  <p class="lead">"Forma 스킬 처음 사용하기" 문서를 현재 네 가지 테마로 만들었습니다. 같은 내용, 다른 레이아웃 문법입니다.</p>
   <table>
     <tr><th>방향</th><th>특징</th><th>보기</th></tr>
     <tr>
-      <td class="direction">Quiet Editorial<br /><small style="color:var(--muted)">현재 채택된 실제 렌더러 출력</small></td>
+      <td class="direction">Simple<br /><small style="color:var(--muted)">편안하게 읽는 기본형</small></td>
       <td>본문 중심, 66-72ch 리딩 폭, 우측 TOC, weight로 구분되는 위계</td>
-      <td><a href="../examples/forma-onboarding/output/index.html">보기</a></td>
+      <td><a href="../examples/forma-theme-simple/output/index.html">보기</a></td>
     </tr>
     <tr>
-      <td class="direction">Precision Workbench<br /><small style="color:var(--muted)">밀도 높은 대시보드형</small></td>
+      <td class="direction">Workspace<br /><small style="color:var(--muted)">밀도 높은 작업 화면형</small></td>
       <td>다크 사이드바 + 카드 그리드, 정보를 병렬로 스캔하는 형태</td>
-      <td><a href="../examples/forma-onboarding-precision-workbench/output/index.html">보기</a></td>
+      <td><a href="../examples/forma-theme-workspace/output/index.html">보기</a></td>
     </tr>
     <tr>
-      <td class="direction">격식 문서형<br /><small style="color:var(--muted)">계약서·RFC 같은 톤</small></td>
-      <td>세리프 본문에 조항마다 번호를 매겨, 공식 문서를 읽는 느낌을 준다</td>
-      <td><a href="technical-manuscript/onboarding.html">보기</a></td>
-    </tr>
-    <tr>
-      <td class="direction">Developer Docs<br /><small style="color:var(--muted)">3단 문서 사이트형</small></td>
+      <td class="direction">Guide<br /><small style="color:var(--muted)">길을 잃지 않는 안내형</small></td>
       <td>좌측 목차 + 중앙 본문, 콜아웃 박스로 요약 강조</td>
-      <td><a href="../examples/forma-onboarding-developer-docs/output/index.html">보기</a></td>
+      <td><a href="../examples/forma-theme-guide/output/index.html">보기</a></td>
     </tr>
     <tr>
-      <td class="direction">Editorial Magazine<br /><small style="color:var(--muted)">잡지·기고문형</small></td>
+      <td class="direction">Magazine<br /><small style="color:var(--muted)">잡지·기고문형</small></td>
       <td>세리프 제목, 드롭캡, 풀쿼트로 읽는 재미를 강조하는 형식</td>
-      <td><a href="../examples/forma-onboarding-editorial-magazine/output/index.html">보기</a></td>
+      <td><a href="../examples/forma-theme-magazine/output/index.html">보기</a></td>
     </tr>
   </table>
   <p style="margin-block-start:2rem; font-size:0.875rem; color:var(--muted);">
-    Quiet Editorial · Precision Workbench · Developer Docs · Editorial Magazine 네 방향 모두
+    Simple · Workspace · Guide · Magazine 네 테마 모두
     forma.spec.json → 렌더러 파이프라인의 실제 출력입니다(콘솔 오류 0건, axe 위반 0건 확인 완료).
     같은 20개 블록·같은 콘텐츠를, <code>meta.designSystem</code> 값만 바꿔 CSS 레이어로 다르게 그린 것입니다.
-    격식 문서형만 아직 손으로 만든 비교용 정적 목업입니다.
   </p>
 
   <h2 style="margin-block-start:3rem; font-size:1.25rem;">참고 — 4모드 fixture 비교 (별도 목업)</h2>

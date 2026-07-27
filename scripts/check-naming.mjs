@@ -51,7 +51,7 @@ async function main() {
   const violations = [];
 
   for (const file of files) {
-    const rel = path.relative(REPO_ROOT, file);
+    const rel = path.relative(REPO_ROOT, file).split(path.sep).join("/");
     if (ALLOWED_FILES.has(rel)) continue;
     let content;
     try {

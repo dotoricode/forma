@@ -15,5 +15,7 @@
   "axeViolationCount": 0,
   "axeViolations": [],
   "headingOrderOk": true,
+  "brokenAnchorTargets": [],
+  "keyboardReachable": true,
   "javascriptDisabledReadable": true
 }

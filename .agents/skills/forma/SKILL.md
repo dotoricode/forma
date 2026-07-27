@@ -24,10 +24,13 @@ that isn't "explain this work to a human."
 1. **Read the request and the material.** Identify what files or text are
    available. If a critical fact is genuinely missing, ask at most 3
    questions — don't block on things you can infer.
-2. **Pick a mode.** One of `explain`, `review`, `test`, `report`. See
+2. **Pick a mode.** One of `explain`, `review`, `test`, `report`, `manual`.
+   Infer it from the requested job when the user does not name one. See
    `references/modes.md` for the narrative grammar of each.
-3. **Decide audience, language, density.** `self | engineering | qa |
-   manager | executive | external`; `ko | en`; `comfortable | compact`.
+3. **Decide theme, audience, language, density.** Choose `simple`,
+   `workspace`, `guide`, or `magazine` by reading purpose and content,
+   not by personal taste. Then choose `self | engineering | qa | manager |
+   executive | external`; `ko | en`; `comfortable | compact`.
 4. **Separate fact from inference.** Anything not directly evidenced by a
    source must be marked `confidence: "inferred"` or `"unknown"` — never
    `"verified"`. See `references/source-handling.md`.
@@ -63,7 +66,7 @@ that isn't "explain this work to a human."
 ## References
 
 - `references/modes.md` — narrative order per mode
-- `references/design-grammar.md` — Quiet Editorial layout rules
+- `references/design-grammar.md` — shared rules and four theme purposes
 - `references/typography.md` — font stack and subsetting rules
 - `references/generic-ai-patterns.md` — the banned-pattern checklist
 - `references/technology-policy.md` — what's allowed in the toolchain

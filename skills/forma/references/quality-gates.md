@@ -14,5 +14,8 @@
 5. You looked at the actual screenshots (not just "it rendered") at least
    once, ideally twice with a refinement pass in between.
 6. You checked dark mode and `prefers-reduced-motion`.
-7. Report exactly what you ran and what you didn't — never claim a test
+7. You checked composition at desktop and mobile: one obvious first focal
+   point, an intentional secondary reading path, no accidental grid break,
+   and spacing that makes section transitions clear.
+8. Report exactly what you ran and what you didn't — never claim a test
    passed if you didn't run it.

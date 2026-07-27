@@ -8,7 +8,7 @@ import { z } from "zod";
 
 export const FORMA_SPEC_VERSION = "0.1" as const;
 
-export const ModeSchema = z.enum(["explain", "review", "test", "report"]);
+export const ModeSchema = z.enum(["explain", "review", "test", "report", "manual"]);
 export type FormaMode = z.infer<typeof ModeSchema>;
 
 export const AudienceSchema = z.enum([
@@ -29,12 +29,24 @@ export const ThemeSchema = z.enum(["light", "dark", "auto"]);
  * shell's data-design hook differ. Adding a design system means adding CSS
  * under `[data-design="..."]`, never writing a parallel block renderer.
  */
-export const DesignSystemSchema = z.enum([
-  "quiet-editorial",
-  "precision-workbench",
-  "developer-docs",
-  "editorial-magazine",
-]);
+export const DESIGN_SYSTEMS = ["simple", "workspace", "guide", "magazine"] as const;
+export const DesignSystemValueSchema = z.enum(DESIGN_SYSTEMS);
+export type DesignSystem = z.infer<typeof DesignSystemValueSchema>;
+
+export const LEGACY_DESIGN_SYSTEMS = {
+  "quiet-editorial": "simple",
+  "precision-workbench": "workspace",
+  "developer-docs": "guide",
+  "editorial-magazine": "magazine",
+} as const satisfies Record<string, DesignSystem>;
+
+export const DesignSystemSchema = z.preprocess(
+  (value) =>
+    typeof value === "string" && value in LEGACY_DESIGN_SYSTEMS
+      ? LEGACY_DESIGN_SYSTEMS[value as keyof typeof LEGACY_DESIGN_SYSTEMS]
+      : value,
+  DesignSystemValueSchema,
+);
 export const DensitySchema = z.enum(["comfortable", "compact"]);
 export const ConfidentialitySchema = z.enum(["public", "internal", "confidential"]);
 export const ConfidenceSchema = z.enum(["verified", "inferred", "unknown"]);
@@ -295,7 +307,7 @@ export const MetaSchema = z.object({
   audience: AudienceSchema,
   language: LanguageSchema,
   theme: ThemeSchema.default("light"),
-  designSystem: DesignSystemSchema.default("quiet-editorial"),
+  designSystem: DesignSystemSchema.default("simple"),
   density: DensitySchema.default("comfortable"),
   confidentiality: ConfidentialitySchema.default("internal"),
 });

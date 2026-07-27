@@ -19,8 +19,7 @@ input (markdown / diff / JUnit XML / CSV / notes)
    pass/fail QA report
 ```
 
-Four modes, one design language ([`DESIGN.md`](./DESIGN.md) — "Quiet
-Editorial"):
+Five modes and four plain-language themes ([`DESIGN.md`](./DESIGN.md)):
 
 | Mode | For |
 |---|---|
@@ -28,8 +27,15 @@ Editorial"):
 | `review` | Turn a diff/PR into a fast, decision-ready review page |
 | `test` | Turn test results into a scannable pass/fail story with evidence |
 | `report` | Turn notes/analysis into a stakeholder-ready report |
+| `manual` | Turn a procedure into a safe, ordered, checkable guide |
+
+Themes are `simple`, `workspace`, `guide`, and `magazine`. Older theme
+identifiers still load and are normalized to these names.
 
 ## Try it
+
+Requirements: Node.js 20.19 or newer and pnpm. Browser QA additionally needs
+the Playwright Chromium binary (`pnpm exec playwright install chromium`).
 
 ```bash
 pnpm install
@@ -45,6 +51,10 @@ Four working examples ship in `fixtures/`: `explain`, `review`, `test`,
 `report` — each with its source input, its `forma.spec.json`, and its
 rendered `output/` (HTML + QA screenshots).
 
+The `examples/forma-theme-{simple,workspace,guide,magazine}/` directories
+render the same `manual` content through every current theme for direct
+comparison.
+
 ## CLI
 
 ```bash
@@ -53,12 +63,17 @@ forma validate <spec>           # schema-check a spec
 forma render <spec> --out <dir> # spec → self-contained HTML
 forma qa <html|dir>             # browser/axe/responsive/offline checks
 forma preview <dir>             # serve rendered output over localhost
+forma generate <input> --instruction "..." # infer mode and write a starter spec
 forma build <spec>              # render + static design lint
 forma install-skills            # sync skills/forma/ → Codex + Claude Code
 forma verify-skills             # check the synced copies aren't stale
 forma schema                    # print the Forma Spec JSON Schema
 forma doctor                    # check the local environment
 ```
+
+`generate` never overwrites an existing spec. It confirms the chosen mode,
+preserves the input as a source, and prints the exact validation step. Use
+`--out <new-path>` when the default filename already exists.
 
 Full QA (Playwright + axe-core + Lighthouse, needs a browser):
 
@@ -77,9 +92,14 @@ Codex:       $forma review this diff for tomorrow's code review meeting
 Claude Code: /forma turn this test-results folder into a visual report
 ```
 
-The Agent reads your material, decides mode/audience/language, and writes
+The Agent reads your material, decides mode/theme/audience/language, and writes
 `forma.spec.json` — it never generates raw HTML/CSS itself. See
 [`skills/forma/SKILL.md`](./skills/forma/SKILL.md).
+
+If `$forma` or `/forma` is missing, run `pnpm forma install-skills`, verify
+with `pnpm forma verify-skills`, then start a new agent session. Skill lists
+are discovered when a session starts, so copying the files cannot refresh an
+already-open session.
 
 ## Why spec-first
 
@@ -98,6 +118,7 @@ excluded).
 - [`docs/security.md`](./docs/security.md) — sanitization, offline guarantees, secret redaction
 - [`docs/technology-audit.md`](./docs/technology-audit.md) — dependency versions/licenses and why
 - [`docs/decisions.md`](./docs/decisions.md) — minor decisions made without blocking on approval
+- [`CHANGELOG.md`](./CHANGELOG.md) — current changes, compatibility, and rollback
 - [`docs/plan/README.md`](./docs/plan/README.md) — the original (Sensemark-named) planning docs vs. the Forma-renamed ones this build actually follows
 
 ## Status

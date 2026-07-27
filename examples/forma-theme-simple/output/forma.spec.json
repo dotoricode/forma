@@ -3,37 +3,37 @@
   "meta": {
     "title": "Forma 스킬 처음 사용하기",
     "subtitle": "언제 쓰고, 어떻게 쓰는가",
-    "mode": "explain",
+    "mode": "manual",
     "audience": "engineering",
     "language": "ko",
     "theme": "light",
+    "designSystem": "simple",
     "density": "comfortable",
-    "confidentiality": "public",
-    "designSystem": "precision-workbench"
+    "confidentiality": "public"
   },
   "sources": [
     {
       "id": "skill-md",
       "label": "skills/forma/SKILL.md",
-      "kind": "file",
-      "path": "skills/forma/SKILL.md"
+      "path": "skills/forma/SKILL.md",
+      "kind": "file"
     },
     {
       "id": "modes-md",
       "label": "skills/forma/references/modes.md",
-      "kind": "file",
-      "path": "skills/forma/references/modes.md"
+      "path": "skills/forma/references/modes.md",
+      "kind": "file"
     },
     {
       "id": "readme",
       "label": "README.md",
-      "kind": "file",
-      "path": "README.md"
+      "path": "README.md",
+      "kind": "file"
     }
   ],
   "narrative": {
     "question": "Forma 스킬은 언제 쓰는 것이고, 실제로 어떻게 사용하는가?",
-    "summary": "Forma는 문서·코드·diff·테스트결과를 읽기 쉬운 오프라인 HTML 한 장으로 만들어주는 스킬이다. 사용자는 자료를 주고 모드(explain/review/test/report)만 고르면 되고, 실제 HTML 작성은 Forma가 대신한다.",
+    "summary": "Forma는 문서·코드·diff·테스트결과를 읽기 쉬운 오프라인 HTML 한 장으로 만들어주는 스킬이다. 작업 지시를 읽어 explain/review/test/report/manual 모드를 정하고, 실제 HTML 작성은 Forma가 대신한다.",
     "takeaways": [
       "브라우저로 읽을 결과물이 필요할 때 쓴다. 슬랙 메시지나 커밋 메시지로 충분하면 굳이 쓰지 않는다.",
       "Codex에서는 $forma, Claude Code에서는 /forma로 부른다.",
@@ -43,9 +43,10 @@
   "sections": [
     {
       "id": "cover",
+      "sourceRefs": [],
       "type": "cover",
-      "title": "Forma 스킬 처음 사용하기",
       "eyebrow": "EXPLAIN · ONBOARDING",
+      "title": "Forma 스킬 처음 사용하기",
       "subtitle": "언제 쓰고, 어떻게 쓰는가",
       "meta": [
         "5분 안에 이해하기",
@@ -54,12 +55,12 @@
     },
     {
       "id": "what-it-does",
-      "type": "key-points",
-      "title": "Forma가 하는 일",
-      "confidence": "verified",
       "sourceRefs": [
         "skill-md"
       ],
+      "confidence": "verified",
+      "type": "key-points",
+      "title": "Forma가 하는 일",
       "points": [
         "문서, 코드, diff, 테스트 결과, 회의 메모 같은 자료를 읽기 쉬운 HTML 한 장으로 바꾼다.",
         "사용자는 자료와 모드만 정하면 되고, HTML/CSS는 Forma가 직접 쓰지 않고 정해진 렌더러가 만든다.",
@@ -68,12 +69,12 @@
     },
     {
       "id": "when",
-      "type": "comparison",
-      "title": "언제 쓰고, 언제 쓰지 않는가",
-      "confidence": "verified",
       "sourceRefs": [
         "skill-md"
       ],
+      "confidence": "verified",
+      "type": "comparison",
+      "title": "언제 쓰고, 언제 쓰지 않는가",
       "left": {
         "label": "이럴 때 쓴다",
         "items": [
@@ -95,12 +96,12 @@
     },
     {
       "id": "how",
-      "type": "flow",
-      "title": "실제 사용 흐름",
-      "confidence": "verified",
       "sourceRefs": [
         "skill-md"
       ],
+      "confidence": "verified",
+      "type": "flow",
+      "title": "실제 사용 흐름",
       "nodes": [
         {
           "id": "ask",
@@ -109,7 +110,7 @@
         },
         {
           "id": "pick-mode",
-          "label": "Forma가 모드를 정함 (explain/review/test/report)",
+          "label": "Forma가 모드를 정함 (explain/review/test/report/manual)",
           "kind": "step"
         },
         {
@@ -149,13 +150,13 @@
     },
     {
       "id": "try-it",
-      "type": "annotated-code",
-      "title": "실제로 이렇게 부른다",
-      "language": "bash",
-      "confidence": "verified",
       "sourceRefs": [
         "readme"
       ],
+      "confidence": "verified",
+      "type": "annotated-code",
+      "title": "실제로 이렇게 부른다",
+      "language": "bash",
       "code": "# Codex에서\n$forma 이 PR diff를 내일 코드리뷰 자료로 만들어줘\n\n# Claude Code에서\n/forma 이 테스트 결과 폴더를 팀 공유용 리포트로 만들어줘\n\n# 결과 확인 (CLI를 직접 쓸 수도 있다)\npnpm forma preview fixtures/review/output",
       "highlightLines": [
         2,
@@ -174,23 +175,24 @@
     },
     {
       "id": "misconceptions",
-      "type": "finding",
-      "title": "가장 흔한 오해: Forma가 매번 새로운 디자인을 그려준다",
-      "severity": "info",
-      "confidence": "verified",
       "sourceRefs": [
         "skill-md"
       ],
-      "body": "Forma는 요청마다 HTML/CSS를 새로 발명하지 않는다. 항상 같은 디자인 시스템(Quiet Editorial) 위에서 어떤 블록을 쓸지만 고른다. 그래서 결과물이 요청마다 들쭉날쭉해지지 않고, 접근성·성능 검증도 매번 같은 기준으로 통과한다."
+      "confidence": "verified",
+      "type": "finding",
+      "title": "가장 흔한 오해: Forma가 매번 새로운 디자인을 그려준다",
+      "body": "Forma는 요청마다 HTML/CSS를 새로 발명하지 않는다. 항상 같은 디자인 시스템(Quiet Editorial) 위에서 어떤 블록을 쓸지만 고른다. 그래서 결과물이 요청마다 들쭉날쭉해지지 않고, 접근성·성능 검증도 매번 같은 기준으로 통과한다.",
+      "severity": "info"
     },
     {
       "id": "glossary",
+      "sourceRefs": [],
       "type": "glossary",
       "title": "처음 보면 헷갈리는 용어",
       "terms": [
         {
           "term": "모드 (mode)",
-          "definition": "이 문서가 어떤 목적인지: explain(설명) · review(리뷰) · test(테스트 결과) · report(보고)."
+          "definition": "이 문서가 어떤 목적인지: explain(설명) · review(리뷰) · test(테스트 결과) · report(보고) · manual(절차 안내)."
         },
         {
           "term": "블록 (block)",
@@ -208,6 +210,7 @@
     },
     {
       "id": "sources",
+      "sourceRefs": [],
       "type": "source-note",
       "title": "원본 출처"
     }

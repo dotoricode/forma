@@ -9,9 +9,10 @@ JSON Schema via `forma schema`. This is a human-readable summary.
   "meta": {
     "title": "string, required",
     "subtitle": "string, optional",
-    "mode": "explain | review | test | report",
+    "mode": "explain | review | test | report | manual",
     "audience": "self | engineering | qa | manager | executive | external",
     "language": "ko | en",
+    "designSystem": "simple | workspace | guide | magazine (default simple)",
     "theme": "light | dark | auto (default light)",
     "density": "comfortable | compact (default comfortable)",
     "confidentiality": "public | internal | confidential (default internal)"

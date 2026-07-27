@@ -86,10 +86,10 @@ reversed.
 
 ## Design direction
 
-- Prototyped Quiet Editorial, Precision Workbench, and Technical
-  Manuscript (see `prototypes/`); **Quiet Editorial** was selected as
-  Forma's one design language across all four modes, per explicit user
-  choice during planning.
+- The original Quiet Editorial direction remains the shared foundation.
+  Research and user testing expanded it into four purpose-led themes with
+  plain-language names: `simple`, `workspace`, `guide`, and `magazine`.
+  Modes remain narrative purposes and themes remain visual treatments.
 
 ## Static design lint implementation
 

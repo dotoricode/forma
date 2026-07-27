@@ -169,16 +169,27 @@ ${fontFaceCss}
 
   .toc {
     display: flex;
-    flex-wrap: wrap;
+    flex-wrap: nowrap;
     gap: var(--space-2) var(--space-5);
     padding-block: var(--space-4);
     font-size: 0.875rem;
+    overflow-x: auto;
+    scrollbar-width: thin;
+    min-width: 0;
+    max-width: 100%;
   }
-  .toc a { color: var(--color-text-muted); text-decoration: none; }
+  .toc a {
+    color: var(--color-text-muted);
+    text-decoration: none;
+    /* Active state changes color, not glyph width. Changing font weight only
+       after IntersectionObserver runs can rewrap the mobile TOC and shift the
+       entire document after first paint. */
+    font-weight: 600;
+    white-space: nowrap;
+  }
   .toc a:hover { color: var(--color-accent); }
   .toc a[aria-current="true"] {
     color: var(--color-accent);
-    font-weight: 600;
   }
 
   /* Main content + table-of-contents rail. Single column with the TOC
@@ -201,6 +212,8 @@ ${fontFaceCss}
   }
   .layout > .side-toc {
     order: -1;
+    min-width: 0;
+    max-width: 100%;
     border-block-end: 1px solid var(--color-border);
     padding-block-end: var(--space-4);
   }
@@ -223,6 +236,10 @@ ${fontFaceCss}
     .side-toc .toc {
       flex-direction: column;
       flex-wrap: nowrap;
+      overflow-x: visible;
+    }
+    .side-toc .toc a {
+      white-space: normal;
     }
   }
 
@@ -323,83 +340,89 @@ ${designSystemCss()}
  */
 function designSystemCss(): string {
   return `
-  /* Precision Workbench — dark sidebar nav (reusing .side-toc/.toc), each
-     .section becomes a raised card instead of a full-bleed divided band. */
-  /* One background plane, one raised plane. The rail and the content area
-     share the canvas; the cards are the only thing that floats. Only
-     --color-canvas flips per theme — everything else is derived from it,
-     so the rail can never drift out of step with the page again. */
-  :root[data-design="precision-workbench"] {
-    --shadow: 0 1px 2px oklch(0% 0 0 / 0.05), 0 4px 16px oklch(0% 0 0 / 0.08);
-    /* Light: grey canvas so the white cards lift off it. */
-    --color-canvas: ${primitiveColor.neutral100};
-    --wb-rail: var(--color-canvas);
-    --wb-rail-border: var(--color-border);
-    /* The rail now sits on the page background, so its text follows the
-       ordinary text tokens instead of a fixed light-on-dark scale. */
-    --wb-rail-text: var(--color-text-muted);
-    --wb-rail-text-strong: var(--color-text);
-    /* The current item reads as a small chip lifted onto the card plane. */
-    --wb-rail-active: var(--color-surface);
+  /* Simple — the default edited-memo treatment. A strong opening rule and
+     tight display type create one leverage point without adding decoration. */
+  :root[data-design="simple"] .blk-cover {
+    border-block-start: 3px solid var(--color-text);
+    padding-block-start: var(--space-7);
   }
-  [data-theme="dark"]:root[data-design="precision-workbench"] {
+  :root[data-design="simple"] .blk-cover__title {
+    max-width: 48rem;
+    letter-spacing: -0.025em;
+  }
+  :root[data-design="simple"] .blk-summary__title {
+    font-size: clamp(1.35rem, 1.1rem + 0.7vw, 1.75rem);
+  }
+
+  /* Workspace — tool-like navigation and a denser rhythm. Raised surfaces
+     are reserved for visual evidence; ordinary prose stays on the canvas so
+     the entire document does not collapse into a uniform card stack. */
+  :root[data-design="workspace"] {
+    --shadow: 0 1px 2px oklch(0% 0 0 / 0.05), 0 4px 16px oklch(0% 0 0 / 0.08);
+    --color-canvas: ${primitiveColor.neutral100};
+    --workspace-rail: var(--color-canvas);
+    --workspace-rail-border: var(--color-border);
+    --workspace-rail-text: var(--color-text-muted);
+    --workspace-rail-text-strong: var(--color-text);
+    --workspace-rail-active: var(--color-surface);
+  }
+  [data-theme="dark"]:root[data-design="workspace"] {
     --color-canvas: ${primitiveColor.neutral950};
   }
   @media (prefers-color-scheme: dark) {
-    :root[data-design="precision-workbench"]:not([data-theme="light"]) {
+    :root[data-design="workspace"]:not([data-theme="light"]) {
       --color-canvas: ${primitiveColor.neutral950};
     }
   }
-  :root[data-design="precision-workbench"] .layout {
-    grid-template-columns: 240px 1fr;
+  :root[data-design="workspace"] .layout {
+    grid-template-columns: 224px minmax(0, 1fr);
     max-width: none;
     align-items: stretch;
   }
-  /* The dark rail spans the whole page, and the nav inside it sticks.
-     Sticking the <aside> itself with height:100vh made the black band stop
-     one viewport down, leaving the canvas showing for the rest of the
-     scroll — a dashboard sidebar that ends a quarter of the way down the
-     page reads as a rendering bug, not a design. */
-  :root[data-design="precision-workbench"] .layout > .side-toc {
+  :root[data-design="workspace"] .layout > .side-toc {
     order: -1;
     align-self: stretch;
     position: static;
-    /* Both reset the >=1280px sticky-rail rule in @layer layout, which
-       otherwise capped the rail at one viewport (100vh - 2rem = 868px on
-       a 900px-tall window) no matter how long the page was. */
     max-height: none;
     overflow: visible;
-    background: var(--wb-rail);
-    border-inline-end: 1px solid var(--wb-rail-border);
+    background: var(--workspace-rail);
+    border-inline-end: 1px solid var(--workspace-rail-border);
     border-block-end: none;
     padding: var(--space-6) var(--space-4);
     margin-inline-start: calc(-1 * var(--space-5));
   }
-  :root[data-design="precision-workbench"] .side-toc .toc {
+  :root[data-design="workspace"] .side-toc .toc {
     position: sticky;
     inset-block-start: var(--space-5);
     max-height: calc(100vh - var(--space-8));
     overflow-y: auto;
-  }
-  :root[data-design="precision-workbench"] .side-toc .toc {
     flex-direction: column;
     flex-wrap: nowrap;
     gap: var(--space-1);
   }
-  :root[data-design="precision-workbench"] .side-toc .toc a {
-    color: var(--wb-rail-text);
+  :root[data-design="workspace"] .side-toc .toc a {
+    color: var(--workspace-rail-text);
     padding: 0.5em 0.75em;
     border-radius: var(--radius-sm);
   }
-  :root[data-design="precision-workbench"] .side-toc .toc a:hover { color: var(--wb-rail-text-strong); }
-  /* Colour is left to the base rule (accent + 600) so the current item
-     still reads as current; this only adds the chip behind it. */
-  :root[data-design="precision-workbench"] .side-toc .toc a[aria-current="true"] {
-    background: var(--wb-rail-active);
+  :root[data-design="workspace"] .side-toc .toc a:hover {
+    color: var(--workspace-rail-text-strong);
+  }
+  :root[data-design="workspace"] .side-toc .toc a[aria-current="true"] {
+    background: var(--workspace-rail-active);
     box-shadow: var(--shadow);
   }
-  :root[data-design="precision-workbench"] .layout > .doc { padding-block: var(--space-6); }
-  :root[data-design="precision-workbench"] .section {
+  :root[data-design="workspace"] .layout > .doc { padding-block: var(--space-6); }
+  :root[data-design="workspace"] .section {
+    border-block-end: 1px solid var(--color-border);
+    padding: var(--space-6) 0;
+  }
+  :root[data-design="workspace"] .section:is(
+    .blk-diagram,
+    .blk-chart,
+    .blk-test-matrix,
+    .blk-comparison
+  ) {
     background: var(--color-surface);
     border: 1px solid var(--color-border);
     border-radius: var(--radius-lg);
@@ -407,66 +430,71 @@ function designSystemCss(): string {
     padding: var(--space-6);
     margin-block-end: var(--space-5);
   }
-  :root[data-design="precision-workbench"] .section:last-of-type { border-block-end: 1px solid var(--color-border); }
 
-  /* Developer Docs — light left nav rail, callout-style finding/decision
+  /* Guide — light left nav rail, callout-style finding/decision
      blocks, tighter reading measure like a docs site's center column. */
-  :root[data-design="developer-docs"] .layout {
-    grid-template-columns: 220px 1fr;
+  :root[data-design="guide"] .layout {
+    grid-template-columns: 232px minmax(0, 1fr);
     max-width: none;
+    gap: var(--space-7);
   }
-  :root[data-design="developer-docs"] .layout > .side-toc {
+  :root[data-design="guide"] .layout > .side-toc {
     order: -1;
     position: sticky;
     inset-block-start: var(--space-5);
     align-self: start;
+    max-height: calc(100vh - var(--space-8));
+    overflow-y: auto;
     border-inline-end: 1px solid var(--color-border);
     border-block-end: none;
     padding-inline-end: var(--space-4);
   }
-  :root[data-design="developer-docs"] .side-toc .toc {
+  :root[data-design="guide"] .side-toc .toc {
     flex-direction: column;
     flex-wrap: nowrap;
+    gap: var(--space-1);
   }
-  :root[data-design="developer-docs"] .side-toc .toc a[aria-current="true"] {
-    border-inline-start: 2px solid var(--color-accent);
-    padding-inline-start: var(--space-3);
-    margin-inline-start: calc(-1 * var(--space-3) - 2px);
+  :root[data-design="guide"] .side-toc .toc a {
+    border-radius: var(--radius-sm);
+    padding: 0.4em 0.65em;
   }
-  :root[data-design="developer-docs"] .measure { max-width: 38rem; }
-  :root[data-design="developer-docs"] .blk-finding,
-  :root[data-design="developer-docs"] .blk-decision .decision-strip {
+  :root[data-design="guide"] .side-toc .toc a[aria-current="true"] {
+    background: color-mix(in oklab, var(--color-accent) 10%, transparent);
+    color: var(--color-text);
+    border-inline-start: 3px solid var(--color-accent);
+  }
+  :root[data-design="guide"] .measure { max-width: 38rem; }
+  :root[data-design="guide"] .blk-finding,
+  :root[data-design="guide"] .blk-decision .decision-strip {
     background: color-mix(in oklab, var(--color-accent) 6%, var(--color-surface));
     border-radius: var(--radius-md);
     padding: var(--space-4) var(--space-5);
   }
-  :root[data-design="developer-docs"] .blk-decision .decision-strip { border-inline-start-width: 3px; }
+  :root[data-design="guide"] .blk-decision .decision-strip { border-inline-start-width: 3px; }
 
-  /* Editorial Magazine — serif display type, narrower measure, drop cap on
-     the opening paragraph. System serif stack only: no subsetting needed
-     since it never leaves the local font fallback chain. */
-  :root[data-design="editorial-magazine"] {
+  /* Magazine — serif display type, a high-leverage cover, and an editorial
+     opening rhythm without decorative images or motion. */
+  :root[data-design="magazine"] {
     --font-serif: Georgia, "Nanum Myeongjo", serif;
   }
-  /* 44rem (704px) sat just under the 720px container-query threshold, so
-     the comparison block's two columns silently never went side by side
-     and stacked instead. 52rem clears it while staying magazine-narrow;
-     body text is still held to --measure-prose by .measure. */
-  :root[data-design="editorial-magazine"] .doc { max-width: 52rem; }
-  :root[data-design="editorial-magazine"] h1,
-  :root[data-design="editorial-magazine"] h2,
-  :root[data-design="editorial-magazine"] h3,
-  :root[data-design="editorial-magazine"] .blk-cover__title,
-  :root[data-design="editorial-magazine"] .blk-narrative__question {
+  :root[data-design="magazine"] .doc { max-width: 52rem; }
+  :root[data-design="magazine"] h1,
+  :root[data-design="magazine"] h2,
+  :root[data-design="magazine"] h3,
+  :root[data-design="magazine"] .blk-cover__title,
+  :root[data-design="magazine"] .blk-narrative__question {
     font-family: var(--font-serif);
     font-weight: 400;
   }
-  :root[data-design="editorial-magazine"] .blk-cover__title { font-size: clamp(2rem, 1.3rem + 3vw, 3.5rem); }
-  /* No italic here: Korean has no true italic, so browsers synthesise a
-     slant that reads as a different, worse typeface next to the roman
-     text around it. Size and serif face carry the emphasis instead. */
-  :root[data-design="editorial-magazine"] .blk-narrative__question { font-size: 1.5rem; }
-  :root[data-design="editorial-magazine"] .blk-narrative__summary p:first-of-type::first-letter {
+  :root[data-design="magazine"] .blk-cover {
+    border-block-start: 5px solid var(--color-text);
+  }
+  :root[data-design="magazine"] .blk-cover__title {
+    font-size: clamp(2.15rem, 1.3rem + 3.2vw, 4rem);
+    letter-spacing: -0.035em;
+  }
+  :root[data-design="magazine"] .blk-narrative__question { font-size: 1.5rem; }
+  :root[data-design="magazine"] .blk-narrative__summary p:first-of-type::first-letter {
     font-family: var(--font-serif);
     font-size: 3.4em;
     font-weight: 700;
@@ -474,11 +502,66 @@ function designSystemCss(): string {
     line-height: 0.8;
     padding-inline-end: var(--space-2);
   }
-  :root[data-design="editorial-magazine"] .blk-takeaways {
+  :root[data-design="magazine"] .blk-takeaways {
     font-family: var(--font-serif);
     font-size: 1.0625rem;
     border-block: 1px solid var(--color-text);
     padding-block: var(--space-4);
+  }
+
+  @media (min-width: 800px) {
+    :root[data-design="magazine"] .blk-cover {
+      display: grid;
+      grid-template-columns: minmax(0, 2.4fr) minmax(12rem, 1fr);
+      column-gap: var(--space-7);
+      align-items: start;
+    }
+    :root[data-design="magazine"] .blk-cover__eyebrow,
+    :root[data-design="magazine"] .blk-cover__title,
+    :root[data-design="magazine"] .blk-cover__subtitle,
+    :root[data-design="magazine"] .blk-cover > .confidence-tag {
+      grid-column: 1;
+    }
+    :root[data-design="magazine"] .blk-cover__meta {
+      grid-column: 2;
+      grid-row: 2 / span 3;
+      border-block-start: 1px solid var(--color-text);
+      padding-block-start: var(--space-3);
+      margin-block-start: var(--space-2);
+    }
+  }
+
+  @media (max-width: 900px) {
+    :root[data-design="workspace"] .layout,
+    :root[data-design="guide"] .layout {
+      grid-template-columns: minmax(0, 1fr);
+      gap: var(--space-4);
+      padding-inline: var(--space-4);
+    }
+    :root[data-design="workspace"] .layout > .side-toc,
+    :root[data-design="guide"] .layout > .side-toc {
+      order: -1;
+      position: static;
+      max-height: none;
+      overflow: visible;
+      border-inline-end: none;
+      border-block-end: 1px solid var(--color-border);
+      margin-inline-start: 0;
+      padding: 0 0 var(--space-4);
+    }
+    :root[data-design="workspace"] .side-toc .toc,
+    :root[data-design="guide"] .side-toc .toc {
+      position: static;
+      max-height: none;
+      overflow-x: auto;
+      overflow-y: visible;
+      flex-direction: row;
+      flex-wrap: nowrap;
+    }
+    :root[data-design="workspace"] .side-toc .toc a,
+    :root[data-design="guide"] .side-toc .toc a {
+      white-space: nowrap;
+    }
   }
   `;
 }
@@ -498,6 +581,8 @@ function componentCss(): string {
   .blk-cover__title {
     font-size: clamp(1.75rem, 1.3rem + 1.8vw, 2.75rem);
     margin-block-start: var(--space-3);
+    word-break: keep-all;
+    overflow-wrap: break-word;
     /* No ch-based max-width here: "ch" is the width of the "0" glyph, so a
        22ch cap meant for Latin text only fits ~11 CJK characters before
        wrapping — every Korean title wrapped to two lines regardless of
@@ -538,15 +623,15 @@ function componentCss(): string {
 
   /* key-points */
   .blk-key-points__title { font-size: 1.125rem; margin-block-end: var(--space-3); }
-  .blk-key-points ol { max-width: var(--measure-prose); counter-reset: kp; list-style: none; }
-  .blk-key-points li {
+  .blk-key-points > ol { max-width: var(--measure-prose); counter-reset: kp; list-style: none; }
+  .blk-key-points > ol > li {
     counter-increment: kp;
     display: grid;
     grid-template-columns: 2rem 1fr;
     gap: var(--space-3);
     padding-block: var(--space-2);
   }
-  .blk-key-points li::before {
+  .blk-key-points > ol > li::before {
     content: counter(kp, decimal-leading-zero);
     color: var(--color-text-muted);
     font-family: var(--font-mono);

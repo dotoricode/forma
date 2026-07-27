@@ -75,7 +75,11 @@ function fontFace(family: string, weight: number, dataUri: string): string {
     font-family: "${family}";
     font-style: normal;
     font-weight: ${weight};
-    font-display: swap;
+    /* The font is a document-specific subset embedded in this same HTML.
+       Optional uses it when ready before first paint but never performs a
+       late fallback-font swap; that keeps Korean mobile reports free of CLS
+       under CPU throttling as well as on fast machines. */
+    font-display: optional;
     src: url("${dataUri}") format("woff2");
   }`;
 }

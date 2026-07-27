@@ -62,3 +62,29 @@ Suggested blocks: `cover`, `test-summary`, `test-matrix`, `chart`, `finding`,
 
 Suggested blocks: `cover`, `summary`, `timeline`, `finding`, `comparison`,
 `decision`, `actions`.
+
+## manual
+
+1. What the reader will complete
+2. Before-you-start requirements and safety notes
+3. Ordered steps with expected results
+4. Decision points and alternate paths
+5. Verification checklist
+6. Troubleshooting and recovery
+7. Completion state and next action
+
+Suggested blocks: `cover`, `summary`, `key-points`, `sequence`, `decision`,
+`test-matrix`, `finding`, `actions`, `source-note`.
+
+## Automatic mode choice
+
+Choose the mode from the requested job, not the input file extension:
+
+- "how it works", "summarize", "understand" → `explain`
+- "review", "risk", "approve", "feedback" → `review`
+- "test result", "failure", "coverage", "verification" → `test`
+- "status", "findings", "stakeholder", "recommendation" → `report`
+- "how to", "steps", "setup", "install", "operate", "manual" → `manual`
+
+When signals conflict, prefer the explicit user noun or verb. Otherwise
+choose the mode whose ending best matches the requested outcome.

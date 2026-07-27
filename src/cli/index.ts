@@ -1,12 +1,14 @@
 #!/usr/bin/env node
 import { Command } from "commander";
 import path from "node:path";
-import { readFile, writeFile, mkdir } from "node:fs/promises";
+import { readFile } from "node:fs/promises";
 import { createServer } from "node:http";
 import { loadSpecFile, renderSpecFileToDir, FormaSpecError } from "../renderer/render.js";
 import { buildFormaJsonSchema } from "../spec/json-schema.js";
 import { installSkills, verifySkills } from "./skills.js";
-import { STARTER_SPEC } from "./starter-spec.js";
+import { writeStarterSpecFile } from "./starter-spec.js";
+import { inferFormaMode, parseFormaMode } from "../spec/mode.js";
+import { writeGeneratedSpec } from "./generate.js";
 
 const program = new Command();
 program.name("forma").description("Turn complex work into clear form.").version("0.1.0");
@@ -16,8 +18,13 @@ program
   .description("Write a starter forma.spec.json in the current directory")
   .option("-o, --out <path>", "output path", "forma.spec.json")
   .action(async (opts: { out: string }) => {
-    await writeFile(opts.out, JSON.stringify(STARTER_SPEC, null, 2), "utf-8");
-    console.log(`forma: wrote ${opts.out}`);
+    try {
+      await writeStarterSpecFile(opts.out);
+      console.log(`forma: wrote ${opts.out}`);
+      console.log(`forma: next run \`pnpm forma validate ${opts.out}\`.`);
+    } catch (error) {
+      exitWithError(error);
+    }
   });
 
 program
@@ -117,6 +124,9 @@ program
   .action(async () => {
     const result = await installSkills(process.cwd());
     for (const target of result.targets) console.log(`forma: synced ${target}`);
+    console.log(
+      "forma: start a new Codex/Claude session if the skill list was already loaded.",
+    );
   });
 
 program
@@ -156,19 +166,35 @@ program
 program
   .command("generate")
   .description("Structured-input scaffolding only — does not call any LLM")
-  .option("--mode <mode>", "explain | review | test | report")
+  .option("--mode <mode>", "auto | explain | review | test | report | manual", "auto")
+  .option("--instruction <text>", "task instruction used to choose a mode automatically")
+  .option("--out <path>", "output spec path")
   .argument("<input>", "input file or directory")
-  .action(async (input: string, opts: { mode?: string }) => {
+  .action(async (input: string, opts: { mode: string; instruction?: string; out?: string }) => {
+    const mode =
+      opts.mode === "auto"
+        ? inferFormaMode(opts.instruction ?? "", input)
+        : parseFormaMode(opts.mode);
+    if (!mode) {
+      exitWithError(
+        new FormaSpecError(
+          `forma: invalid mode '${opts.mode}' (expected auto, explain, review, test, report, or manual)`,
+        ),
+      );
+    }
     console.log(
-      `forma: 'generate' only scaffolds a starter spec from ${input} (mode=${opts.mode ?? "explain"}).\n` +
+      `forma: 'generate' only scaffolds a starter spec from ${input} (mode=${mode}).\n` +
         "forma: it does not call an LLM. For narrative composition, use the Forma Agent Skill\n" +
         "forma: (Codex: $forma, Claude Code: /forma) to read the input and author forma.spec.json.",
     );
-    const out = `${path.basename(input).replace(/\.[^.]+$/, "")}.forma.spec.json`;
-    const spec = { ...STARTER_SPEC, meta: { ...STARTER_SPEC.meta, mode: opts.mode ?? "explain" } };
-    await mkdir(path.dirname(path.resolve(out)), { recursive: true });
-    await writeFile(out, JSON.stringify(spec, null, 2), "utf-8");
-    console.log(`forma: wrote scaffold ${out}`);
+    const out = opts.out ?? `${path.basename(input).replace(/\.[^.]+$/, "")}.forma.spec.json`;
+    try {
+      await writeGeneratedSpec({ input, mode, out });
+      console.log(`forma: wrote scaffold ${out}`);
+      console.log(`forma: next run \`pnpm forma validate ${out}\`, then author its narrative with $forma.`);
+    } catch (error) {
+      exitWithError(error);
+    }
   });
 
 function contentType(filePath: string): string {

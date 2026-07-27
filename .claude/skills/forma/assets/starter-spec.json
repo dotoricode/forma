@@ -5,6 +5,7 @@
     "mode": "explain",
     "audience": "engineering",
     "language": "en",
+    "designSystem": "simple",
     "theme": "light",
     "density": "comfortable",
     "confidentiality": "internal"

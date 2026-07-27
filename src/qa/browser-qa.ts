@@ -35,6 +35,8 @@ export interface BrowserQaResult {
   axeViolationCount: number;
   axeViolations: { id: string; impact: string | null; nodes: number }[];
   headingOrderOk: boolean;
+  brokenAnchorTargets: string[];
+  keyboardReachable: boolean;
   javascriptDisabledReadable: boolean;
 }
 
@@ -119,6 +121,28 @@ async function checkHeadingOrder(page: Page): Promise<boolean> {
   });
 }
 
+async function checkAnchorTargets(page: Page): Promise<string[]> {
+  return page.evaluate(() =>
+    Array.from(document.querySelectorAll<HTMLAnchorElement>('a[href^="#"]'))
+      .map((anchor) => anchor.getAttribute("href") ?? "")
+      .filter((href) => href.length > 1 && document.getElementById(href.slice(1)) === null),
+  );
+}
+
+async function checkKeyboardReachable(page: Page): Promise<boolean> {
+  const visibleInteractiveCount = await page.locator("a[href], button, input, select, textarea").count();
+  if (visibleInteractiveCount === 0) return true;
+  await page.locator("body").focus();
+  await page.keyboard.press("Tab");
+  return page.evaluate(() => {
+    const active = document.activeElement;
+    const reachable =
+      active !== null && active !== document.body && active !== document.documentElement;
+    if (active instanceof HTMLElement) active.blur();
+    return reachable;
+  });
+}
+
 async function captureScreenshot(page: Page, filePath: string): Promise<void> {
   let lastError: unknown;
   for (let attempt = 0; attempt < 3; attempt += 1) {
@@ -161,6 +185,8 @@ export async function runBrowserQa(options: BrowserQaOptions): Promise<BrowserQa
   await page.waitForTimeout(150);
 
   const headingOrderOk = await checkHeadingOrder(page);
+  const brokenAnchorTargets = await checkAnchorTargets(page);
+  const keyboardReachable = await checkKeyboardReachable(page);
   const axeResults = await new AxeBuilder({ page }).analyze();
   const axeViolations = axeResults.violations.map((violation) => ({
     id: violation.id,
@@ -209,6 +235,8 @@ export async function runBrowserQa(options: BrowserQaOptions): Promise<BrowserQa
     overflowElements === 0 &&
     axeViolations.length === 0 &&
     headingOrderOk &&
+    brokenAnchorTargets.length === 0 &&
+    keyboardReachable &&
     javascriptDisabledReadable;
 
   const result: BrowserQaResult = {
@@ -223,6 +251,8 @@ export async function runBrowserQa(options: BrowserQaOptions): Promise<BrowserQa
     axeViolationCount: axeViolations.length,
     axeViolations,
     headingOrderOk,
+    brokenAnchorTargets,
+    keyboardReachable,
     javascriptDisabledReadable,
   };
   const portableResult = {
@@ -244,6 +274,8 @@ export function formatQaResult(result: BrowserQaResult): string {
     `[${status}] console=${result.consoleErrors.length} ` +
     `axe=${result.axeViolationCount} overflow=${result.overflowElements} ` +
     `externalRequests=${result.externalRequests.length} ` +
-    `headings=${result.headingOrderOk ? "ok" : "invalid"}`
+    `headings=${result.headingOrderOk ? "ok" : "invalid"} ` +
+    `anchors=${result.brokenAnchorTargets.length === 0 ? "ok" : "broken"} ` +
+    `keyboard=${result.keyboardReachable ? "ok" : "unreachable"}`
   );
 }

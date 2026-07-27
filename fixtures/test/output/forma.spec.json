@@ -7,7 +7,7 @@
     "audience": "qa",
     "language": "ko",
     "theme": "light",
-    "designSystem": "quiet-editorial",
+    "designSystem": "simple",
     "density": "compact",
     "confidentiality": "internal"
   },

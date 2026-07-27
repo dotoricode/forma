@@ -1,15 +1,16 @@
 # DESIGN.md — Forma's design system
 
-Single source of truth for Forma's visual language: **Quiet Editorial**,
-chosen after comparing it against two other directions (see
-`docs/design-audit.md` and `prototypes/`). One language, used consistently
-across all four modes — only composition (which blocks, what order)
-changes per mode, never the tokens or typographic system.
+Single source of truth for Forma's visual language. Every Rendered Output
+shares the same semantic tokens, accessibility rules, block markup, and
+offline guarantees, then chooses one of four understandable themes:
+`simple`, `workspace`, `guide`, or `magazine`. See
+`docs/design-research-2026.md` for the research and naming rationale.
 
 ## Design intent
 
-Simple, refined, minimal, quiet, editorial, precise, technical, legible.
-Explicitly not a SaaS landing page, not a dashboard, not an AI-tool demo.
+Refined, purposeful, legible, and visibly authored. Theme differences come
+from composition, rhythm, and typography rather than ornamental effects.
+Explicitly not a SaaS landing page or a generic AI-tool demo.
 See `skills/forma/references/generic-ai-patterns.md` for the exhaustive
 banned-pattern list — none of it appears here by construction.
 
@@ -62,7 +63,19 @@ the two most important structural rules:
 2. **No decorative oversized brackets.** No `content: "["`, `content:
    "{"`, `content: "</>"` anywhere. Also lint-checked.
 
-## Mode composition (not separate designs)
+## Themes
+
+| Theme | Best for | Composition |
+|---|---|---|
+| `simple` | Mixed-audience documents | Strong opening rule, stable reading edge, generous pauses |
+| `workspace` | Dense technical review and test evidence | Persistent tool rail, compact rhythm, raised evidence only |
+| `guide` | Manuals and step-by-step explanations | Orientation-first rail, narrow measure, prominent callouts |
+| `magazine` | Narrative reports and long-form explainers | Display serif, asymmetric cover, editorial rules |
+
+Legacy identifiers remain accepted at the schema boundary and normalize to
+these names. New specs and documentation only use the four names above.
+
+## Mode composition
 
 | Mode | Emphasis |
 |---|---|
@@ -70,8 +83,9 @@ the two most important structural rules:
 | `review` | Decision-relevant material up front: comparison, diff, risk, test evidence, decision strip |
 | `test` | Result band → matrix → chart → failure evidence → limitations/actions |
 | `report` | Executive summary → timeline/findings → options → decision → actions |
+| `manual` | Outcome → prerequisites → procedure → checkpoints → troubleshooting → verification |
 
-All four render through the same `src/design/css.ts` stylesheet and the
+All five render through the same `src/design/css.ts` stylesheet and the
 same 20 block renderers in `src/renderer/blocks.ts` — there is no
 per-mode CSS file or theme swap beyond `data-density` and `data-theme`.
 

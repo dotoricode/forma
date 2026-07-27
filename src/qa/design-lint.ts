@@ -153,7 +153,7 @@ function stripAtRuleBlock(css: string, prelude: string): string {
 
 /**
  * A colour literal on a paint property is frozen at one theme. The
- * precision-workbench rail hardcoded neutral900, which happens to be
+ * workspace rail hardcoded neutral900, which happens to be
  * exactly `--color-surface` in dark mode, so the sidebar and the cards
  * became one indistinguishable mass; the same rule's hardcoded page
  * background kept dark mode on a light canvas and failed contrast at

@@ -3,13 +3,13 @@
   "meta": {
     "title": "Forma 스킬 처음 사용하기",
     "subtitle": "언제 쓰고, 어떻게 쓰는가",
-    "mode": "explain",
+    "mode": "manual",
     "audience": "engineering",
     "language": "ko",
     "theme": "light",
     "density": "comfortable",
     "confidentiality": "public",
-    "designSystem": "developer-docs"
+    "designSystem": "workspace"
   },
   "sources": [
     {
@@ -33,7 +33,7 @@
   ],
   "narrative": {
     "question": "Forma 스킬은 언제 쓰는 것이고, 실제로 어떻게 사용하는가?",
-    "summary": "Forma는 문서·코드·diff·테스트결과를 읽기 쉬운 오프라인 HTML 한 장으로 만들어주는 스킬이다. 사용자는 자료를 주고 모드(explain/review/test/report)만 고르면 되고, 실제 HTML 작성은 Forma가 대신한다.",
+    "summary": "Forma는 문서·코드·diff·테스트결과를 읽기 쉬운 오프라인 HTML 한 장으로 만들어주는 스킬이다. 작업 지시를 읽어 explain/review/test/report/manual 모드를 정하고, 실제 HTML 작성은 Forma가 대신한다.",
     "takeaways": [
       "브라우저로 읽을 결과물이 필요할 때 쓴다. 슬랙 메시지나 커밋 메시지로 충분하면 굳이 쓰지 않는다.",
       "Codex에서는 $forma, Claude Code에서는 /forma로 부른다.",
@@ -109,7 +109,7 @@
         },
         {
           "id": "pick-mode",
-          "label": "Forma가 모드를 정함 (explain/review/test/report)",
+          "label": "Forma가 모드를 정함 (explain/review/test/report/manual)",
           "kind": "step"
         },
         {

@@ -1,8 +1,15 @@
-# Design grammar — Quiet Editorial
+# Design grammar
 
-Forma's one design language, chosen after three prototypes were compared
-(`prototypes/`, `docs/design-audit.md`). All four modes share the same
-tokens and typography; only composition changes.
+Forma has one shared foundation and four purpose-led themes. Modes decide
+the story; themes decide its visual composition.
+
+- `simple`: calm reading for explanations and short reports.
+- `workspace`: compact tool rail and raised evidence for reviews and tests.
+- `guide`: persistent orientation and narrow reading measure for manuals.
+- `magazine`: strong display hierarchy and asymmetric rhythm for narrative
+  reports. Use it only when the content supports a deliberate editorial pace.
+
+All themes share the following rules:
 
 - Prose measure is 66–72ch. Only code, tables, and diagrams break out wider.
 - Heading hierarchy comes from weight + measure + line-height + space, not
@@ -18,3 +25,8 @@ tokens and typography; only composition changes.
 - At most 3 surface levels (canvas / surface / raised) in either theme.
 - You do not choose colors, radii, or shadows per document — those come
   from the renderer's design tokens. You choose blocks and content.
+- Establish one primary focal point, then a secondary reading path and a
+  clear continuation. Grid breaks are allowed only when they strengthen
+  that path.
+- Treat spacing as timing: related items cluster, transitions breathe, and
+  section rhythm remains legible at desktop and mobile widths.

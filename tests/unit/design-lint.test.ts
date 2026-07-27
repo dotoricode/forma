@@ -1,7 +1,21 @@
 import { describe, expect, it } from "vitest";
 import { lintCss } from "../../src/qa/design-lint.js";
+import { buildStylesheet } from "../../src/design/css.js";
 
 describe("lintCss", () => {
+  it("limits key-point counters to direct items so source locators do not collapse", () => {
+    const css = buildStylesheet("");
+    expect(css).toContain(".blk-key-points > ol > li {");
+    expect(css).not.toMatch(/\.blk-key-points li\s*\{/);
+  });
+
+  it("contains the mobile TOC in one non-wrapping scroll row", () => {
+    const css = buildStylesheet("");
+    expect(css).toMatch(/\.toc\s*\{[\s\S]*?flex-wrap:\s*nowrap;/);
+    expect(css).toMatch(/\.toc\s*\{[\s\S]*?overflow-x:\s*auto;/);
+    expect(css).toMatch(/\.layout > \.side-toc\s*\{[\s\S]*?min-width:\s*0;/);
+  });
+
   it("flags a ::before rule combining left and top/bottom borders (bracket frame)", () => {
     const css = `.section::before { content: ""; border-left: 2px solid red; border-top: 2px solid red; }`;
     const findings = lintCss(css);
@@ -51,7 +65,7 @@ describe("lintCss", () => {
     it("allows the shared page column to centre itself", () => {
       const css = `.doc { max-width: 64rem; margin-inline: auto; }
         .layout { max-width: 64rem; margin-inline: auto; }
-        :root[data-design="editorial-magazine"] .doc { max-width: 52rem; margin-inline: auto; }`;
+        :root[data-design="magazine"] .doc { max-width: 52rem; margin-inline: auto; }`;
       expect(lintCss(css).some((f) => f.rule === "centered-width-cap")).toBe(false);
     });
 

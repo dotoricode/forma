@@ -14,6 +14,11 @@ import lighthouse from "lighthouse";
 
 const FIXTURES = ["explain", "review", "test", "report"];
 const PORT = 4321;
+const PERFORMANCE_MIN = 0.95;
+const ACCESSIBILITY_MIN = 1;
+const BEST_PRACTICES_MIN = 1;
+const CLS_MAX = 0.05;
+const TBT_MAX = 100;
 
 function contentType(filePath: string): string {
   if (filePath.endsWith(".html")) return "text/html; charset=utf-8";
@@ -73,11 +78,42 @@ async function main() {
       }
     }
   } finally {
-    await chrome.kill();
+    try {
+      await chrome.kill();
+    } catch (error) {
+      // chrome-launcher can kill Chromium successfully and then fail to
+      // remove its temporary profile on Windows while an antivirus scanner
+      // still holds a file handle. Do not turn completed audits into a false
+      // failure; the OS cleans its temp directory later.
+      if ((error as NodeJS.ErrnoException).code !== "EPERM") throw error;
+      console.warn("forma lighthouse: Chromium stopped; Windows deferred temp-profile cleanup");
+    }
   }
 
   await writeFile("docs/lighthouse-summary.json", JSON.stringify(summary, null, 2), "utf-8");
   console.log("forma lighthouse: summary written to docs/lighthouse-summary.json");
+
+  const failures = Object.entries(summary).filter(([, value]) => {
+    const scores = value as {
+      performance?: number;
+      accessibility?: number;
+      bestPractices?: number;
+      cls?: number;
+      tbt?: number;
+    };
+    return (
+      (scores.performance ?? 0) < PERFORMANCE_MIN ||
+      (scores.accessibility ?? 0) < ACCESSIBILITY_MIN ||
+      (scores.bestPractices ?? 0) < BEST_PRACTICES_MIN ||
+      (scores.cls ?? Number.POSITIVE_INFINITY) > CLS_MAX ||
+      (scores.tbt ?? Number.POSITIVE_INFINITY) > TBT_MAX
+    );
+  });
+  if (failures.length > 0) {
+    throw new Error(
+      `Forma Lighthouse budget failed: ${failures.map(([fixture]) => fixture).join(", ")}`,
+    );
+  }
 }
 
 await main();
