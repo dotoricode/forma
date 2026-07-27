@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Synthetic fixture input. -->
+<testsuite name="ConnectionManagerTest" tests="14" failures="0" skipped="2">
+  <testcase name="reconnect stops after max retries" classname="ConnectionManagerTest" time="0.02" />
+  <testcase name="reconnect notifies failure after exhausting retries" classname="ConnectionManagerTest" time="0.01" />
+  <testcase name="onNetworkChanged resets connection state" classname="ConnectionManagerTest" time="0.01" />
+  <testcase name="concurrent network change events do not double-reset" classname="ConnectionManagerConcurrencyTest" time="0.0">
+    <skipped message="Not yet implemented — see review notes" />
+  </testcase>
+  <testcase name="rapid network flapping does not exceed retry budget" classname="ConnectionManagerConcurrencyTest" time="0.0">
+    <skipped message="Not yet implemented — see review notes" />
+  </testcase>
+</testsuite>

@@ -1,0 +1,9 @@
+{
+  "generator": "forma@0.1.0",
+  "specVersion": "0.1",
+  "mode": "review",
+  "title": "네트워크 재연결 로직 변경 리뷰",
+  "language": "ko",
+  "sectionCount": 8,
+  "bytes": 143625
+}

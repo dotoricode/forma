@@ -1,0 +1,9 @@
+node_modules/
+dist/
+forma-output/
+.forma-cache/
+*.log
+.DS_Store
+
+# fixtures/*/output/ is committed on purpose — it's the demo gallery
+# (rendered HTML + QA screenshots for the four required fixtures).

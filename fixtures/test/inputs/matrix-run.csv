@@ -1,0 +1,19 @@
+device,os,result,accuracy_pct
+Pixel 4a,Android 10,fail,99.6
+Galaxy A12,Android 10,fail,99.5
+Pixel 4a,Android 11,pass,99.7
+Galaxy A12,Android 11,pass,99.6
+Pixel 4a,Android 12,pass,99.7
+Galaxy A12,Android 12,pass,99.7
+Pixel 7,Android 12,pass,99.8
+Galaxy S22,Android 12,pass,99.8
+Pixel 4a,Android 13,pass,99.7
+Pixel 7,Android 13,pass,99.8
+Galaxy S22,Android 13,pass,99.8
+Pixel 8,Android 13,pass,99.9
+Galaxy S24,Android 13,pass,99.9
+Pixel 4a,Android 14,pass,99.7
+Pixel 7,Android 14,pass,99.8
+Galaxy S22,Android 14,pass,99.8
+Pixel 8,Android 14,pass,99.9
+Galaxy S24,Android 14,pass,99.9

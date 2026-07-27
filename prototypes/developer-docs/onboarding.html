@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Developer Docs — onboarding prototype</title>
+<style>
+  :root {
+    --canvas: oklch(100% 0 0); --sidebar: oklch(98.5% 0.002 90);
+    --text: oklch(20% 0.005 260); --muted: oklch(48% 0.01 260); --border: oklch(90% 0.005 260);
+    --accent: oklch(52% 0.18 265); --accent-bg: oklch(96% 0.02 265);
+    font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--canvas); color: var(--text); line-height: 1.65; }
+  .shell { display: grid; grid-template-columns: 240px 1fr 200px; max-width: 1280px; margin-inline: auto; }
+  .side { border-inline-end: 1px solid var(--border); padding: 2rem 1.25rem; font-size: 0.875rem; }
+  .side .grp { color: var(--muted); font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.04em; margin: 1.25rem 0 0.5rem; }
+  .side a { display: block; padding: 0.3rem 0; color: var(--text); text-decoration: none; }
+  .side a.active { color: var(--accent); font-weight: 600; border-inline-start: 2px solid var(--accent); padding-inline-start: 0.6rem; margin-inline-start: -0.62rem; }
+  .content { padding: 2.5rem 2.5rem 4rem; max-width: 68ch; }
+  .content h1 { font-size: 1.75rem; margin: 0 0 0.4rem; }
+  .content .lead { color: var(--muted); font-size: 1.0625rem; margin-bottom: 1.5rem; }
+  .content h2 { font-size: 1.15rem; margin-top: 2.25rem; padding-top: 1.5rem; border-top: 1px solid var(--border); }
+  .callout { background: var(--accent-bg); border-inline-start: 3px solid var(--accent); border-radius: 6px; padding: 1rem 1.25rem; margin: 1.25rem 0; font-size: 0.9375rem; }
+  .callout b { color: var(--accent); display: block; font-size: 0.8125rem; text-transform: uppercase; letter-spacing: 0.03em; margin-bottom: 0.3rem; }
+  pre { background: oklch(20% 0.01 260); color: oklch(92% 0.005 260); border-radius: 8px; padding: 1rem 1.25rem; font-family: ui-monospace, monospace; font-size: 0.8125rem; overflow-x: auto; }
+  .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin: 1rem 0; }
+  .box { border: 1px solid var(--border); border-radius: 8px; padding: 1rem 1.25rem; font-size: 0.9375rem; }
+  .box h4 { margin: 0 0 0.5rem; font-size: 0.875rem; }
+  .toc { padding: 2rem 1rem; font-size: 0.8125rem; }
+  .toc div { color: var(--muted); text-transform: uppercase; font-size: 0.7rem; letter-spacing: 0.04em; margin-bottom: 0.5rem; }
+  .toc a { display: block; color: var(--muted); text-decoration: none; padding: 0.25rem 0; }
+</style>
+</head>
+<body>
+<div class="shell">
+  <aside class="side">
+    <div class="grp">시작하기</div>
+    <a href="#" class="active">Forma란</a>
+    <a href="#">언제 쓰는가</a>
+    <div class="grp">가이드</div>
+    <a href="#">사용 흐름</a>
+    <a href="#">CLI 명령</a>
+    <div class="grp">참고</div>
+    <a href="#">용어</a>
+  </aside>
+  <main class="content">
+    <h1>Forma 스킬 처음 사용하기</h1>
+    <p class="lead">언제 쓰고, 어떻게 쓰는가</p>
+
+    <div class="callout">
+      <b>한 줄 요약</b>
+      Forma는 문서·코드·diff·테스트결과를 읽기 쉬운 오프라인 HTML 한 장으로 만든다. 사용자는 자료와 모드만 정하면 된다.
+    </div>
+
+    <h2>언제 쓰고, 언제 쓰지 않는가</h2>
+    <div class="grid2">
+      <div class="box"><h4>✓ 이럴 때 쓴다</h4>코드리뷰 회의 자료, 테스트 결과 공유, 설계 설명, 상사 보고</div>
+      <div class="box"><h4>✕ 이럴 땐 안 쓴다</h4>슬랙 한두 줄, 마케팅 페이지, PDF 필수, 실시간 공동편집</div>
+    </div>
+
+    <h2>실제로 이렇게 부른다</h2>
+    <pre># Codex
+$forma 이 PR diff를 내일 코드리뷰 자료로 만들어줘
+
+# Claude Code
+/forma 이 테스트 결과 폴더를 팀 공유용 리포트로 만들어줘</pre>
+
+    <h2>가장 흔한 오해</h2>
+    <div class="callout">
+      <b>Forma가 매번 새로운 디자인을 그려준다?</b>
+      아니다. 항상 같은 디자인 시스템 위에서 블록만 고른다. 그래서 결과물이 요청마다 들쭉날쭉하지 않다.
+    </div>
+  </main>
+  <aside class="toc">
+    <div>이 페이지</div>
+    <a href="#">Forma란</a>
+    <a href="#">언제 쓰는가</a>
+    <a href="#">사용 흐름</a>
+    <a href="#">흔한 오해</a>
+  </aside>
+</div>
+</body>
+</html>

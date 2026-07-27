@@ -1,0 +1,132 @@
+{
+  "version": "0.1",
+  "meta": {
+    "title": "네트워크 재연결 로직 변경 리뷰",
+    "subtitle": "VPN 전환 직후 DNS 복구 로직에 재시도 상한을 도입한다",
+    "mode": "review",
+    "audience": "engineering",
+    "language": "ko",
+    "theme": "light",
+    "density": "comfortable",
+    "confidentiality": "internal"
+  },
+  "sources": [
+    {
+      "id": "diff",
+      "label": "connection-reset.diff",
+      "path": "fixtures/review/inputs/change.diff",
+      "kind": "diff"
+    },
+    {
+      "id": "junit",
+      "label": "concurrency-tests/results.xml",
+      "path": "fixtures/review/inputs/results.xml",
+      "kind": "junit"
+    }
+  ],
+  "narrative": {
+    "question": "이 변경이 VPN 전환 직후의 네트워크 오류를 안전하게 해결하는가?",
+    "summary": "연결 상태를 명시적으로 재초기화하고 재시도 횟수를 3회로 제한한다. 단일 스레드 테스트는 모두 통과했지만 동시성 테스트는 아직 추가되지 않았다.",
+    "takeaways": [
+      "오류 복구 범위가 명시적으로 분리되었다.",
+      "재시도가 무한 루프에서 최대 3회로 제한되었다.",
+      "동시성 테스트가 병합 전에 추가로 필요하다."
+    ]
+  },
+  "sections": [
+    {
+      "id": "cover",
+      "sourceRefs": [],
+      "type": "cover",
+      "eyebrow": "REVIEW · #482 · INTERNAL",
+      "title": "네트워크 재연결 로직 변경 리뷰",
+      "subtitle": "VPN 전환 시 DNS 복구 로직에 재시도 상한을 도입한다",
+      "meta": [
+        "4개 파일 변경",
+        "위험도: 중간",
+        "테스트 12/14 통과"
+      ]
+    },
+    {
+      "id": "before-after",
+      "sourceRefs": [],
+      "type": "comparison",
+      "title": "Before / After",
+      "left": {
+        "label": "Before",
+        "items": [
+          "네트워크 변경 시 무제한으로 재연결을 시도한다.",
+          "연결 상태가 암묵적으로 남아 있어 재초기화되지 않는다."
+        ]
+      },
+      "right": {
+        "label": "After",
+        "items": [
+          "재시도 횟수를 최대 3회로 제한한다.",
+          "네트워크 변경 시 연결 상태를 명시적으로 재초기화한다."
+        ]
+      }
+    },
+    {
+      "id": "diff",
+      "sourceRefs": [
+        "diff"
+      ],
+      "confidence": "verified",
+      "type": "diff",
+      "title": "핵심 변경: ConnectionManager.kt",
+      "unifiedDiff": "--- a/ConnectionManager.kt\n+++ b/ConnectionManager.kt\n@@ -40,9 +40,11 @@ class ConnectionManager {\n     fun onNetworkChanged(network: Network) {\n-        reconnect()\n+        resetConnectionState()\n+        reconnect(maxRetries = MAX_RETRIES)\n     }\n \n-    private fun reconnect() {\n-        while (true) {\n-            if (tryConnect()) return\n-        }\n+    private fun reconnect(maxRetries: Int) {\n+        repeat(maxRetries) {\n+            if (tryConnect()) return\n+        }\n+        notifyReconnectFailed()\n     }\n"
+    },
+    {
+      "id": "impact",
+      "sourceRefs": [
+        "diff"
+      ],
+      "confidence": "inferred",
+      "type": "risk",
+      "title": "동시에 여러 네트워크 변경 이벤트가 도착하면 상태 재초기화가 겹칠 수 있다",
+      "likelihood": "medium",
+      "impact": "medium",
+      "mitigation": "resetConnectionState()에 mutex를 적용하거나, 동일 프레임 내 중복 이벤트를 debounce한다."
+    },
+    {
+      "id": "tests",
+      "sourceRefs": [
+        "junit"
+      ],
+      "confidence": "verified",
+      "type": "test-summary",
+      "title": "테스트 증거",
+      "total": 14,
+      "passed": 12,
+      "failed": 0,
+      "skipped": 2
+    },
+    {
+      "id": "open-questions",
+      "sourceRefs": [
+        "junit"
+      ],
+      "confidence": "verified",
+      "type": "finding",
+      "title": "동시성 테스트가 아직 스킵 상태다",
+      "body": "`ConnectionManagerConcurrencyTest`의 2개 케이스가 `@Ignore`로 스킵되어 있다. 병합 전 활성화하거나, 활성화 계획을 결정에 명시해야 한다.",
+      "severity": "high"
+    },
+    {
+      "id": "decision",
+      "sourceRefs": [],
+      "confidence": "inferred",
+      "type": "decision",
+      "title": "동시성 테스트를 추가한 뒤 병합한다",
+      "status": "recommended",
+      "rationale": "재시도 상한 로직 자체는 검증되었지만, 동시 네트워크 변경 시나리오가 테스트되지 않은 상태로 병합하면 회귀를 놓칠 위험이 있다."
+    },
+    {
+      "id": "sources",
+      "sourceRefs": [],
+      "type": "source-note",
+      "title": "원본 출처"
+    }
+  ]
+}

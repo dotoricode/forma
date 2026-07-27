@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Technical Manuscript — report prototype</title>
+<style>
+  :root {
+    --canvas: oklch(99% 0.002 90); --text: oklch(15% 0.004 90);
+    --muted: oklch(48% 0.006 90); --rule: oklch(85% 0.004 90);
+    font-family: Georgia, "Nanum Myeongjo", serif;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--canvas); color: var(--text); line-height: 1.7; }
+  .shell { max-width: 760px; margin-inline: auto; padding: 3rem 1.5rem; }
+  .masthead { display: flex; justify-content: space-between; font-size: 0.8125rem; color: var(--muted); border-bottom: 2px solid var(--text); padding-bottom: 0.5rem; margin-bottom: 2rem; font-family: ui-monospace, monospace; }
+  h1 { font-size: 1.5rem; font-weight: 400; margin: 0 0 1.5rem; }
+  .clause { counter-increment: clause; margin-block: 1.25rem; }
+  .clauses { counter-reset: clause; }
+  .clause .num { font-family: ui-monospace, monospace; color: var(--muted); margin-right: 0.5em; }
+  .clause .num::before { content: counter(clause) "."; }
+  table { width: 100%; border-collapse: collapse; font-family: ui-monospace, monospace; font-size: 0.8125rem; margin-block: 1.5rem; }
+  td, th { border-bottom: 1px solid var(--rule); padding: 0.35rem 0.5rem; text-align: left; }
+  .footnote { font-size: 0.8125rem; color: var(--muted); border-top: 1px solid var(--rule); margin-top: 2rem; padding-top: 0.75rem; }
+</style>
+</head>
+<body>
+<div class="shell">
+  <div class="masthead"><span>Forma / Report</span><span>incident review</span></div>
+  <h1>7월 21일 알림 발송 지연 장애 — 원인 분석과 개선 제안</h1>
+
+  <section class="clauses">
+    <div class="clause"><span class="num"></span>근본 원인은 DB 커넥션 풀 고갈이다.</div>
+    <div class="clause"><span class="num"></span>자동 확장 반응 지연(5분)이 40분 지연으로 누적되었다.</div>
+    <div class="clause"><span class="num"></span>커넥션 풀 상한 상향과 조기 경보 조정을 제안한다.</div>
+  </section>
+
+  <table>
+    <tr><th>시각</th><th>사건</th></tr>
+    <tr><td>14:12</td><td>지연 첫 감지</td></tr>
+    <tr><td>14:31</td><td>커넥션 풀 고갈 확인</td></tr>
+    <tr><td>15:07</td><td>정상 복구</td></tr>
+  </table>
+
+  <div class="footnote">원본 출처: incident-2026-07-21.log, 포스트모템 초안</div>
+</div>
+</body>
+</html>

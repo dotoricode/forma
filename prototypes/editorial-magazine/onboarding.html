@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Editorial Magazine — onboarding prototype</title>
+<style>
+  :root {
+    --canvas: oklch(99% 0.001 90); --text: oklch(12% 0 0); --muted: oklch(45% 0 0); --rule: oklch(85% 0 0);
+    --accent: oklch(45% 0.19 25);
+    font-family: "Georgia", "Nanum Myeongjo", serif;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--canvas); color: var(--text); line-height: 1.6; }
+  .kicker-bar { border-top: 4px solid var(--text); border-bottom: 1px solid var(--rule); padding: 0.6rem 0; text-align: center; font-family: system-ui, sans-serif; font-size: 0.75rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); }
+  .shell { max-width: 900px; margin-inline: auto; padding: 2.5rem 1.5rem 4rem; }
+  .headline { font-size: 3.2rem; font-weight: 700; line-height: 1.02; margin: 1.5rem 0 0.5rem; letter-spacing: -0.01em; }
+  .dek { font-size: 1.3rem; color: var(--muted); font-style: italic; max-width: 60ch; margin-bottom: 2rem; }
+  .byline { font-family: system-ui, sans-serif; font-size: 0.8125rem; color: var(--muted); border-top: 1px solid var(--rule); border-bottom: 1px solid var(--rule); padding: 0.6rem 0; margin-bottom: 2.5rem; }
+  .lede { font-size: 1.2rem; }
+  .lede::first-letter { font-size: 3.6rem; float: left; line-height: 0.8; padding-right: 0.5rem; font-weight: 700; }
+  .pullquote { font-size: 1.6rem; font-style: italic; border-top: 1px solid var(--text); border-bottom: 1px solid var(--text); padding: 1.5rem 0; margin: 2.5rem 0; text-align: center; }
+  .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; margin: 2rem 0; font-family: system-ui, sans-serif; font-size: 0.9375rem; }
+  .two-col h4 { font-family: Georgia, serif; font-size: 1rem; border-bottom: 2px solid var(--text); padding-bottom: 0.4rem; margin-bottom: 0.6rem; }
+  pre { font-family: ui-monospace, monospace; font-size: 0.85rem; background: oklch(96% 0 0); padding: 1rem 1.25rem; overflow-x: auto; }
+  .caption { font-family: system-ui, sans-serif; font-size: 0.8125rem; color: var(--muted); border-left: 3px solid var(--accent); padding-left: 1rem; margin: 1.5rem 0; }
+</style>
+</head>
+<body>
+<div class="kicker-bar">FORMA · 온보딩 가이드</div>
+<div class="shell">
+  <h1 class="headline">Forma 스킬 처음 사용하기</h1>
+  <p class="dek">언제 쓰고, 어떻게 쓰는가 — 5분이면 충분하다.</p>
+  <div class="byline">EXPLAIN · ONBOARDING &nbsp;·&nbsp; Codex + Claude Code 공용</div>
+
+  <p class="lede">Forma는 문서, 코드, diff, 테스트 결과를 읽기 쉬운 오프라인 HTML 한 장으로 만들어주는 스킬이다. 사용자는 자료를 주고 모드만 고르면 되고, 실제 HTML 작성은 Forma가 대신한다.</p>
+
+  <div class="two-col">
+    <div><h4>이럴 때 쓴다</h4>코드리뷰 회의 자료, 테스트 결과 공유, 설계 설명, 상사 보고</div>
+    <div><h4>이럴 땐 안 쓴다</h4>슬랙 한두 줄, 마케팅 페이지, PDF 필수, 실시간 공동편집</div>
+  </div>
+
+  <div class="pullquote">"Agent는 HTML을 직접 쓰지 않는다 — spec만 쓰고 렌더러가 나머지를 담당한다."</div>
+
+  <pre># Codex에서
+$forma 이 PR diff를 내일 코드리뷰 자료로 만들어줘
+
+# Claude Code에서
+/forma 이 테스트 결과 폴더를 팀 공유용 리포트로 만들어줘</pre>
+
+  <div class="caption">가장 흔한 오해: Forma가 매번 새로운 디자인을 그려준다 — 아니다, 항상 같은 시스템 위에서 블록만 고른다.</div>
+</div>
+</body>
+</html>

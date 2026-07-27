@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Technical Manuscript — test prototype</title>
+<style>
+  :root {
+    --canvas: oklch(99% 0.002 90); --text: oklch(15% 0.004 90);
+    --muted: oklch(48% 0.006 90); --rule: oklch(85% 0.004 90);
+    --danger: oklch(58% 0.18 25); --success: oklch(58% 0.13 152);
+    font-family: Georgia, "Nanum Myeongjo", serif;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--canvas); color: var(--text); line-height: 1.7; }
+  .shell { max-width: 760px; margin-inline: auto; padding: 3rem 1.5rem; }
+  .masthead { display: flex; justify-content: space-between; font-size: 0.8125rem; color: var(--muted); border-bottom: 2px solid var(--text); padding-bottom: 0.5rem; margin-bottom: 2rem; font-family: ui-monospace, monospace; }
+  h1 { font-size: 1.5rem; font-weight: 400; margin: 0 0 1.5rem; }
+  .clause { counter-increment: clause; margin-block: 1.25rem; }
+  .clauses { counter-reset: clause; }
+  .clause .num { font-family: ui-monospace, monospace; color: var(--muted); margin-right: 0.5em; }
+  .clause .num::before { content: counter(clause) "."; }
+  table { width: 100%; border-collapse: collapse; font-family: ui-monospace, monospace; font-size: 0.8125rem; margin-block: 1.5rem; }
+  td, th { border-bottom: 1px solid var(--rule); padding: 0.35rem 0.5rem; text-align: left; }
+  .fail { color: var(--danger); } .pass { color: var(--success); }
+  .footnote { font-size: 0.8125rem; color: var(--muted); border-top: 1px solid var(--rule); margin-top: 2rem; padding-top: 0.75rem; }
+</style>
+</head>
+<body>
+<div class="shell">
+  <div class="masthead"><span>Forma / Test</span><span>detection v3.2</span></div>
+  <h1>단말·OS 버전별 위협 탐지 회귀 테스트</h1>
+
+  <section class="clauses">
+    <div class="clause"><span class="num"></span>18개 조합 중 16개가 통과했다.</div>
+    <div class="clause"><span class="num"></span>Android 10 저사양 단말 2종에서 배터리 예산을 초과했다.</div>
+  </section>
+
+  <table>
+    <tr><th></th><th>Android 10</th><th>11</th><th>12</th></tr>
+    <tr><td>Pixel 4a</td><td class="fail">FAIL</td><td class="pass">PASS</td><td class="pass">PASS</td></tr>
+    <tr><td>Galaxy A12</td><td class="fail">FAIL</td><td class="pass">PASS</td><td class="pass">PASS</td></tr>
+  </table>
+
+  <div class="footnote">원본 출처: detection-matrix-2026-07.csv, battery-profile.log</div>
+</div>
+</body>
+</html>

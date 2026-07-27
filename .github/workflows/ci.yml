@@ -1,0 +1,44 @@
+name: forma-ci
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  build-test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20.19
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm build
+      - run: pnpm test
+      - run: node scripts/check-naming.mjs
+      - run: pnpm forma verify-skills
+
+  render-and-qa:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20.19
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: npx playwright install --with-deps chromium
+      - run: |
+          for mode in explain review test report; do
+            pnpm forma render "fixtures/$mode/forma.spec.json" --out "fixtures/$mode/output"
+          done
+      - run: pnpm lint:design fixtures/explain/output/index.html
+      - run: pnpm qa

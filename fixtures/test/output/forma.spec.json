@@ -1,0 +1,249 @@
+{
+  "version": "0.1",
+  "meta": {
+    "title": "단말·OS 버전별 위협 탐지 회귀 테스트",
+    "subtitle": "Android 10~15, 6개 단말에서의 탐지 정확도와 배터리 영향",
+    "mode": "test",
+    "audience": "qa",
+    "language": "ko",
+    "theme": "light",
+    "density": "compact",
+    "confidentiality": "internal"
+  },
+  "sources": [
+    {
+      "id": "matrix-run",
+      "label": "detection-matrix-2026-07.csv",
+      "path": "fixtures/test/inputs/matrix-run.csv",
+      "kind": "file"
+    },
+    {
+      "id": "battery-log",
+      "label": "battery-profile.log",
+      "path": "fixtures/test/inputs/battery-profile.log",
+      "kind": "log"
+    }
+  ],
+  "narrative": {
+    "question": "탐지 엔진 v3.2가 모든 지원 Android 버전과 단말에서 오탐 없이 동작하는가?",
+    "summary": "18개 조합 중 16개가 통과했다. Android 10의 저사양 단말 2종에서 백그라운드 스캔 배터리 소모가 예산을 초과해 실패했다.",
+    "takeaways": [
+      "탐지 정확도 자체는 모든 조합에서 목표(99.5%)를 충족한다.",
+      "Android 10 저사양 단말 2종에서 배터리 소모가 예산(2%/h)을 초과한다.",
+      "Android 14/15는 새 백그라운드 제약 때문에 스캔 주기를 조정해야 한다."
+    ]
+  },
+  "sections": [
+    {
+      "id": "cover",
+      "sourceRefs": [],
+      "type": "cover",
+      "eyebrow": "TEST · QA",
+      "title": "단말·OS 버전별 위협 탐지 회귀 테스트",
+      "subtitle": "탐지 엔진 v3.2 · Android 10~15, 6개 단말",
+      "meta": [
+        "18개 조합",
+        "16 통과 · 2 실패",
+        "2026-07-20 ~ 2026-07-24"
+      ]
+    },
+    {
+      "id": "purpose",
+      "sourceRefs": [],
+      "type": "prose",
+      "title": "목적과 성공 기준",
+      "body": "탐지 엔진 v3.2를 배포하기 전, 지원 대상 Android 버전(10~15)과 대표 단말 6종에서 오탐률과 배터리 영향이 기준을 충족하는지 확인한다. 성공 기준: 탐지 정확도 99.5% 이상, 백그라운드 배터리 소모 시간당 2% 이하."
+    },
+    {
+      "id": "summary",
+      "sourceRefs": [
+        "matrix-run"
+      ],
+      "confidence": "verified",
+      "type": "test-summary",
+      "title": "전체 결과",
+      "total": 18,
+      "passed": 16,
+      "failed": 2,
+      "skipped": 0,
+      "durationMs": 14400000
+    },
+    {
+      "id": "matrix",
+      "sourceRefs": [
+        "matrix-run"
+      ],
+      "confidence": "verified",
+      "type": "test-matrix",
+      "title": "단말 × OS 버전 매트릭스",
+      "columns": [
+        "Android 10",
+        "Android 11",
+        "Android 12",
+        "Android 13",
+        "Android 14",
+        "Android 15"
+      ],
+      "rows": [
+        {
+          "id": "pixel-4a",
+          "label": "Pixel 4a (저사양)",
+          "cells": {
+            "Android 10": "fail",
+            "Android 11": "pass",
+            "Android 12": "pass",
+            "Android 13": "pass",
+            "Android 14": "pass",
+            "Android 15": "na"
+          }
+        },
+        {
+          "id": "galaxy-a12",
+          "label": "Galaxy A12 (저사양)",
+          "cells": {
+            "Android 10": "fail",
+            "Android 11": "pass",
+            "Android 12": "pass",
+            "Android 13": "na",
+            "Android 14": "na",
+            "Android 15": "na"
+          }
+        },
+        {
+          "id": "pixel-7",
+          "label": "Pixel 7",
+          "cells": {
+            "Android 10": "na",
+            "Android 11": "na",
+            "Android 12": "pass",
+            "Android 13": "pass",
+            "Android 14": "pass",
+            "Android 15": "pass"
+          }
+        },
+        {
+          "id": "galaxy-s22",
+          "label": "Galaxy S22",
+          "cells": {
+            "Android 10": "na",
+            "Android 11": "na",
+            "Android 12": "pass",
+            "Android 13": "pass",
+            "Android 14": "pass",
+            "Android 15": "pass"
+          }
+        },
+        {
+          "id": "pixel-8",
+          "label": "Pixel 8",
+          "cells": {
+            "Android 10": "na",
+            "Android 11": "na",
+            "Android 12": "na",
+            "Android 13": "pass",
+            "Android 14": "pass",
+            "Android 15": "pass"
+          }
+        },
+        {
+          "id": "galaxy-s24",
+          "label": "Galaxy S24",
+          "cells": {
+            "Android 10": "na",
+            "Android 11": "na",
+            "Android 12": "na",
+            "Android 13": "pass",
+            "Android 14": "pass",
+            "Android 15": "pass"
+          }
+        }
+      ]
+    },
+    {
+      "id": "battery-chart",
+      "sourceRefs": [
+        "battery-log"
+      ],
+      "confidence": "verified",
+      "type": "chart",
+      "title": "단말별 시간당 배터리 소모율 (%)",
+      "kind": "bar",
+      "categories": [
+        "Pixel 4a",
+        "Galaxy A12",
+        "Pixel 7",
+        "Galaxy S22",
+        "Pixel 8",
+        "Galaxy S24"
+      ],
+      "series": [
+        {
+          "label": "배터리 소모율",
+          "values": [
+            2.8,
+            3.1,
+            1.2,
+            1.4,
+            0.9,
+            1
+          ]
+        }
+      ],
+      "unit": "%/h"
+    },
+    {
+      "id": "failure-evidence",
+      "sourceRefs": [
+        "battery-log"
+      ],
+      "confidence": "verified",
+      "type": "annotated-code",
+      "title": "저사양 단말 실패 로그 발췌",
+      "language": "bash",
+      "code": "device=Pixel 4a os=Android10\nscan_interval=15s\nbattery_drain=2.8%/h  # budget=2.0%/h\nresult=FAIL reason=battery_budget_exceeded\n\ndevice=Galaxy A12 os=Android10\nscan_interval=15s\nbattery_drain=3.1%/h  # budget=2.0%/h\nresult=FAIL reason=battery_budget_exceeded",
+      "highlightLines": [
+        3,
+        8
+      ],
+      "annotations": [
+        {
+          "line": 3,
+          "text": "예산(2.0%/h) 대비 40% 초과했다. 스캔 주기를 늘리거나 저전력 모드 조건을 추가해야 한다."
+        }
+      ]
+    },
+    {
+      "id": "limitations",
+      "sourceRefs": [],
+      "confidence": "unknown",
+      "type": "finding",
+      "title": "Android 15 저사양 단말은 이번 라운드에 포함되지 않았다",
+      "body": "테스트 목록에 Android 15를 탑재한 저사양 단말이 없어 해당 조합의 배터리 영향은 확인되지 않았다. 다음 라운드에 추가가 필요하다.",
+      "severity": "low"
+    },
+    {
+      "id": "next-steps",
+      "sourceRefs": [],
+      "type": "actions",
+      "title": "다음 조치",
+      "items": [
+        {
+          "label": "저사양 단말 대상 스캔 주기를 15s → 30s로 조정 후 재측정",
+          "owner": "감지엔진팀",
+          "due": "다음 스프린트"
+        },
+        {
+          "label": "Android 15 저사양 단말 테스트베드 확보",
+          "owner": "QA",
+          "due": "TBD"
+        }
+      ]
+    },
+    {
+      "id": "sources",
+      "sourceRefs": [],
+      "type": "source-note",
+      "title": "원본 출처"
+    }
+  ]
+}
