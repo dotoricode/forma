@@ -1,7 +1,9 @@
 # OnOrca Docs 기반 Forma HTML 디자인 목표
 
-조사 대상: <https://www.onorca.dev/docs>  
-조사일: 2026-07-28  
+조사 대상: <https://www.onorca.dev/docs>
+
+조사일: 2026-07-28
+
 목적: OnOrca Docs의 정보 밀도, 레이아웃, 타이포그래피, 컨트롤 배치를 Forma가 추구할 HTML 디자인 기준으로 번역한다. 색은 OnOrca의 순수 검정 팔레트를 복제하지 않고 VS Code의 공식 **Default Dark Modern / Default Light Modern** 팔레트로 대체한다.
 
 ## 1. 결론
