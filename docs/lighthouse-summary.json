@@ -1,6 +1,6 @@
 {
   "explain": {
-    "performance": 0.98,
+    "performance": 0.99,
     "accessibility": 1,
     "bestPractices": 1,
     "cls": 0.007287596127153477,
@@ -18,7 +18,7 @@
     "accessibility": 1,
     "bestPractices": 1,
     "cls": 0,
-    "tbt": 75.5
+    "tbt": 96.5
   },
   "report": {
     "performance": 1,

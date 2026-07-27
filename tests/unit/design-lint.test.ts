@@ -76,6 +76,38 @@ describe("lintCss", () => {
     });
   });
 
+  describe("hardcoded-paint-color", () => {
+    it("flags a literal background that cannot follow the theme", () => {
+      const css = `.side-toc { background: oklch(13% 0.004 90); }`;
+      expect(lintCss(css).some((f) => f.rule === "hardcoded-paint-color")).toBe(true);
+    });
+
+    it("flags a hex literal on a border colour", () => {
+      const css = `.card { border-block-end-color: #ccc; }`;
+      expect(lintCss(css).some((f) => f.rule === "hardcoded-paint-color")).toBe(true);
+    });
+
+    it("accepts a var() reference", () => {
+      const css = `.side-toc { background: var(--wb-rail); color: var(--wb-rail-text); }`;
+      expect(lintCss(css).some((f) => f.rule === "hardcoded-paint-color")).toBe(false);
+    });
+
+    it("accepts literals inside the token block, which is where they belong", () => {
+      const css = `:root { --color-canvas: oklch(96.5% 0.003 90); --wb-rail: oklch(13% 0.004 90); }`;
+      expect(lintCss(css).some((f) => f.rule === "hardcoded-paint-color")).toBe(false);
+    });
+
+    it("exempts @media print, which pins ink on purpose", () => {
+      const css = `@media print { body { background: white; } .section { border-block-end-color: #ccc; } }`;
+      expect(lintCss(css).some((f) => f.rule === "hardcoded-paint-color")).toBe(false);
+    });
+
+    it("does not flag keyword or currentColor values", () => {
+      const css = `.a { color: currentColor; } .b { background: transparent; } .c { color: inherit; }`;
+      expect(lintCss(css).some((f) => f.rule === "hardcoded-paint-color")).toBe(false);
+    });
+  });
+
   describe("oklch-color-mix-hue-shift", () => {
     it("flags color-mix in oklch, which interpolates hue toward the neutral's hue 0", () => {
       const css = `.tint { background: color-mix(in oklch, var(--color-accent) 6%, var(--color-surface)); }`;

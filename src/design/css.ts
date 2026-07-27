@@ -325,10 +325,39 @@ function designSystemCss(): string {
   return `
   /* Precision Workbench — dark sidebar nav (reusing .side-toc/.toc), each
      .section becomes a raised card instead of a full-bleed divided band. */
+  /* Theme-aware via token overrides, not raw primitives. Hardcoding the
+     page background and the rail colour meant dark mode kept a light
+     canvas (muted footer text failed contrast at 2.41:1) while the rail
+     landed on exactly the same value as --color-surface, so the sidebar
+     and the cards became one indistinguishable dark mass. The rail wants
+     to sit *behind* the cards in both themes, which is a relationship
+     between tokens, not a fixed colour. */
   :root[data-design="precision-workbench"] {
     --shadow: 0 1px 2px oklch(0% 0 0 / 0.05), 0 4px 16px oklch(0% 0 0 / 0.08);
+    /* Light: grey canvas so the white cards lift off it. */
+    --color-canvas: ${primitiveColor.neutral100};
+    --wb-rail: ${primitiveColor.neutral900};
+    --wb-rail-border: transparent;
+    /* The rail is dark in both themes, so its own text scale is fixed
+       rather than following --color-text (which flips with the theme). */
+    --wb-rail-text: ${primitiveColor.neutral400};
+    --wb-rail-text-strong: ${primitiveColor.neutral0};
+    --wb-rail-active: ${primitiveColor.neutral800};
   }
-  :root[data-design="precision-workbench"] body { background: ${primitiveColor.neutral100}; }
+  /* Dark: the rail recedes to the canvas and the cards (--color-surface,
+     neutral900) are the raised layer. A hairline keeps the edge readable. */
+  [data-theme="dark"]:root[data-design="precision-workbench"] {
+    --color-canvas: ${primitiveColor.neutral950};
+    --wb-rail: ${primitiveColor.neutral950};
+    --wb-rail-border: ${primitiveColor.neutral800};
+  }
+  @media (prefers-color-scheme: dark) {
+    :root[data-design="precision-workbench"]:not([data-theme="light"]) {
+      --color-canvas: ${primitiveColor.neutral950};
+      --wb-rail: ${primitiveColor.neutral950};
+      --wb-rail-border: ${primitiveColor.neutral800};
+    }
+  }
   :root[data-design="precision-workbench"] .layout {
     grid-template-columns: 240px 1fr;
     max-width: none;
@@ -348,7 +377,8 @@ function designSystemCss(): string {
        a 900px-tall window) no matter how long the page was. */
     max-height: none;
     overflow: visible;
-    background: ${primitiveColor.neutral900};
+    background: var(--wb-rail);
+    border-inline-end: 1px solid var(--wb-rail-border);
     border-block-end: none;
     padding: var(--space-6) var(--space-4);
     margin-inline-start: calc(-1 * var(--space-5));
@@ -365,14 +395,14 @@ function designSystemCss(): string {
     gap: var(--space-1);
   }
   :root[data-design="precision-workbench"] .side-toc .toc a {
-    color: ${primitiveColor.neutral400};
+    color: var(--wb-rail-text);
     padding: 0.5em 0.75em;
     border-radius: var(--radius-sm);
   }
-  :root[data-design="precision-workbench"] .side-toc .toc a:hover { color: ${primitiveColor.neutral0}; }
+  :root[data-design="precision-workbench"] .side-toc .toc a:hover { color: var(--wb-rail-text-strong); }
   :root[data-design="precision-workbench"] .side-toc .toc a[aria-current="true"] {
-    background: ${primitiveColor.neutral800};
-    color: ${primitiveColor.neutral0};
+    background: var(--wb-rail-active);
+    color: var(--wb-rail-text-strong);
   }
   :root[data-design="precision-workbench"] .layout > .doc { padding-block: var(--space-6); }
   :root[data-design="precision-workbench"] .section {

@@ -126,8 +126,71 @@ function findOklchColorMix(css: string): DesignLintFinding[] {
   }));
 }
 
+/** Removes an at-rule and its whole balanced `{ ... }` body from the source. */
+function stripAtRuleBlock(css: string, prelude: string): string {
+  let out = css;
+  for (;;) {
+    const start = out.indexOf(prelude);
+    if (start === -1) return out;
+    const open = out.indexOf("{", start);
+    if (open === -1) return out;
+    let depth = 0;
+    let end = -1;
+    for (let i = open; i < out.length; i += 1) {
+      if (out[i] === "{") depth += 1;
+      else if (out[i] === "}") {
+        depth -= 1;
+        if (depth === 0) {
+          end = i;
+          break;
+        }
+      }
+    }
+    if (end === -1) return out.slice(0, start);
+    out = out.slice(0, start) + out.slice(end + 1);
+  }
+}
+
+/**
+ * A colour literal on a paint property is frozen at one theme. The
+ * precision-workbench rail hardcoded neutral900, which happens to be
+ * exactly `--color-surface` in dark mode, so the sidebar and the cards
+ * became one indistinguishable mass; the same rule's hardcoded page
+ * background kept dark mode on a light canvas and failed contrast at
+ * 2.41:1. Literals belong in token definitions (custom properties), and
+ * everything else references those tokens.
+ */
+function findHardcodedPaintColors(css: string): DesignLintFinding[] {
+  const findings: DesignLintFinding[] = [];
+  // Print deliberately pins ink to paper — being theme-independent is the
+  // whole point there, so those literals are correct and exempt.
+  const source = stripAtRuleBlock(css.replace(/\/\*[\s\S]*?\*\//g, ""), "@media print");
+  const PAINT = /(?<![\w-])(background|background-color|color|fill|stroke|border-color|(?:border|outline)(?:-(?:top|right|bottom|left|block|inline)(?:-(?:start|end))?)?-color)\s*:\s*([^;{}]+)/g;
+  const LITERAL = /(?:oklch|oklab|rgba?|hsla?)\(|#[0-9a-fA-F]{3,8}\b/;
+  const ruleRegex = /([^{}]+)\{([^}]*)\}/g;
+  let rule: RegExpExecArray | null;
+  while ((rule = ruleRegex.exec(source)) !== null) {
+    const selector = (rule[1] ?? "").trim();
+    const body = rule[2] ?? "";
+    if (selector.includes("@")) continue;
+    let decl: RegExpExecArray | null;
+    PAINT.lastIndex = 0;
+    while ((decl = PAINT.exec(body)) !== null) {
+      const value = (decl[2] ?? "").trim();
+      // `currentColor`, keywords and var() references are all theme-aware.
+      if (!LITERAL.test(value)) continue;
+      findings.push({
+        rule: "hardcoded-paint-color",
+        message: `"${selector.slice(0, 48)}" sets ${decl[1]}: ${value.slice(0, 40)} as a literal — it cannot follow the theme. Define a custom property in the token block and reference it with var().`,
+      });
+    }
+  }
+  return findings;
+}
+
 export function lintCss(css: string): DesignLintFinding[] {
   return [
+    ...findHardcodedPaintColors(css),
     ...findBracketBorders(css),
     ...findDecorativeContent(css),
     ...findExcessiveGradients(css),
