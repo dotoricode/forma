@@ -252,3 +252,59 @@ export const MANUAL_LABEL: Record<"ko" | "en", ManualStrings> = {
     selectorFallback: "모든 단계가 표시된 상태입니다. 위에서 환경을 고르면 해당 단계만 남습니다.",
   },
 };
+
+/** Dashboard vocabulary. */
+export interface DashboardStrings {
+  status: Record<"normal" | "warning" | "critical" | "unknown", string>;
+  directionWord: Record<"up" | "down" | "flat", string>;
+  keyMetrics: string;
+  periodUnknown: string;
+  suspected: string;
+  drivers: string;
+  detail: string;
+  segment: string;
+  noData: string;
+  freshness: string;
+  asOf: string;
+  coverage: string;
+  lastUpdated: string;
+  knownGaps: string;
+  delayed: string;
+}
+
+export const DASHBOARD_LABEL: Record<"ko" | "en", DashboardStrings> = {
+  en: {
+    status: { normal: "Normal", warning: "Needs attention", critical: "Critical", unknown: "Unknown" },
+    directionWord: { up: "up", down: "down", flat: "flat" },
+    keyMetrics: "Key metrics",
+    periodUnknown: "period not stated",
+    suspected: "Suspected cause",
+    drivers: "What drove it",
+    detail: "Detail",
+    segment: "Segment",
+    noData: "no data",
+    freshness: "Data freshness",
+    asOf: "As of",
+    coverage: "Coverage",
+    lastUpdated: "Last updated",
+    knownGaps: "Known gaps",
+    delayed: "This feed is running behind. Treat the numbers as provisional.",
+  },
+  ko: {
+    status: { normal: "정상", warning: "주의", critical: "심각", unknown: "확인 불가" },
+    directionWord: { up: "증가", down: "감소", flat: "변화 없음" },
+    keyMetrics: "핵심 지표",
+    periodUnknown: "기간 미표기",
+    suspected: "의심 원인",
+    drivers: "무엇이 그렇게 만들었나",
+    detail: "상세",
+    segment: "구분",
+    noData: "데이터 없음",
+    freshness: "데이터 기준",
+    asOf: "기준 시각",
+    coverage: "포함 범위",
+    lastUpdated: "마지막 갱신",
+    knownGaps: "알려진 누락",
+    delayed: "수집이 지연 중입니다. 잠정 수치로 보십시오.",
+  },
+};

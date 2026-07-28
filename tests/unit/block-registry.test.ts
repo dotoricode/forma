@@ -57,6 +57,20 @@ describe("block registry", () => {
     }
   });
 
+  it("carries the dashboard vocabulary", () => {
+    for (const type of [
+      "status-header",
+      "metric",
+      "metric-group",
+      "anomaly",
+      "breakdown",
+      "segmented-table",
+      "data-freshness",
+    ]) {
+      expect(getBlockDefinition(type), `${type} must be registered`).toBeDefined();
+    }
+  });
+
   it("still carries every block the 0.1 spec could use", () => {
     const legacyTwenty = [
       "cover",
@@ -270,6 +284,24 @@ function minimalBlockFor(type: string): Record<string, unknown> {
       return { ...base, check: "c", expected: "e" };
     case "next-task":
       return { ...base, tasks: [{ label: "l" }] };
+    case "status-header":
+      return { ...base, headline: "h", status: "normal" };
+    case "metric":
+      return { ...base, label: "l", value: 1 };
+    case "metric-group":
+      return { ...base, metrics: [{ id: "m", label: "l", value: 1 }] };
+    case "anomaly":
+      return { ...base, what: "w", when: "now", magnitude: "2x" };
+    case "breakdown":
+      return { ...base, unit: "%", reading: "r", contributions: [{ label: "l", value: 1 }] };
+    case "segmented-table":
+      return {
+        ...base,
+        columns: [{ id: "c", label: "C" }],
+        rows: [{ id: "r", label: "l", cells: { c: 1 } }],
+      };
+    case "data-freshness":
+      return { ...base, asOf: "now", coverage: "all" };
     default:
       throw new Error(
         `block '${type}' was registered without a minimal fixture — add one so the registry tests cover it`,

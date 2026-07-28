@@ -137,11 +137,19 @@ or put a `checkpoint` after it — otherwise `forma validate` fails with
 `manual-step-without-verification`. Environment branching is a field
 (`environments: ["macos"]`), not a sentence in the middle of a paragraph;
 the selector island filters on it and shows everything when JS is off.
-`dashboard` and `advanced` have their contracts defined and enforced, but
-the blocks that fill `kpi`, `change`, `driver`, `freshness`,
-`evidence-graph`, `simulation`, and `decision` are still being built. Until
-they land, those two artifacts fail validation with a named unfilled role
-rather than quietly rendering as a report with cards.
+`dashboard` has `status-header`, `metric`, `metric-group`, `anomaly`,
+`breakdown`, `segmented-table`, `data-freshness`.
 
-Do not work around this by mapping a dashboard onto `chart` and `key-points`
-blocks. A wrong-shaped output that validates is worse than a clear failure.
+Every metric must state its `period`, and a dashboard showing metrics must
+carry a `data-freshness` block — both are build errors
+(`metric-without-context`, `dashboard-without-freshness`). A comparison
+carries its own `basis` and a separate `sentiment`, because cost up and
+pass rate up are both "up" and mean opposite things.
+
+`advanced` has its contract defined and enforced, but the blocks that fill
+`evidence-graph`, `simulation`, and `decision` are still being built. Until
+they land it fails validation with a named unfilled role rather than
+quietly rendering as a report with tabs.
+
+Do not work around a missing block by approximating it. A wrong-shaped
+output that validates is worse than a clear failure.

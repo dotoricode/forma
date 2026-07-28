@@ -1,0 +1,156 @@
+{
+  "version": "0.2",
+  "meta": {
+    "title": "SDK 4.2.0 출시 게이트",
+    "artifact": "dashboard",
+    "purpose": "monitor",
+    "audience": "engineering",
+    "language": "ko",
+    "variant": "release-gate",
+    "colorMode": "light",
+    "density": "compact",
+    "interaction": "static",
+    "confidentiality": "internal"
+  },
+  "sources": [
+    { "id": "ci", "label": "CI 파이프라인", "path": "ci/runs/4.2.0", "kind": "log" },
+    { "id": "crash", "label": "Crashlytics", "path": "artifacts/crash-2026-07.csv", "kind": "log" },
+    { "id": "beta", "label": "사내 베타 텔레메트리", "path": "artifacts/beta-telemetry.csv", "kind": "log" }
+  ],
+  "narrative": {
+    "question": "SDK 4.2.0을 지금 출시할 수 있는 상태인가?",
+    "summary": "통과율은 기준을 넘었지만 blocker 3건이 열려 있고 크래시율이 이틀째 오르고 있다. 게이트는 아직 닫혀 있다.",
+    "takeaways": [
+      "통과율 95.2%로 기준 95%는 넘겼다",
+      "blocker 3건이 전부 백그라운드 실행 제한에서 파생됐다",
+      "크래시율 상승분의 78%가 Android 17 단일 OS에서 나온다"
+    ]
+  },
+  "sections": [
+    {
+      "id": "status",
+      "type": "status-header",
+      "headline": "출시 게이트가 열리지 않았다. blocker 3건이 남아 있다.",
+      "status": "warning",
+      "detail": "통과율 기준은 충족했다. 남은 것은 백그라운드 실행 제한에서 파생된 blocker 3건이다.",
+      "confidence": "verified",
+      "sourceRefs": ["ci"]
+    },
+    {
+      "id": "kpi",
+      "type": "metric-group",
+      "title": "게이트 지표",
+      "metrics": [
+        {
+          "id": "pass",
+          "label": "통과율",
+          "value": 95.2,
+          "unit": "%",
+          "period": "2026-07-24 CI 실행",
+          "status": "normal",
+          "comparison": { "value": 1.8, "direction": "up", "basis": "전주 93.4% 대비", "sentiment": "positive" },
+          "series": [91.0, 92.4, 93.4, 93.1, null, 94.6, 95.2]
+        },
+        {
+          "id": "blockers",
+          "label": "출시 blocker",
+          "value": 3,
+          "unit": "건",
+          "period": "2026-07-24 기준",
+          "status": "critical",
+          "comparison": { "value": 1, "direction": "up", "basis": "전일 2건 대비", "sentiment": "negative" },
+          "series": [0, 0, 1, 1, 2, 2, 3]
+        },
+        {
+          "id": "crash",
+          "label": "크래시율",
+          "value": 0.42,
+          "unit": "%",
+          "period": "최근 24시간",
+          "status": "warning",
+          "comparison": { "value": 0.15, "direction": "up", "basis": "기준선 0.27% 대비", "sentiment": "negative" },
+          "series": [0.26, 0.27, 0.25, 0.28, 0.31, 0.38, 0.42]
+        },
+        {
+          "id": "coverage",
+          "label": "단말 커버리지",
+          "value": 12,
+          "unit": "종",
+          "period": "2026-07-24 기준",
+          "status": "warning",
+          "comparison": { "value": 0, "direction": "flat", "basis": "전주와 동일", "sentiment": "neutral" }
+        }
+      ],
+      "confidence": "verified",
+      "sourceRefs": ["ci", "crash"]
+    },
+    {
+      "id": "anomaly",
+      "type": "anomaly",
+      "what": "크래시율이 이틀 연속 올라 기준선의 1.55배가 됐다.",
+      "when": "2026-07-22 이후",
+      "magnitude": "0.27% → 0.42%",
+      "suspected": "Android 17의 백그라운드 서비스 종료 이후 재연결 실패",
+      "severity": "high",
+      "confidence": "inferred",
+      "sourceRefs": ["crash"]
+    },
+    {
+      "id": "drivers",
+      "type": "breakdown",
+      "title": "크래시율 상승분의 출처",
+      "unit": "%p",
+      "reading": "상승분 0.15%p 가운데 0.117%p, 즉 78%가 Android 17 한 OS에서 나왔다. 나머지 OS는 기준선 안에 있다.",
+      "contributions": [
+        { "label": "Android 17", "value": 0.117 },
+        { "label": "Android 16", "value": 0.021 },
+        { "label": "Android 15", "value": 0.014 },
+        { "label": "Android 14 이하", "value": -0.002 }
+      ],
+      "confidence": "verified",
+      "sourceRefs": ["crash"]
+    },
+    {
+      "id": "segments",
+      "type": "segmented-table",
+      "title": "OS별 상세",
+      "columns": [
+        { "id": "tests", "label": "테스트" },
+        { "id": "fail", "label": "실패" },
+        { "id": "crash", "label": "크래시율 %" },
+        { "id": "devices", "label": "단말" }
+      ],
+      "rows": [
+        { "id": "a17", "label": "Android 17", "cells": { "tests": 124, "fail": 6, "crash": 0.71, "devices": 5 }, "status": "critical" },
+        { "id": "a16", "label": "Android 16", "cells": { "tests": 124, "fail": 0, "crash": 0.29, "devices": 4 }, "status": "normal" },
+        { "id": "a15", "label": "Android 15", "cells": { "tests": 124, "fail": 0, "crash": 0.26, "devices": 3 }, "status": "normal" },
+        { "id": "a14", "label": "Android 14", "cells": { "tests": null, "fail": null, "crash": 0.24, "devices": 0 }, "status": "unknown" }
+      ],
+      "confidence": "verified",
+      "sourceRefs": ["ci", "crash"]
+    },
+    {
+      "id": "actions",
+      "type": "action-plan",
+      "title": "게이트를 열려면",
+      "items": [
+        { "id": "a1", "label": "재연결 스케줄러를 foregroundServiceType 기반으로 수정", "owner": "플랫폼팀", "due": "2026-07-31", "blocking": true },
+        { "id": "a2", "label": "Android 15·16 전체 회귀 실행", "owner": "QA", "due": "2026-08-01", "blocking": true },
+        { "id": "a3", "label": "Android 14 단말 확보 후 재측정", "owner": "QA", "due": "2026-08-05" }
+      ]
+    },
+    {
+      "id": "freshness",
+      "type": "data-freshness",
+      "asOf": "2026-07-24 18:00 KST",
+      "coverage": "사내 베타 사용자 2,140명 / 단말 12종",
+      "lastUpdated": "2026-07-24 18:12 KST",
+      "knownGaps": [
+        "Android 14 이하는 검증 단말이 없어 CI 수치가 없다",
+        "베타 사용자 구성이 실사용자와 달라 크래시율을 그대로 환산할 수 없다"
+      ],
+      "delayed": false,
+      "sourceRefs": ["ci", "crash", "beta"]
+    }
+  ]
+}
