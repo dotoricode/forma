@@ -14,6 +14,15 @@ export interface RenderOutcome {
   bytes: number;
 }
 
+export interface RenderOptions {
+  /**
+   * Records in the manifest that this build is meant to travel as a file.
+   * It changes no markup: the standard render is already self-contained.
+   * What it adds is the claim, written down where a reviewer can check it.
+   */
+  portable?: boolean;
+}
+
 /** Reads and validates a `forma.spec.json` file, throwing FormaSpecError on failure. */
 export async function loadSpecFile(specPath: string) {
   const { spec } = await loadSpecFileWithSource(specPath);
@@ -39,7 +48,11 @@ export async function loadSpecFileWithSource(specPath: string) {
 }
 
 /** Renders a validated spec file to a self-contained `index.html` plus manifest. */
-export async function renderSpecFileToDir(specPath: string, outDir: string): Promise<RenderOutcome> {
+export async function renderSpecFileToDir(
+  specPath: string,
+  outDir: string,
+  options: RenderOptions = {},
+): Promise<RenderOutcome> {
   const { spec, raw } = await loadSpecFileWithSource(specPath);
   const { html } = await renderSpecToHtml(spec);
 
@@ -71,6 +84,11 @@ export async function renderSpecFileToDir(specPath: string, outDir: string): Pro
     language: spec.meta.language,
     sectionCount: spec.sections.length,
     bytes: Buffer.byteLength(guarded, "utf-8"),
+    // Stated rather than assumed. A reader handed the file should be able
+    // to see the claim and check it with `forma qa`, which measures the
+    // same property in a real browser.
+    externalNetworkRequests: 0,
+    ...(options.portable ? { portable: true, selfContainedDirectory: true } : {}),
   };
   const manifestPath = path.join(outDir, "manifest.json");
   await writeFile(manifestPath, JSON.stringify(manifest, null, 2), "utf-8");

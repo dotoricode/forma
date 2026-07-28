@@ -123,7 +123,67 @@ export function buildInteractiveScript(): string {
     if (stored) apply(stored);
   }
 
+
+  /* Simulation. The AST walk below mirrors src/spec/formula.ts exactly:
+     literal, variable, and four operators, nothing else. There is no eval,
+     no Function constructor and no identifier lookup, so a formula authored
+     into a spec cannot reach anything but the declared inputs. */
+  function evalFormula(node, vars, depth) {
+    if (depth > 32) throw new Error("formula too deep");
+    if (node.type === "literal") return node.value;
+    if (node.type === "variable") {
+      const v = vars[node.name];
+      if (v === undefined) throw new Error("undeclared variable");
+      return v;
+    }
+    if (node.type !== "operation") throw new Error("unknown node");
+    const l = evalFormula(node.left, vars, depth + 1);
+    const r = evalFormula(node.right, vars, depth + 1);
+    if (node.operator === "add") return l + r;
+    if (node.operator === "subtract") return l - r;
+    if (node.operator === "multiply") return l * r;
+    if (node.operator === "divide") {
+      if (r === 0) throw new Error("divide by zero");
+      return l / r;
+    }
+    throw new Error("unknown operator");
+  }
+
+  function initSimulations() {
+    for (const panel of document.querySelectorAll("[data-forma-simulation]")) {
+      const inputs = Array.from(panel.querySelectorAll("[data-sim-input]"));
+      const outputs = Array.from(panel.querySelectorAll("[data-sim-output]"));
+      if (inputs.length === 0 || outputs.length === 0) continue;
+
+      const recompute = () => {
+        const vars = {};
+        for (const input of inputs) {
+          const name = input.getAttribute("data-sim-input");
+          vars[name] = Number(input.value);
+          const echo = panel.querySelector('[data-sim-echo="' + name + '"]');
+          if (echo) echo.textContent = String(input.value);
+        }
+        for (const output of outputs) {
+          const precision = Number(output.getAttribute("data-sim-precision") || 2);
+          const unit = output.getAttribute("data-sim-unit") || "";
+          try {
+            const node = JSON.parse(output.getAttribute("data-sim-output"));
+            output.textContent = evalFormula(node, vars, 0).toFixed(precision) + unit;
+          } catch {
+            /* A broken formula leaves the build-time value in place rather
+               than replacing a real number with NaN. */
+          }
+        }
+      };
+
+      for (const input of inputs) input.addEventListener("input", recompute);
+      const fallback = panel.querySelector(".blk-simulation__fallback");
+      if (fallback) fallback.hidden = true;
+    }
+  }
+
   initThemeToggle();
+  initSimulations();
   initEnvSelector();
     initCodeCopy();
     initTocActiveState();

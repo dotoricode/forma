@@ -1,0 +1,234 @@
+{
+  "version": "0.2",
+  "meta": {
+    "title": "SDK 4.2.0 출시 결정",
+    "artifact": "advanced",
+    "purpose": "decide",
+    "audience": "engineering",
+    "language": "ko",
+    "variant": "release-decision",
+    "colorMode": "light",
+    "density": "comfortable",
+    "interaction": "islands",
+    "confidentiality": "internal"
+  },
+  "sources": [
+    { "id": "junit", "label": "CI 테스트 결과", "path": "artifacts/android17-junit.xml", "kind": "junit" },
+    { "id": "crash", "label": "Crashlytics", "path": "artifacts/crash-2026-07.csv", "kind": "log" },
+    { "id": "beta", "label": "사내 베타 텔레메트리", "path": "artifacts/beta-telemetry.csv", "kind": "log" },
+    { "id": "policy", "label": "출시 인증 정책", "path": "docs/release-policy.md", "kind": "file" },
+    { "id": "support", "label": "지원팀 문의 통계", "path": "artifacts/support-tickets.csv", "kind": "log" }
+  ],
+  "narrative": {
+    "question": "SDK 4.2.0을 지금 정식 출시할 것인가?",
+    "summary": "권고는 사내 배포 후 1주 뒤 정식 인증이다. 이 방에서 확인할 것은 그 1주가 실제로 충분한가, 그리고 지연 비용을 우리가 감당할 수 있는가다.",
+    "takeaways": [
+      "blocker 3건이 한 원인에서 나와 수정 범위가 좁다",
+      "지연 1주의 비용 추정은 근거가 약하다",
+      "미검증 칩셋 계열에서 같은 증상이 재현될 가능성이 남아 있다"
+    ]
+  },
+  "sections": [
+    {
+      "id": "brief",
+      "type": "brief",
+      "question": "SDK 4.2.0을 지금 정식 출시할 것인가?",
+      "summary": "기능 검증은 끝났다. 남은 것은 백그라운드 실행 제한에서 파생된 blocker 3건이고, 수정 범위는 재연결 스케줄러 한 곳으로 좁다. 쟁점은 기술이 아니라 **1주 지연을 감당할 수 있는가**다.",
+      "decideToday": [
+        "정식 인증을 1주 미룰 것인가",
+        "사내 배포를 그동안 진행할 것인가",
+        "미검증 칩셋 3종 확보를 blocker로 볼 것인가"
+      ],
+      "stillUnknown": [
+        "미검증 칩셋 계열에서 같은 증상이 나오는지",
+        "지연 1주가 파트너 일정에 실제로 얼마를 물리는지"
+      ],
+      "sourceRefs": ["junit", "policy"]
+    },
+    {
+      "id": "graph",
+      "type": "evidence-graph",
+      "claims": [
+        {
+          "id": "fix-one-week",
+          "statement": "blocker 3건은 1주 안에 고칠 수 있다.",
+          "confidence": "inferred",
+          "impact": "high",
+          "supportedBy": ["junit"],
+          "contradictedBy": []
+        },
+        {
+          "id": "delay-cost",
+          "statement": "출시 1주 지연의 비용은 감당 가능한 수준이다.",
+          "confidence": "unknown",
+          "impact": "high",
+          "supportedBy": [],
+          "contradictedBy": []
+        },
+        {
+          "id": "single-cause",
+          "statement": "blocker 3건이 모두 백그라운드 실행 제한 변경에서 나왔다.",
+          "confidence": "verified",
+          "impact": "medium",
+          "supportedBy": ["junit", "crash"],
+          "contradictedBy": []
+        },
+        {
+          "id": "chipset-risk",
+          "statement": "미검증 칩셋 계열에서는 같은 증상이 나오지 않는다.",
+          "confidence": "unknown",
+          "impact": "medium",
+          "supportedBy": [],
+          "contradictedBy": ["beta"]
+        },
+        {
+          "id": "beta-representative",
+          "statement": "사내 베타 크래시율을 실사용자에 그대로 환산할 수 있다.",
+          "confidence": "unknown",
+          "impact": "low",
+          "supportedBy": [],
+          "contradictedBy": ["beta"]
+        }
+      ]
+    },
+    {
+      "id": "challenge",
+      "type": "challenge",
+      "strongestCounterargument": "1주 지연의 비용을 아무도 계산하지 않았다. 기술 리스크는 근거를 갖고 논의하면서 일정 리스크는 감으로 넘기고 있다. 비용이 실제로 크다면 blocker 3건을 알고도 내보내는 편이 합리적일 수 있다.",
+      "unprovenAssumptions": [
+        "재연결 스케줄러 수정이 다른 전원 관리 경로를 건드리지 않는다",
+        "사내 베타 1주로 미검증 칩셋 문제를 발견할 수 있다",
+        "파트너가 1주 지연을 수용한다"
+      ],
+      "failureConditions": [
+        "수정이 Android 15·16에 회귀를 만든다",
+        "1주 안에 못 고쳐 지연이 누적된다",
+        "미검증 칩셋에서 다른 원인의 실패가 나온다"
+      ],
+      "reversalTriggers": [
+        "blocker 수정이 7일을 넘긴다",
+        "사내 배포에서 백그라운드 제한과 무관한 연결 실패가 나온다",
+        "파트너가 일정 변경을 거부한다"
+      ],
+      "sourceRefs": ["policy"]
+    },
+    {
+      "id": "sim",
+      "type": "simulation",
+      "title": "지연 비용과 노출 위험",
+      "description": "지연 일수와 사용자 규모를 바꿔가며 두 값을 비교한다. 계산은 아래 입력만 사용하며 외부로 나가는 요청은 없다.",
+      "inputs": [
+        { "name": "delayDays", "label": "정식 인증 지연", "value": 7, "min": 0, "max": 30, "step": 1, "unit": "일" },
+        { "name": "dailyUsers", "label": "일 활성 사용자", "value": 42000, "min": 1000, "max": 200000, "step": 1000, "unit": "명" },
+        { "name": "crashRate", "label": "예상 크래시율", "value": 0.42, "min": 0.1, "max": 3, "step": 0.01, "unit": "%" },
+        { "name": "ticketCost", "label": "문의 1건 처리 비용", "value": 12000, "min": 1000, "max": 50000, "step": 1000, "unit": "원" }
+      ],
+      "outputs": [
+        {
+          "label": "지연 기간 미노출 사용자",
+          "unit": "명",
+          "precision": 0,
+          "formula": {
+            "type": "operation",
+            "operator": "multiply",
+            "left": { "type": "variable", "name": "dailyUsers" },
+            "right": { "type": "variable", "name": "delayDays" }
+          }
+        },
+        {
+          "label": "지금 내보낼 때 하루 예상 문의 비용",
+          "unit": "원",
+          "precision": 0,
+          "formula": {
+            "type": "operation",
+            "operator": "multiply",
+            "left": {
+              "type": "operation",
+              "operator": "divide",
+              "left": {
+                "type": "operation",
+                "operator": "multiply",
+                "left": { "type": "variable", "name": "dailyUsers" },
+                "right": { "type": "variable", "name": "crashRate" }
+              },
+              "right": { "type": "literal", "value": 100 }
+            },
+            "right": { "type": "variable", "name": "ticketCost" }
+          }
+        }
+      ],
+      "sourceRefs": ["crash", "support"]
+    },
+    {
+      "id": "options",
+      "type": "option-comparison",
+      "title": "선택지",
+      "criteria": ["출시 시점", "고객 노출 위험", "추가 공수", "되돌리기"],
+      "options": [
+        {
+          "id": "a",
+          "label": "A. 지금 정식 인증",
+          "cells": { "출시 시점": "이번 주", "고객 노출 위험": "높음", "추가 공수": "없음", "되돌리기": "인증 철회 2주" }
+        },
+        {
+          "id": "b",
+          "label": "B. 사내 배포 + 인증 1주 보류",
+          "cells": { "출시 시점": "사내 이번 주 / 정식 +1주", "고객 노출 위험": "낮음", "추가 공수": "1주", "되돌리기": "사내 롤백 1일" },
+          "recommended": true
+        }
+      ]
+    },
+    {
+      "id": "risks",
+      "type": "risk-register",
+      "risks": [
+        {
+          "id": "r1",
+          "description": "수정이 다른 전원 관리 경로에 회귀를 만든다",
+          "likelihood": "medium",
+          "impact": "high",
+          "mitigation": "Android 15·16 전체 회귀 실행",
+          "owner": "플랫폼팀"
+        },
+        {
+          "id": "r2",
+          "description": "미검증 칩셋에서 같은 증상이 다른 형태로 재현된다",
+          "likelihood": "medium",
+          "impact": "medium",
+          "mitigation": "사내 배포 기간에 단말 3종 확보",
+          "owner": "QA"
+        }
+      ]
+    },
+    {
+      "id": "decision",
+      "type": "decision-record",
+      "decision": "사내 배포를 이번 주 진행하고 정식 인증은 blocker 해결 후로 1주 미룬다.",
+      "owner": "플랫폼팀 리드",
+      "due": "2026-07-31",
+      "rationale": "blocker가 한 원인에서 나왔고 수정 범위가 좁다. 사내 배포로 미검증 칩셋 노출을 늘리면서 동시에 고객 노출은 막을 수 있다. 지연 비용은 여전히 추정치라 재검토 조건을 달았다.",
+      "status": "decided",
+      "dissent": [
+        { "who": "제품", "objection": "지연 비용을 계산하지 않은 채 1주를 결정했다. 파트너 확인 전이라 근거가 비어 있다." },
+        { "who": "QA", "objection": "칩셋 3종 확보를 blocker로 올려야 한다. 사내 배포 1주로 발견된다는 보장이 없다." }
+      ],
+      "revisitWhen": [
+        "blocker 수정이 7일을 넘길 때",
+        "파트너가 일정 변경을 거부할 때",
+        "사내 배포에서 다른 원인의 연결 실패가 나올 때"
+      ],
+      "sourceRefs": ["policy"]
+    },
+    {
+      "id": "ledger",
+      "type": "source-ledger",
+      "entries": [
+        { "sourceRef": "junit", "covers": "기능 검증 124건", "limits": "검증 단말 12종에 한정" },
+        { "sourceRef": "crash", "covers": "사내 베타 크래시 62건", "limits": "실사용자 구성과 다름" },
+        { "sourceRef": "beta", "covers": "베타 단말 구성", "limits": "칩셋 계열 3종 미포함" },
+        { "sourceRef": "policy", "covers": "정식 인증 요건" },
+        { "sourceRef": "support", "covers": "문의 1건 평균 처리 비용", "limits": "2026-06 기준, 계절성 미반영" }
+      ]
+    }
+  ]
+}

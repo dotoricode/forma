@@ -16,6 +16,7 @@ import { dataBlocks } from "./data.js";
 import { decisionBlocks } from "./decision.js";
 import { diagramBlocks } from "./diagram.js";
 import { documentBlocks } from "./document.js";
+import { advancedBlocks } from "./advanced.js";
 import { dashboardBlocks } from "./dashboard.js";
 import { manualBlocks } from "./manual.js";
 import { reportBlocks } from "./report.js";
@@ -30,6 +31,7 @@ export const ALL_BLOCK_DEFINITIONS = [
   ...reportBlocks,
   ...manualBlocks,
   ...dashboardBlocks,
+  ...advancedBlocks,
 ] as const;
 
 export type AnyBlockDefinition = (typeof ALL_BLOCK_DEFINITIONS)[number];
