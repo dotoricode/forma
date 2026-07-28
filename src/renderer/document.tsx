@@ -16,6 +16,12 @@ const NAV_LABEL: Record<"ko" | "en", string> = {
   ko: "섹션 이동",
 };
 
+/** Shorter than NAV_LABEL because it is set as a rail heading, not a sentence. */
+const RAIL_LABEL: Record<"ko" | "en", string> = {
+  en: "On this page",
+  ko: "이 문서의 목차",
+};
+
 export function Narrative(props: { spec: FormaSpec; showTitle: boolean }) {
   const { narrative, meta } = props.spec;
   return (
@@ -74,6 +80,12 @@ export function TableOfContents(props: { spec: FormaSpec }): ReactElement | null
   if (entries.length === 0) return null;
   return (
     <nav className="toc" aria-label={NAV_LABEL[props.spec.meta.language]}>
+      {/* Visible only where the nav is a vertical rail, and aria-hidden
+          because the nav's own aria-label already announces the same thing.
+          Without it a rail of fifteen bare links does not say what it is. */}
+      <p className="toc__label" aria-hidden="true">
+        {RAIL_LABEL[props.spec.meta.language]}
+      </p>
       {entries.map((entry) => (
         <a key={entry.id} href={`#${entry.id}`}>
           {entry.title}

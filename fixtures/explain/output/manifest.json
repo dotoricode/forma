@@ -8,5 +8,6 @@
   "title": "모바일 SDK 초기화와 서버 정책 확인 흐름",
   "language": "ko",
   "sectionCount": 7,
-  "bytes": 184759
+  "bytes": 212574,
+  "externalNetworkRequests": 0
 }
