@@ -85,7 +85,46 @@ export function buildInteractiveScript(): string {
   if (document.readyState === "loading") {
     document.addEventListener("DOMContentLoaded", () => { initThemeToggle(); initCodeCopy(); initTocActiveState(); });
   } else {
-    initThemeToggle();
+  
+  /* Environment filter for manuals. Steps and commands declare which
+     environments they belong to; this narrows the page to one of them.
+     Nothing is hidden until a choice is made, so a manual whose script
+     fails to run still shows every step. */
+  function initEnvSelector() {
+    const control = document.querySelector("[data-forma-env-selector]");
+    if (!control) return;
+    const scoped = Array.from(document.querySelectorAll("[data-environments]"));
+    if (scoped.length === 0) return;
+    const STORAGE_KEY = "forma-env";
+
+    function apply(env) {
+      for (const el of scoped) {
+        const tags = (el.getAttribute("data-environments") || "").split(" ").filter(Boolean);
+        const match = !env || tags.length === 0 || tags.indexOf(env) !== -1;
+        el.hidden = !match;
+      }
+      for (const button of control.querySelectorAll("[data-env-option]")) {
+        button.setAttribute("aria-pressed", String(button.getAttribute("data-env-option") === env));
+      }
+      const fallback = document.querySelector(".blk-env-selector__fallback");
+      if (fallback) fallback.hidden = Boolean(env);
+    }
+
+    let stored = null;
+    try { stored = localStorage.getItem(STORAGE_KEY); } catch {}
+    control.addEventListener("click", (event) => {
+      const button = event.target.closest("[data-env-option]");
+      if (!button) return;
+      const next = button.getAttribute("data-env-option");
+      const env = button.getAttribute("aria-pressed") === "true" ? null : next;
+      try { env ? localStorage.setItem(STORAGE_KEY, env) : localStorage.removeItem(STORAGE_KEY); } catch {}
+      apply(env);
+    });
+    if (stored) apply(stored);
+  }
+
+  initThemeToggle();
+  initEnvSelector();
     initCodeCopy();
     initTocActiveState();
   }

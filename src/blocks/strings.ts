@@ -157,3 +157,98 @@ export const REPORT_LABEL: Record<"ko" | "en", ReportStrings> = {
     limits: "다루지 않는 것",
   },
 };
+
+/** Manual vocabulary. Section names a reader sees, not UI chrome. */
+export interface ManualStrings {
+  taskMap: string;
+  estimate: string;
+  minutes: string;
+  scope: string;
+  appliesTo: string;
+  doesNotCover: string;
+  prerequisites: string;
+  optional: string;
+  quickPath: string;
+  elevation: string;
+  expectedResult: string;
+  verify: string;
+  ifItFails: string;
+  checkpoint: string;
+  ifNotMet: string;
+  troubleshooting: string;
+  cause: string;
+  fix: string;
+  compatibility: string;
+  target: string;
+  supported: string;
+  partial: string;
+  unsupported: string;
+  untested: string;
+  andLater: string;
+  completion: string;
+  nextTask: string;
+  selectorFallback: string;
+}
+
+export const MANUAL_LABEL: Record<"ko" | "en", ManualStrings> = {
+  en: {
+    taskMap: "What you can finish here",
+    estimate: "Estimated time",
+    minutes: " min",
+    scope: "Who this is for",
+    appliesTo: "Applies to",
+    doesNotCover: "Does not cover",
+    prerequisites: "Before you start",
+    optional: "optional",
+    quickPath: "Fastest path",
+    elevation: "needs elevated permissions",
+    expectedResult: "You should see",
+    verify: "Confirm it",
+    ifItFails: "If it fails: ",
+    checkpoint: "Checkpoint",
+    ifNotMet: "If any of these is false: ",
+    troubleshooting: "When it goes wrong",
+    cause: "Cause",
+    fix: "Fix",
+    compatibility: "Compatibility",
+    target: "Target",
+    supported: "Supported",
+    partial: "Partial",
+    unsupported: "Not supported",
+    untested: "Untested",
+    andLater: "and later",
+    completion: "Confirm you are done",
+    nextTask: "What to do next",
+    selectorFallback: "Every step is shown. Choosing an environment above narrows them.",
+  },
+  ko: {
+    taskMap: "이 문서로 끝낼 수 있는 것",
+    estimate: "예상 소요",
+    minutes: "분",
+    scope: "적용 대상",
+    appliesTo: "해당됨",
+    doesNotCover: "다루지 않음",
+    prerequisites: "시작하기 전에",
+    optional: "선택",
+    quickPath: "가장 빠른 경로",
+    elevation: "관리자 권한 필요",
+    expectedResult: "이렇게 보이면 성공",
+    verify: "확인 방법",
+    ifItFails: "실패하면: ",
+    checkpoint: "여기까지 확인",
+    ifNotMet: "하나라도 아니라면: ",
+    troubleshooting: "안 될 때",
+    cause: "원인",
+    fix: "해결",
+    compatibility: "지원 범위",
+    target: "대상",
+    supported: "지원",
+    partial: "부분 지원",
+    unsupported: "미지원",
+    untested: "미검증",
+    andLater: "이상",
+    completion: "완료 확인",
+    nextTask: "다음에 할 것",
+    selectorFallback: "모든 단계가 표시된 상태입니다. 위에서 환경을 고르면 해당 단계만 남습니다.",
+  },
+};

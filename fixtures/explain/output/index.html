@@ -95,6 +95,10 @@
     --color-warning: oklch(72% 0.15 80);
     --color-danger: oklch(58% 0.18 25);
     --color-info: oklch(60% 0.10 235);
+    --color-success-text: oklch(43% 0.12 152);
+    --color-warning-text: oklch(48% 0.12 80);
+    --color-danger-text: oklch(45% 0.17 25);
+    --color-info-text: oklch(45% 0.11 235);
 
     --font-sans: "Geist", "IBM Plex Sans KR", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
     --font-mono: "Geist Mono", ui-monospace, "SFMono-Regular", Consolas, "Liberation Mono", monospace;
@@ -127,6 +131,10 @@
     --color-accent: oklch(62% 0.11 250);
     --color-accent-strong: oklch(54% 0.13 250);
     --color-on-accent: oklch(9% 0.003 90);
+    --color-success-text: oklch(80% 0.13 152);
+    --color-warning-text: oklch(84% 0.13 80);
+    --color-danger-text: oklch(78% 0.14 25);
+    --color-info-text: oklch(80% 0.10 235);
     color-scheme: dark;
   }
 
@@ -769,7 +777,7 @@
   .blk-decision-matrix__override {
     margin-block-start: var(--space-3);
     font-size: 0.875rem;
-    color: var(--color-warning);
+    color: var(--color-warning-text);
   }
 
   .blk-recommendation__label {
@@ -853,6 +861,236 @@
   }
 
   .blk-appendix__title { font-size: 1rem; color: var(--color-text-muted); }
+
+  
+  /* ---- manual vocabulary ------------------------------------------- */
+
+  .blk-task-map__outcomes { padding-inline-start: var(--space-5); }
+  .blk-task-map__estimate {
+    margin-block-start: var(--space-4);
+    font-size: 0.875rem;
+    color: var(--color-text-muted);
+  }
+
+  .blk-audience-scope__grid {
+    display: grid;
+    gap: var(--space-5) var(--space-7);
+    grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr));
+  }
+  .blk-audience-scope__grid h3 {
+    font-size: 0.8125rem;
+    color: var(--color-text-muted);
+    margin-block-end: var(--space-2);
+  }
+
+  .blk-prerequisite__list { list-style: none; padding: 0; }
+  .blk-prerequisite__item {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: var(--space-2) var(--space-3);
+    padding-block: var(--space-3);
+    border-block-end: 1px solid var(--color-border);
+  }
+  .blk-prerequisite__item[data-required="false"] .blk-prerequisite__label {
+    color: var(--color-text-muted);
+  }
+  .blk-prerequisite__optional {
+    font-size: 0.75rem;
+    color: var(--color-text-muted);
+  }
+  .blk-prerequisite__check {
+    font-size: 0.8125rem;
+    color: var(--color-text-muted);
+  }
+
+  .blk-env-selector__control {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--space-2);
+  }
+  .blk-env-selector__label {
+    font-size: 0.8125rem;
+    color: var(--color-text-muted);
+    margin-inline-end: var(--space-2);
+  }
+  .blk-env-selector__option {
+    font: inherit;
+    font-size: 0.875rem;
+    padding: 0.3em 0.8em;
+    background: var(--color-surface);
+    color: var(--color-text);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+  }
+  .blk-env-selector__option[aria-pressed="true"] {
+    background: var(--color-accent);
+    color: var(--color-on-accent);
+    border-color: var(--color-accent);
+  }
+  .blk-env-selector__fallback {
+    margin-block-start: var(--space-3);
+    font-size: 0.8125rem;
+    color: var(--color-text-muted);
+  }
+
+  .blk-quick-path__list {
+    padding-inline-start: var(--space-5);
+    font-size: 0.9375rem;
+  }
+
+  /* The step number is the anchor the eye returns to after looking away at
+     a terminal, so it sits outside the text column rather than inline. */
+  .blk-step__title {
+    position: relative;
+    font-size: 1.125rem;
+    padding-inline-start: var(--space-7);
+  }
+  .blk-step__number {
+    position: absolute;
+    inset-inline-start: 0;
+    inset-block-start: 0;
+    min-width: var(--space-6);
+    font-variant-numeric: tabular-nums;
+    color: var(--color-text-muted);
+  }
+  .blk-step__instruction, .blk-step__substeps,
+  .blk-step__command, .blk-step__expected,
+  .blk-step__verify, .blk-step__failure {
+    margin-inline-start: var(--space-7);
+  }
+  .blk-step__command { margin-block: var(--space-4); }
+  .blk-step__command-meta {
+    font-size: 0.75rem;
+    color: var(--color-text-muted);
+    margin-block-end: var(--space-1);
+  }
+  .blk-step__command-meta:empty { display: none; }
+  .blk-step__command-shell {
+    margin: 0;
+    padding: var(--space-3) var(--space-4);
+    background: var(--color-surface-raised);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-sm);
+    overflow-x: auto;
+    font-size: 0.875rem;
+  }
+  .blk-step__expected, .blk-step__verify {
+    margin-block-start: var(--space-3);
+    padding-inline-start: var(--space-4);
+    border-inline-start: 1px solid var(--color-border-strong);
+  }
+  .blk-step__expected-label, .blk-step__verify-label,
+  .blk-step__failure-label, .blk-checkpoint__fallback-label {
+    font-size: 0.75rem;
+    letter-spacing: 0.03em;
+    text-transform: uppercase;
+    color: var(--color-text-muted);
+  }
+  .blk-step__failure-label { margin-inline-end: var(--space-2); }
+  .blk-step__failure { margin-block-start: var(--space-3); font-size: 0.9375rem; }
+
+  .blk-checkpoint__title { font-size: 1rem; }
+  .blk-checkpoint__list { padding-inline-start: var(--space-5); }
+  .blk-checkpoint__fallback { margin-block-start: var(--space-3); font-size: 0.9375rem; }
+
+  .blk-decision-tree__question { font-size: 1.0625rem; }
+  .blk-decision-tree__branches dt {
+    font-weight: 600;
+    margin-block-start: var(--space-4);
+  }
+  .blk-decision-tree__branches dd { margin: 0; }
+
+  .blk-troubleshooting__entry {
+    border-block-end: 1px solid var(--color-border);
+    padding-block: var(--space-3);
+  }
+  .blk-troubleshooting__entry summary {
+    cursor: pointer;
+    font-weight: 600;
+  }
+  .blk-troubleshooting__cause, .blk-troubleshooting__fix {
+    margin-block-start: var(--space-2);
+    font-size: 0.9375rem;
+  }
+  .blk-troubleshooting__cause span, .blk-troubleshooting__fix span {
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+    color: var(--color-text-muted);
+    margin-inline-end: var(--space-2);
+  }
+
+  .blk-compat-matrix__scroll { overflow-x: auto; }
+  .blk-compat-matrix__table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.875rem;
+  }
+  .blk-compat-matrix__table th,
+  .blk-compat-matrix__table td {
+    text-align: start;
+    padding: var(--space-2) var(--space-3);
+    border-block-end: 1px solid var(--color-border);
+    white-space: nowrap;
+  }
+  .blk-compat-matrix__table td[data-status="supported"] { color: var(--color-success-text); }
+  .blk-compat-matrix__table td[data-status="unsupported"] { color: var(--color-danger-text); }
+  .blk-compat-matrix__table td[data-status="partial"] { color: var(--color-warning-text); }
+  .blk-compat-matrix__table td[data-status="untested"] { color: var(--color-text-muted); }
+
+  .blk-version-note__range {
+    font-size: 0.75rem;
+    letter-spacing: 0.03em;
+    color: var(--color-text-muted);
+    font-variant-numeric: tabular-nums;
+  }
+  .blk-version-note__note {
+    padding-inline-start: var(--space-4);
+    border-inline-start: 2px solid var(--color-border-strong);
+  }
+
+  .blk-completion-check__check {
+    margin: var(--space-3) 0;
+    padding: var(--space-3) var(--space-4);
+    background: var(--color-surface-raised);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-sm);
+    overflow-x: auto;
+    font-size: 0.875rem;
+  }
+  .blk-completion-check__expected span {
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+    color: var(--color-text-muted);
+    margin-inline-end: var(--space-2);
+  }
+
+  .blk-next-task__list { list-style: none; padding: 0; }
+  .blk-next-task__list li {
+    padding-block: var(--space-3);
+    border-block-end: 1px solid var(--color-border);
+  }
+  .blk-next-task__why {
+    display: block;
+    font-size: 0.875rem;
+    color: var(--color-text-muted);
+  }
+
+  
+  .blk-narrative__title {
+    font-size: clamp(1.75rem, 1.3rem + 1.8vw, 2.75rem);
+    line-height: 1.15;
+    margin-block-end: var(--space-3);
+  }
+  .blk-narrative__subtitle {
+    font-size: 1.0625rem;
+    color: var(--color-text-muted);
+    margin-block-end: var(--space-6);
+  }
 
   
 }
@@ -1257,7 +1495,46 @@
   if (document.readyState === "loading") {
     document.addEventListener("DOMContentLoaded", () => { initThemeToggle(); initCodeCopy(); initTocActiveState(); });
   } else {
-    initThemeToggle();
+  
+  /* Environment filter for manuals. Steps and commands declare which
+     environments they belong to; this narrows the page to one of them.
+     Nothing is hidden until a choice is made, so a manual whose script
+     fails to run still shows every step. */
+  function initEnvSelector() {
+    const control = document.querySelector("[data-forma-env-selector]");
+    if (!control) return;
+    const scoped = Array.from(document.querySelectorAll("[data-environments]"));
+    if (scoped.length === 0) return;
+    const STORAGE_KEY = "forma-env";
+
+    function apply(env) {
+      for (const el of scoped) {
+        const tags = (el.getAttribute("data-environments") || "").split(" ").filter(Boolean);
+        const match = !env || tags.length === 0 || tags.indexOf(env) !== -1;
+        el.hidden = !match;
+      }
+      for (const button of control.querySelectorAll("[data-env-option]")) {
+        button.setAttribute("aria-pressed", String(button.getAttribute("data-env-option") === env));
+      }
+      const fallback = document.querySelector(".blk-env-selector__fallback");
+      if (fallback) fallback.hidden = Boolean(env);
+    }
+
+    let stored = null;
+    try { stored = localStorage.getItem(STORAGE_KEY); } catch {}
+    control.addEventListener("click", (event) => {
+      const button = event.target.closest("[data-env-option]");
+      if (!button) return;
+      const next = button.getAttribute("data-env-option");
+      const env = button.getAttribute("aria-pressed") === "true" ? null : next;
+      try { env ? localStorage.setItem(STORAGE_KEY, env) : localStorage.removeItem(STORAGE_KEY); } catch {}
+      apply(env);
+    });
+    if (stored) apply(stored);
+  }
+
+  initThemeToggle();
+  initEnvSelector();
     initCodeCopy();
     initTocActiveState();
   }

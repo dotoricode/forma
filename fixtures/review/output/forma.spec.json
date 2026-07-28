@@ -1,31 +1,18 @@
 {
-  "version": "0.2",
+  "version": "0.1",
   "meta": {
     "title": "네트워크 재연결 로직 변경 리뷰",
     "subtitle": "VPN 전환 직후 DNS 복구 로직에 재시도 상한을 도입한다",
-    "artifact": "report",
-    "purpose": "decide",
+    "mode": "review",
     "audience": "engineering",
     "language": "ko",
-    "variant": "technical",
-    "colorMode": "light",
+    "theme": "light",
     "density": "comfortable",
-    "interaction": "static",
     "confidentiality": "internal"
   },
   "sources": [
-    {
-      "id": "diff",
-      "label": "connection-reset.diff",
-      "path": "fixtures/review/inputs/change.diff",
-      "kind": "diff"
-    },
-    {
-      "id": "junit",
-      "label": "concurrency-tests/results.xml",
-      "path": "fixtures/review/inputs/results.xml",
-      "kind": "junit"
-    }
+    { "id": "diff", "label": "connection-reset.diff", "kind": "diff", "path": "fixtures/review/inputs/change.diff" },
+    { "id": "junit", "label": "concurrency-tests/results.xml", "kind": "junit", "path": "fixtures/review/inputs/results.xml" }
   ],
   "narrative": {
     "question": "이 변경이 VPN 전환 직후의 네트워크 오류를 안전하게 해결하는가?",
@@ -39,20 +26,14 @@
   "sections": [
     {
       "id": "cover",
-      "sourceRefs": [],
       "type": "cover",
-      "eyebrow": "REVIEW · #482 · INTERNAL",
       "title": "네트워크 재연결 로직 변경 리뷰",
+      "eyebrow": "REVIEW · #482 · INTERNAL",
       "subtitle": "VPN 전환 시 DNS 복구 로직에 재시도 상한을 도입한다",
-      "meta": [
-        "4개 파일 변경",
-        "위험도: 중간",
-        "테스트 12/14 통과"
-      ]
+      "meta": ["4개 파일 변경", "위험도: 중간", "테스트 12/14 통과"]
     },
     {
       "id": "before-after",
-      "sourceRefs": [],
       "type": "comparison",
       "title": "Before / After",
       "left": {
@@ -72,34 +53,28 @@
     },
     {
       "id": "diff",
-      "sourceRefs": [
-        "diff"
-      ],
-      "confidence": "verified",
       "type": "diff",
       "title": "핵심 변경: ConnectionManager.kt",
+      "confidence": "verified",
+      "sourceRefs": ["diff"],
       "unifiedDiff": "--- a/ConnectionManager.kt\n+++ b/ConnectionManager.kt\n@@ -40,9 +40,11 @@ class ConnectionManager {\n     fun onNetworkChanged(network: Network) {\n-        reconnect()\n+        resetConnectionState()\n+        reconnect(maxRetries = MAX_RETRIES)\n     }\n \n-    private fun reconnect() {\n-        while (true) {\n-            if (tryConnect()) return\n-        }\n+    private fun reconnect(maxRetries: Int) {\n+        repeat(maxRetries) {\n+            if (tryConnect()) return\n+        }\n+        notifyReconnectFailed()\n     }\n"
     },
     {
       "id": "impact",
-      "sourceRefs": [
-        "diff"
-      ],
-      "confidence": "inferred",
       "type": "risk",
       "title": "동시에 여러 네트워크 변경 이벤트가 도착하면 상태 재초기화가 겹칠 수 있다",
       "likelihood": "medium",
       "impact": "medium",
-      "mitigation": "resetConnectionState()에 mutex를 적용하거나, 동일 프레임 내 중복 이벤트를 debounce한다."
+      "mitigation": "resetConnectionState()에 mutex를 적용하거나, 동일 프레임 내 중복 이벤트를 debounce한다.",
+      "confidence": "inferred",
+      "sourceRefs": ["diff"]
     },
     {
       "id": "tests",
-      "sourceRefs": [
-        "junit"
-      ],
-      "confidence": "verified",
       "type": "test-summary",
       "title": "테스트 증거",
+      "confidence": "verified",
+      "sourceRefs": ["junit"],
       "total": 14,
       "passed": 12,
       "failed": 0,
@@ -107,27 +82,23 @@
     },
     {
       "id": "open-questions",
-      "sourceRefs": [
-        "junit"
-      ],
-      "confidence": "verified",
       "type": "finding",
       "title": "동시성 테스트가 아직 스킵 상태다",
-      "body": "`ConnectionManagerConcurrencyTest`의 2개 케이스가 `@Ignore`로 스킵되어 있다. 병합 전 활성화하거나, 활성화 계획을 결정에 명시해야 한다.",
-      "severity": "high"
+      "severity": "high",
+      "confidence": "verified",
+      "sourceRefs": ["junit"],
+      "body": "`ConnectionManagerConcurrencyTest`의 2개 케이스가 `@Ignore`로 스킵되어 있다. 병합 전 활성화하거나, 활성화 계획을 결정에 명시해야 한다."
     },
     {
       "id": "decision",
-      "sourceRefs": [],
-      "confidence": "inferred",
       "type": "decision",
       "title": "동시성 테스트를 추가한 뒤 병합한다",
       "status": "recommended",
+      "confidence": "inferred",
       "rationale": "재시도 상한 로직 자체는 검증되었지만, 동시 네트워크 변경 시나리오가 테스트되지 않은 상태로 병합하면 회귀를 놓칠 위험이 있다."
     },
     {
       "id": "sources",
-      "sourceRefs": [],
       "type": "source-note",
       "title": "원본 출처"
     }
