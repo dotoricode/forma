@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Technical Manuscript — onboarding prototype</title>
+<style>
+  :root {
+    --canvas: oklch(99% 0.002 90); --text: oklch(15% 0.004 90);
+    --muted: oklch(48% 0.006 90); --rule: oklch(85% 0.004 90);
+    font-family: Georgia, "Nanum Myeongjo", serif;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--canvas); color: var(--text); line-height: 1.7; }
+  .shell { max-width: 760px; margin-inline: auto; padding: 3rem 1.5rem; }
+  .masthead { display: flex; justify-content: space-between; font-size: 0.8125rem; color: var(--muted); border-bottom: 2px solid var(--text); padding-bottom: 0.5rem; margin-bottom: 2rem; font-family: ui-monospace, monospace; }
+  h1 { font-size: 1.5rem; font-weight: 400; margin: 0 0 1.5rem; }
+  .clause { counter-increment: clause; margin-block: 1.25rem; }
+  .clauses { counter-reset: clause; }
+  .clause .num { font-family: ui-monospace, monospace; color: var(--muted); margin-right: 0.5em; }
+  .clause .num::before { content: counter(clause) "."; }
+  pre { font-family: ui-monospace, monospace; font-size: 0.8125rem; border-top: 1px solid var(--rule); border-bottom: 1px solid var(--rule); padding: 0.75rem 0; overflow-x: auto; }
+  .footnote { font-size: 0.8125rem; color: var(--muted); border-top: 1px solid var(--rule); margin-top: 2rem; padding-top: 0.75rem; }
+</style>
+</head>
+<body>
+<div class="shell">
+  <div class="masthead"><span>Forma / Onboarding</span><span>처음 사용하기</span></div>
+  <h1>Forma 스킬 처음 사용하기</h1>
+
+  <section class="clauses">
+    <div class="clause"><span class="num"></span>이럴 때 쓴다: 코드리뷰 회의 자료, 테스트 결과 공유, 설계 설명, 상사 보고.</div>
+    <div class="clause"><span class="num"></span>이럴 땐 안 쓴다: 슬랙 한두 줄, 마케팅 페이지, PDF 필수, 실시간 공동편집.</div>
+    <div class="clause"><span class="num"></span>Agent는 HTML을 직접 쓰지 않는다. spec만 쓰고 렌더러가 나머지를 담당한다.</div>
+  </section>
+
+  <pre># Codex
+$forma 이 PR diff를 내일 코드리뷰 자료로 만들어줘
+
+# Claude Code
+/forma 이 테스트 결과 폴더를 팀 공유용 리포트로 만들어줘</pre>
+
+  <div class="footnote">가장 흔한 오해: Forma가 매번 새로운 디자인을 그려준다고 생각하는 것. 실제로는 항상 같은 디자인 시스템 위에서 블록만 고른다.</div>
+</div>
+</body>
+</html>

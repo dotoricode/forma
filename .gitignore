@@ -1,0 +1,12 @@
+node_modules/
+dist/
+forma-output/
+.forma-cache/
+*.log
+.DS_Store
+
+# fixtures/*/output/ is committed on purpose — it's the demo gallery
+# (rendered HTML + QA screenshots for the four required fixtures).
+# Theme examples commit their HTML, spec, and manifest; browser-QA screenshots
+# are reproducible evidence and stay local to avoid four duplicate image sets.
+examples/forma-theme-*/output/qa/

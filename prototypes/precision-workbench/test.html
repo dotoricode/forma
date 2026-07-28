@@ -1,0 +1,101 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Precision Workbench — test prototype</title>
+<style>
+  :root {
+    --canvas: oklch(96% 0.004 260); --surface: oklch(100% 0 0);
+    --sidebar: oklch(18% 0.02 260); --sidebar-text: oklch(85% 0.01 260);
+    --text: oklch(18% 0.01 260); --muted: oklch(50% 0.01 260); --border: oklch(90% 0.005 260);
+    --accent: oklch(56% 0.16 260); --danger: oklch(58% 0.18 25); --success: oklch(60% 0.14 152); --warning: oklch(72% 0.15 80);
+    --shadow: 0 1px 2px oklch(0% 0 0 / 0.04), 0 4px 12px oklch(0% 0 0 / 0.06);
+    font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--canvas); color: var(--text); }
+  .app { display: grid; grid-template-columns: 220px 1fr; min-height: 100vh; }
+  .sidebar { background: var(--sidebar); color: var(--sidebar-text); padding: 1.5rem 1.25rem; }
+  .sidebar .brand { font-weight: 700; font-size: 1.05rem; color: white; margin-bottom: 2rem; }
+  .sidebar nav a { display: block; padding: 0.55rem 0.75rem; border-radius: 8px; color: var(--sidebar-text); text-decoration: none; font-size: 0.875rem; margin-bottom: 0.15rem; }
+  .sidebar nav a.active { background: oklch(28% 0.03 260); color: white; font-weight: 600; }
+  .main { padding: 1.75rem 2rem 3rem; }
+  .topbar { display: flex; align-items: baseline; justify-content: space-between; margin-bottom: 1.5rem; }
+  .topbar h1 { font-size: 1.25rem; margin: 0; }
+  .topbar .meta { color: var(--muted); font-size: 0.875rem; }
+  .pill { padding: 0.25em 0.75em; border-radius: 999px; font-size: 0.75rem; font-weight: 600; }
+  .pill.danger { background: color-mix(in oklch, var(--danger) 16%, white); color: oklch(45% 0.16 25); }
+
+  .kpi-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem; margin-bottom: 1.5rem; }
+  .kpi-card { background: var(--surface); border-radius: 12px; box-shadow: var(--shadow); padding: 1.1rem 1.25rem; }
+  .kpi-card .label { font-size: 0.8125rem; color: var(--muted); margin-bottom: 0.4rem; }
+  .kpi-card .value { font-size: 1.85rem; font-weight: 700; line-height: 1; }
+  .kpi-card .bar { height: 4px; border-radius: 2px; background: var(--border); margin-top: 0.6rem; overflow: hidden; }
+  .kpi-card .bar > span { display: block; height: 100%; border-radius: 2px; }
+
+  .content-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+  .card { background: var(--surface); border-radius: 12px; box-shadow: var(--shadow); padding: 1.25rem 1.5rem; }
+  .card h3 { margin: 0 0 1rem; font-size: 0.95rem; }
+  table { width: 100%; border-collapse: collapse; font-size: 0.8125rem; }
+  th, td { padding: 0.4rem 0.5rem; text-align: left; border-bottom: 1px solid var(--border); }
+  .fail { color: var(--danger); font-weight: 700; } .pass { color: var(--success); }
+  .chart-bars { display: flex; align-items: flex-end; gap: 0.75rem; height: 140px; }
+  .chart-bars .bar-col { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 0.4rem; }
+  .chart-bars .bar-col .fill { width: 100%; border-radius: 4px 4px 0 0; background: var(--accent); }
+  .chart-bars .bar-col.over .fill { background: var(--danger); }
+  .chart-bars .bar-col small { font-size: 0.7rem; color: var(--muted); }
+</style>
+</head>
+<body>
+<div class="app">
+  <aside class="sidebar">
+    <div class="brand">Forma Workbench</div>
+    <nav>
+      <a href="#">리뷰</a>
+      <a href="#" class="active">테스트 대시보드</a>
+      <a href="#">보고서</a>
+      <a href="#">설정</a>
+    </nav>
+  </aside>
+  <main class="main">
+    <div class="topbar">
+      <div>
+        <h1>단말·OS 버전별 위협 탐지 회귀 테스트</h1>
+        <div class="meta">탐지 엔진 v3.2 · 2026-07-20 ~ 2026-07-24</div>
+      </div>
+      <span class="pill danger">2건 실패</span>
+    </div>
+
+    <div class="kpi-grid">
+      <div class="kpi-card"><div class="label">전체 조합</div><div class="value">18</div><div class="bar"><span style="width:100%; background:var(--muted);"></span></div></div>
+      <div class="kpi-card"><div class="label">성공</div><div class="value" style="color:var(--success)">16</div><div class="bar"><span style="width:89%; background:var(--success);"></span></div></div>
+      <div class="kpi-card"><div class="label">실패</div><div class="value" style="color:var(--danger)">2</div><div class="bar"><span style="width:11%; background:var(--danger);"></span></div></div>
+      <div class="kpi-card"><div class="label">정확도</div><div class="value">99.7%</div><div class="bar"><span style="width:99%; background:var(--accent);"></span></div></div>
+    </div>
+
+    <div class="content-grid">
+      <div class="card">
+        <h3>배터리 소모율 (%/h, 예산 2.0)</h3>
+        <div class="chart-bars">
+          <div class="bar-col over"><div class="fill" style="height:80%"></div><small>Pixel 4a</small></div>
+          <div class="bar-col over"><div class="fill" style="height:88%"></div><small>A12</small></div>
+          <div class="bar-col"><div class="fill" style="height:34%"></div><small>Pixel 7</small></div>
+          <div class="bar-col"><div class="fill" style="height:40%"></div><small>S22</small></div>
+          <div class="bar-col"><div class="fill" style="height:26%"></div><small>Pixel 8</small></div>
+        </div>
+      </div>
+      <div class="card">
+        <h3>단말 × OS 매트릭스</h3>
+        <table>
+          <tr><th></th><th>10</th><th>11</th><th>12</th></tr>
+          <tr><td>Pixel 4a</td><td class="fail">FAIL</td><td class="pass">PASS</td><td class="pass">PASS</td></tr>
+          <tr><td>Galaxy A12</td><td class="fail">FAIL</td><td class="pass">PASS</td><td class="pass">PASS</td></tr>
+          <tr><td>Pixel 7</td><td>·</td><td>·</td><td class="pass">PASS</td></tr>
+        </table>
+      </div>
+    </div>
+  </main>
+</div>
+</body>
+</html>

@@ -1,0 +1,48 @@
+{
+  "name": "forma",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Turn complex work into clear form. Spec-first compiler that renders documents, code, reviews, tests and reports into polished, self-contained HTML.",
+  "type": "module",
+  "license": "MIT",
+  "bin": {
+    "forma": "./dist/cli/index.js"
+  },
+  "engines": {
+    "node": ">=20.19"
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "dev": "tsx src/cli/index.ts",
+    "forma": "tsx src/cli/index.ts",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "qa": "tsx src/qa/run-qa.ts",
+    "lint:design": "tsx src/qa/design-lint.ts",
+    "lighthouse": "tsx src/qa/run-lighthouse.ts",
+    "check-naming": "node scripts/check-naming.mjs",
+    "fonts:build": "tsx scripts/build-fonts.mjs"
+  },
+  "dependencies": {
+    "commander": "^15.0.0",
+    "diff": "^9.0.0",
+    "isomorphic-dompurify": "^3.19.0",
+    "shiki": "^4.3.1",
+    "svgo": "^4.0.2",
+    "zod": "^4.4.3"
+  },
+  "devDependencies": {
+    "@axe-core/playwright": "^4.12.1",
+    "@ibm/plex-sans-kr": "^1.1.0",
+    "@playwright/test": "^1.62.0",
+    "@types/node": "^22.14.0",
+    "chrome-launcher": "^1.2.1",
+    "geist": "^1.7.2",
+    "lighthouse": "^13.4.1",
+    "playwright": "^1.62.0",
+    "subset-font": "^2.5.0",
+    "tsx": "^4.23.1",
+    "typescript": "^5.9.3",
+    "vitest": "^4.1.10"
+  }
+}

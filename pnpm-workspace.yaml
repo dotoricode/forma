@@ -1,0 +1,4 @@
+allowBuilds:
+  '@ibm/plex-sans-kr': false
+  esbuild: false
+  sharp: false

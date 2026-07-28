@@ -1,0 +1,30 @@
+{
+  "explain": {
+    "performance": 0.98,
+    "accessibility": 1,
+    "bestPractices": 1,
+    "cls": 0,
+    "tbt": 0
+  },
+  "review": {
+    "performance": 0.99,
+    "accessibility": 1,
+    "bestPractices": 1,
+    "cls": 0,
+    "tbt": 0
+  },
+  "test": {
+    "performance": 0.99,
+    "accessibility": 1,
+    "bestPractices": 1,
+    "cls": 0,
+    "tbt": 0
+  },
+  "report": {
+    "performance": 0.99,
+    "accessibility": 1,
+    "bestPractices": 1,
+    "cls": 0,
+    "tbt": 0
+  }
+}

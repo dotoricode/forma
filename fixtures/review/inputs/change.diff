@@ -1,0 +1,19 @@
+--- a/ConnectionManager.kt
++++ b/ConnectionManager.kt
+@@ -40,9 +40,11 @@ class ConnectionManager {
+     fun onNetworkChanged(network: Network) {
+-        reconnect()
++        resetConnectionState()
++        reconnect(maxRetries = MAX_RETRIES)
+     }
+
+-    private fun reconnect() {
+-        while (true) {
+-            if (tryConnect()) return
+-        }
++    private fun reconnect(maxRetries: Int) {
++        repeat(maxRetries) {
++            if (tryConnect()) return
++        }
++        notifyReconnectFailed()
+     }

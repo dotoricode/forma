@@ -1,0 +1,252 @@
+{
+  "version": "0.1",
+  "meta": {
+    "title": "Forma란 무엇인가",
+    "subtitle": "복잡한 업무를 명확한 형태로 바꾸는 spec-first HTML 컴파일러",
+    "mode": "explain",
+    "audience": "engineering",
+    "language": "ko",
+    "theme": "light",
+    "designSystem": "quiet-editorial",
+    "density": "comfortable",
+    "confidentiality": "public"
+  },
+  "sources": [
+    {
+      "id": "readme",
+      "label": "README.md",
+      "path": "README.md",
+      "kind": "file"
+    },
+    {
+      "id": "design",
+      "label": "DESIGN.md",
+      "path": "DESIGN.md",
+      "kind": "file"
+    },
+    {
+      "id": "architecture",
+      "label": "docs/architecture.md",
+      "path": "docs/architecture.md",
+      "kind": "file"
+    },
+    {
+      "id": "product-brief",
+      "label": "docs/product-brief.md",
+      "path": "docs/product-brief.md",
+      "kind": "file"
+    },
+    {
+      "id": "lighthouse",
+      "label": "docs/lighthouse-summary.json",
+      "path": "docs/lighthouse-summary.json",
+      "kind": "file"
+    }
+  ],
+  "narrative": {
+    "question": "Forma는 무엇이고, 왜 Agent가 매번 HTML을 새로 그리는 방식과 다른가?",
+    "summary": "Forma는 문서·코드·리뷰·테스트결과·보고자료를 읽어 forma.spec.json이라는 구조화된 사양으로 정리하고, 결정론적 렌더러가 그 사양을 항상 같은 디자인 시스템으로 HTML로 컴파일하는 도구다. Agent는 내용과 블록 선택만 담당하고, 스타일과 품질은 렌더러가 책임진다.",
+    "takeaways": [
+      "Agent는 HTML/CSS를 직접 쓰지 않는다. spec만 쓰고 렌더러가 나머지를 담당한다.",
+      "20개 의미 기반 블록과 4개 모드(explain/review/test/report)가 하나의 디자인 시스템 위에서 조합만 달라진다.",
+      "결과물은 폰트까지 포함해 완전히 오프라인 단일 HTML이며 외부 네트워크 요청이 0건이다."
+    ]
+  },
+  "sections": [
+    {
+      "id": "cover",
+      "sourceRefs": [],
+      "type": "cover",
+      "eyebrow": "EXPLAIN · TOOL OVERVIEW",
+      "title": "Forma란 무엇인가",
+      "subtitle": "Turn complex work into clear form.",
+      "meta": [
+        "spec-first 컴파일러",
+        "20개 블록 · 4개 모드",
+        "MIT License"
+      ]
+    },
+    {
+      "id": "core-idea",
+      "sourceRefs": [
+        "readme",
+        "product-brief"
+      ],
+      "confidence": "verified",
+      "type": "key-points",
+      "title": "핵심 아이디어",
+      "points": [
+        "입력(문서·diff·JUnit XML·노트)을 Agent가 읽고 forma.spec.json을 작성한다.",
+        "결정론적 TypeScript 렌더러가 spec을 semantic HTML로 컴파일한다. 같은 spec은 항상 같은 바이트 결과를 낸다.",
+        "Playwright·axe-core·Lighthouse가 결과물을 실제 브라우저에서 검증한다.",
+        "Agent가 매번 자유롭게 HTML/CSS를 생성하는 방식보다 일관되고 접근성이 보장된 결과를 만든다."
+      ]
+    },
+    {
+      "id": "pipeline",
+      "sourceRefs": [
+        "architecture"
+      ],
+      "confidence": "verified",
+      "type": "flow",
+      "title": "입력에서 HTML까지",
+      "nodes": [
+        {
+          "id": "input",
+          "label": "입력 자료 (문서/코드/diff/테스트결과)",
+          "kind": "start"
+        },
+        {
+          "id": "agent",
+          "label": "Agent Skill이 내용을 읽고 분석",
+          "kind": "step"
+        },
+        {
+          "id": "spec",
+          "label": "forma.spec.json 작성",
+          "kind": "step"
+        },
+        {
+          "id": "validate",
+          "label": "스키마 검증 (forma validate)",
+          "kind": "decision"
+        },
+        {
+          "id": "render",
+          "label": "결정론적 렌더러가 HTML로 컴파일",
+          "kind": "step"
+        },
+        {
+          "id": "qa",
+          "label": "Playwright + axe + Lighthouse 검증",
+          "kind": "end"
+        }
+      ],
+      "edges": [
+        {
+          "from": "input",
+          "to": "agent"
+        },
+        {
+          "from": "agent",
+          "to": "spec"
+        },
+        {
+          "from": "spec",
+          "to": "validate"
+        },
+        {
+          "from": "validate",
+          "to": "render",
+          "label": "통과"
+        },
+        {
+          "from": "render",
+          "to": "qa"
+        }
+      ]
+    },
+    {
+      "id": "not-freehand",
+      "sourceRefs": [
+        "product-brief"
+      ],
+      "confidence": "verified",
+      "type": "comparison",
+      "title": "왜 Agent가 HTML을 직접 쓰지 않는가",
+      "left": {
+        "label": "Agent가 매번 HTML/CSS 자유 생성",
+        "items": [
+          "요청마다 디자인이 조금씩 달라짐",
+          "generic AI 디자인 패턴(그라디언트, 과도한 카드 등)이 섞이기 쉬움",
+          "접근성·성능 검증이 매번 달라짐"
+        ]
+      },
+      "right": {
+        "label": "Forma의 spec-first 방식",
+        "items": [
+          "Agent는 내용·블록 선택만 담당",
+          "렌더러가 하나의 디자인 시스템(Quiet Editorial)을 항상 적용",
+          "같은 spec → 항상 같은 바이트의 HTML (재현 가능)"
+        ]
+      }
+    },
+    {
+      "id": "modes-glossary",
+      "sourceRefs": [
+        "readme"
+      ],
+      "confidence": "verified",
+      "type": "glossary",
+      "title": "네 가지 모드와 핵심 용어",
+      "terms": [
+        {
+          "term": "explain",
+          "definition": "설계·코드·아키텍처를 이해하기 쉽게 설명하는 모드. (이 문서 자체가 explain 모드로 만들어졌다.)"
+        },
+        {
+          "term": "review",
+          "definition": "PR/diff를 코드리뷰 회의용 자료로 만드는 모드."
+        },
+        {
+          "term": "test",
+          "definition": "테스트 결과를 한눈에 보이는 리포트로 만드는 모드."
+        },
+        {
+          "term": "report",
+          "definition": "분석·조사 내용을 상사·동료 보고용으로 만드는 모드."
+        },
+        {
+          "term": "forma.spec.json",
+          "definition": "Agent가 작성하는 구조화된 사양 파일. Zod 스키마로 엄격하게 검증된다."
+        },
+        {
+          "term": "블록(block)",
+          "definition": "cover, summary, diff, flow, test-matrix 등 20개의 의미 기반 시각 구성 요소. 모든 블록이 같은 카드 컴포넌트가 아니라 내용에 맞는 서로 다른 레이아웃을 가진다."
+        }
+      ]
+    },
+    {
+      "id": "try-it",
+      "sourceRefs": [
+        "readme"
+      ],
+      "confidence": "verified",
+      "type": "annotated-code",
+      "title": "직접 사용해보기",
+      "language": "bash",
+      "code": "pnpm install\npnpm build\n\n# spec을 HTML로 렌더링\npnpm forma render fixtures/review/forma.spec.json --out fixtures/review/output\n\n# 로컬 서버로 미리보기\npnpm forma preview fixtures/review/output\n\n# Claude Code에서: /forma 이 diff를 리뷰 자료로 만들어줘\n# Codex에서:      $forma 이 diff를 리뷰 자료로 만들어줘",
+      "highlightLines": [
+        4,
+        7
+      ],
+      "annotations": [
+        {
+          "line": 4,
+          "text": "forma.spec.json 하나만 있으면 render 명령으로 바로 오프라인 HTML을 만든다."
+        },
+        {
+          "line": 7,
+          "text": "preview는 로컬 HTTP 서버만 띄운다. 외부로 아무것도 전송하지 않는다."
+        }
+      ]
+    },
+    {
+      "id": "results-finding",
+      "sourceRefs": [
+        "lighthouse"
+      ],
+      "confidence": "verified",
+      "type": "finding",
+      "title": "네 가지 예시 문서 모두 성능·접근성 목표를 충족했다",
+      "body": "explain 99점, review 100점, test 98점, report 99점(Lighthouse Performance, 목표 95점 이상). Accessibility와 Best Practices는 네 문서 모두 100점이며, 콘솔 에러와 외부 네트워크 요청은 0건이다.",
+      "severity": "info"
+    },
+    {
+      "id": "sources",
+      "sourceRefs": [],
+      "type": "source-note",
+      "title": "원본 출처"
+    }
+  ]
+}
