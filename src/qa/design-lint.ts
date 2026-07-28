@@ -7,6 +7,7 @@
  * so this runs in `forma build` even when Playwright isn't available.
  */
 import { readFile } from "node:fs/promises";
+import { lintDom } from "./dom-lint.js";
 
 export interface DesignLintFinding {
   rule: string;
@@ -200,11 +201,17 @@ export function lintCss(css: string): DesignLintFinding[] {
   ];
 }
 
+/**
+ * Lints a rendered file at both layers: the stylesheet for rules that
+ * should not exist, and the DOM for rules used too many times. The second
+ * needs the document — card saturation and layout repetition are properties
+ * of the output, not of any single declaration.
+ */
 export async function lintHtmlFile(htmlPath: string): Promise<DesignLintFinding[]> {
   const html = await readFile(htmlPath, "utf-8");
   const styleMatch = html.match(/<style>([\s\S]*?)<\/style>/);
   const css = styleMatch?.[1] ?? "";
-  return lintCss(css);
+  return [...lintCss(css), ...lintDom(html)];
 }
 
 async function main() {

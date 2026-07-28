@@ -56,7 +56,9 @@ program
   .command("build <spec>")
   .description("Render a spec and run the static (non-browser) quality gates")
   .option("--out <dir>", "output directory", "forma-output")
-  .action(async (specPath: string, opts: { out: string }) => {
+  .option("--quality <level>", "standard | advanced (advanced runs the candidate tournament)", "standard")
+  .option("--seed <text>", "seed for candidate generation; same seed, same winner", "forma")
+  .action(async (specPath: string, opts: { out: string; quality: string; seed: string }) => {
     try {
       const outcome = await renderSpecFileToDir(specPath, opts.out);
       console.log(`forma: rendered ${outcome.htmlPath} (${outcome.bytes} bytes)`);
@@ -68,6 +70,34 @@ program
         console.log(`forma: design lint — ${findings.length} finding(s):`);
         for (const f of findings) console.log(`  - [${f.rule}] ${f.message}`);
       }
+
+      if (opts.quality === "advanced") {
+        const { buildCandidates, scoreCandidate, seedFrom, selectWinner } = await import(
+          "../qa/candidates.js"
+        );
+        const { loadSpecFile } = await import("../renderer/render.js");
+        const spec = await loadSpecFile(specPath);
+        const candidates = buildCandidates(spec, 8, seedFrom(opts.seed));
+        // Every candidate is scored against the same rendered evidence for
+        // now: composition axes do not yet feed the stylesheet, so varying
+        // them would change nothing and pretending otherwise would make the
+        // tournament theatre. The selection machinery is real and pinned by
+        // tests; wiring the axes into the renderer is the remaining step.
+        const evidence = { lintFindings: findings };
+        const scores = candidates.map((candidate) => scoreCandidate(candidate, evidence));
+        const winner = selectWinner(scores);
+        if (!winner) {
+          console.log("forma: every candidate failed a hard gate. Nothing to select.");
+        } else {
+          console.log(
+            `forma: quality advanced — ${candidates.length} candidates, winner '${winner.candidate.id}' at ${winner.score}/100`,
+          );
+          for (const [dimension, value] of Object.entries(winner.breakdown)) {
+            console.log(`  ${dimension}: ${value}`);
+          }
+        }
+      }
+
       console.log(`forma: run \`forma qa ${opts.out}\` for the full browser/axe gate`);
     } catch (error) {
       exitWithError(error);

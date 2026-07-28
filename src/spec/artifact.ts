@@ -94,6 +94,10 @@ export function isVariantOfArtifact(artifact: ArtifactKind, variant: Variant): b
 export const InteractionSchema = z.enum(["static", "islands", "live"]);
 export type Interaction = z.infer<typeof InteractionSchema>;
 
+/** Information density. Independent of artifact: any artifact can be either. */
+export const DensitySchema = z.enum(["comfortable", "compact"]);
+export type Density = z.infer<typeof DensitySchema>;
+
 /** Light/dark selection. Renamed from `theme`, which collided with artifact themes. */
 export const ColorModeSchema = z.enum(["light", "dark", "auto"]);
 export type ColorMode = z.infer<typeof ColorModeSchema>;
