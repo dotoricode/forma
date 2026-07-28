@@ -193,15 +193,67 @@ dist/codex/forma-<name>/SKILL.md
 - Claude: `disable-model-invocation: true`
 - Codex: `policy.allow_implicit_invocation: false`
 
-### 착수 전에 반드시 할 것
+### 외부 문서 검증 결과 (2026-07-28 확인 완료)
 
-**사용자 제안서에 인용된 외부 문서를 아직 아무도 검증하지 않았다.**
-Agent Skills 표준의 이름 규칙, Claude Code 플러그인 namespace,
-Codex의 `$skill-name` 호출 형식과 `.agents/skills` 탐색 경로,
-스킬 목록 컨텍스트 상한(2% 또는 8,000자) — 전부 미확인이다.
+핸드오프가 "착수 전 반드시 확인"으로 남겼던 항목을 전부 1차 출처에서
+확인했다. **제안서의 컨텍스트 상한 수치가 틀렸고, 이름 규칙에 제안서가
+언급하지 않은 제약이 하나 더 있다.**
 
-PR1~7에는 영향이 없었지만 PR9는 이 위에 서 있다. **먼저 확인하고 시작하라.**
-확인 결과가 제안서와 다르면 사용자에게 알리고 진행할 것.
+| 제안서 주장 | 검증 결과 |
+|---|---|
+| Agent Skills 이름 규칙 | 맞음 + 제약 추가 (아래) |
+| Claude `/forma:dashboard` namespace | 맞음 |
+| Codex `$skill-name` 호출 | 맞음 (CLI/IDE에서 `$`. ChatGPT Work는 `@`) |
+| `.agents/skills` 탐색 경로 | 맞음 |
+| Claude `disable-model-invocation: true` | 맞음 (SKILL.md frontmatter) |
+| Codex `policy.allow_implicit_invocation: false` | 맞음, **단 위치가 다르다** |
+| 컨텍스트 상한 "2% 또는 8,000자" | **틀렸다** |
+
+**이름은 부모 디렉터리 이름과 일치해야 한다.** Agent Skills 스펙:
+1~64자, 소문자·숫자·하이픈만, 앞뒤 하이픈 금지, 연속 하이픈(`--`) 금지,
+그리고 **`name`이 부모 디렉터리 이름과 같아야 한다**. `description`은
+1~1024자.
+
+이게 설계에 직접 영향을 준다. Claude 쪽은
+`forma/skills/dashboard/SKILL.md` + `name: dashboard` → `/forma:dashboard`.
+Codex 쪽은 `forma-dashboard/SKILL.md` + `name: forma-dashboard` →
+`$forma-dashboard`. **두 호스트가 서로 다른 `name` 값을 요구한다.** 어댑터
+생성기가 SKILL.md를 그냥 복사하면 안 되고 호스트별로 frontmatter를 다시
+써야 한다. 현재 `src/cli/skills.ts`의 copy+checksum 구조를 그대로 확장하면
+여기서 걸린다.
+
+**Codex의 암묵 호출 차단은 frontmatter가 아니다.** `agents/openai.yaml`에
+`policy.allow_implicit_invocation: false`로 넣는다. Codex가 지원하는
+SKILL.md frontmatter는 `name`과 `description` 두 개뿐이다. Claude 쪽
+`disable-model-invocation`은 frontmatter가 맞다. 즉 `advanced`를 명시적
+호출 전용으로 만들려면 **서로 다른 파일 두 곳**을 건드려야 한다.
+
+**컨텍스트 상한 실제 값** (Claude Code):
+- 스킬 목록 예산 기본값은 모델 컨텍스트 창의 **1%**. 제안서의 "2%"는
+  `skillListingBudgetFraction`을 **올리는 예시**(`0.02`)를 기본값으로
+  잘못 읽은 것이다.
+- 고정 문자수로 바꾸려면 `SLASH_COMMAND_TOOL_CHAR_BUDGET`.
+- 항목별 `description` + `when_to_use` 합계 상한은 **1,536자**
+  (`skillListingMaxDescChars`로 조정). **8,000자는 어디에도 없다.**
+- 예산을 넘기면 Claude Code가 덜 쓰는 스킬부터 description을 버린다.
+  이름은 항상 남는다. `/doctor`로 실측할 수 있다.
+
+스킬이 4종뿐이므로 1,536자 상한만 지키면 예산은 문제가 아니다. 다만
+`description`을 1024자(Agent Skills 스펙 상한)로 쓰면 Claude Code 목록에서
+잘리지는 않지만, 4종 합계가 예산을 압박할 수 있다. 핵심 용례를 앞에 둘 것.
+
+**Codex 탐색 경로 전체**: `$CWD/.agents/skills` → 상위 디렉터리들 →
+`$REPO_ROOT/.agents/skills` → `$HOME/.agents/skills` →
+`/etc/codex/skills`. Claude Code: `.claude/skills/`(시작 디렉터리와 repo
+root까지의 모든 상위, 작업 중 하위도 on-demand) → `~/.claude/skills/` →
+enterprise. 플러그인 스킬은 `plugin-name:skill-name`으로 namespace되므로
+다른 레벨과 충돌하지 않는다.
+
+**출처**
+- https://code.claude.com/docs/en/skills
+- https://code.claude.com/docs/en/plugins-reference
+- https://agentskills.io/specification
+- https://learn.chatgpt.com/docs/build-skills.md (developers.openai.com/codex/skills.md에서 308 리다이렉트)
 
 ---
 
