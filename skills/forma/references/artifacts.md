@@ -163,8 +163,38 @@ page would run agent-authored text with the page's privileges. The
 validator also rejects a formula reading an undeclared variable, a slider
 default outside its own range, and a division by zero at starting values.
 
-Room Mode (a localhost server with `--lan` opt-in) is not built yet.
-`forma advanced` without `--portable` says so rather than guessing.
+### The two Advanced modes
+
+`forma advanced` needs one of them named. It refuses to guess, because they
+have different security postures and the difference is the point.
+
+| | `--portable` | `--room` |
+|---|---|---|
+| What it is | a file you send | a live session on your machine |
+| Server | none | binds `127.0.0.1`, or `0.0.0.0` with `--lan` |
+| External network requests | 0 | 0 |
+| Local network traffic | none | yes, that is what the mode is |
+| Votes and comments | no | yes, synced between participants |
+| Written to disk | the build | nothing until a Decision Freeze |
+| `meta.interaction: "live"` | rejected | required for syncing |
+
+**Do not write "makes no network requests" about Room Mode.** It makes no
+*external* requests, and participants do talk to the server. Those are two
+claims and the manifest keeps them in two fields (`session` and `snapshot`)
+for that reason. Collapsing them into one line makes the security claim
+false, and it is the claim people are trusting.
+
+`--lan` is never implied. Without it the room is unreachable from any other
+machine. A one-time session token guards every request, lives only in the
+process, and dies with it.
+
+**Decision Freeze** is the only thing Room Mode writes: `decision.json`,
+`snapshot.html`, and `manifest.json`. The snapshot is the document plus the
+meeting record, and it makes zero requests of any kind — the room server is
+gone by the time anyone reads it. The record carries the decision, owner,
+due date, rationale, dissent (tagged by whether it was authored beforehand
+or raised in the room), what was still unknown, the simulation inputs as
+they stood when the call was made, and both hashes.
 
 Do not work around a missing block by approximating it. A wrong-shaped
 output that validates is worse than a clear failure.

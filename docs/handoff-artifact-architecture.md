@@ -18,19 +18,14 @@ artifact 계약은 `skills/forma/references/artifacts.md`.
 | 4 | manual artifact 블록 13종 + 절차 검증 | 머지됨 (#4) |
 | 5 | dashboard artifact 블록 7종 + 지표 검증 | 머지됨 (#5) |
 | 6 | DOM lint 8종 + 후보 선택 계층 | 머지됨 (#6) |
-| 7 | Decision Room 블록 5종 + Portable 모드 | **PR #7 열림, CI 통과. 머지만 하면 됨** |
-| 8 | Room Mode + 협업 + Decision Freeze | 미착수 |
+| 7 | Decision Room 블록 5종 + Portable 모드 | 머지됨 (#7) |
+| 8 | Room Mode + 협업 + Decision Freeze | **PR 열림 (`feat/room-mode`)** |
 | 9 | Codex/Claude 스킬 패키징 + 최종 QA | 미착수 |
 
-브랜치: `feat/decision-room` (푸시됨, 워킹트리 clean)
+브랜치: `feat/room-mode`
 
-**첫 할 일**
-
-```bash
-gh pr checks 7          # 통과 확인
-gh pr merge 7 --merge --delete-branch
-git checkout main && git pull
-```
+**첫 할 일**: PR8을 머지하고 PR9로 넘어간다. PR9는 아래 "PR9" 절의
+경고를 먼저 읽어라 — 검증되지 않은 외부 문서 전제 위에 서 있다.
 
 ---
 
@@ -41,7 +36,7 @@ git checkout main && git pull
 ```bash
 pnpm install
 pnpm build            # tsc, 오류 0
-pnpm test             # 172개 통과
+pnpm test             # 231개 통과
 pnpm qa               # 8/8 (fixture 8종 x 4뷰포트 + axe)
 node scripts/check-naming.mjs
 pnpm forma verify-skills
@@ -70,6 +65,8 @@ src/
 ├── renderer/      document.tsx  compose.tsx  static.tsx  shell.ts
 │                  diagrams.ts  sparkline.ts  interactive.ts  highlight.ts
 ├── design/        foundations-css.ts  block-css.ts  artifact-css.ts  tokens.ts
+├── room/          state.ts  protocol.ts  token.ts  server.ts
+│                  panel.ts  freeze.ts  persist.ts        (Room Mode, PR8)
 └── qa/            design-lint.ts  dom-lint.ts  candidates.ts  browser-qa.ts
 ```
 
@@ -81,45 +78,89 @@ src/
 
 ---
 
-## PR8: Room Mode
+## PR8: Room Mode (완료)
 
-### 요구사항 (사용자 확정)
+### 무엇을 만들었나
 
 ```
-forma advanced <spec> --room
+forma advanced <spec> --room [--lan] [--port N] [--out dir]
 ```
 
-- 기본 bind는 `127.0.0.1`. `--lan`을 **명시해야만** 사내 네트워크 허용
-- 일회용 session token
-- WebSocket 또는 동등한 로컬 실시간 동기화
-- 여러 참여자의 투표와 코멘트
-- 세션 종료 후 자동 폐기 가능
-- 외부 서버 및 telemetry 전송 없음
-- Freeze 실행 시에만 영구 저장
-- 회의 후 정적 snapshot HTML export
+```
+src/room/
+├── state.ts      메모리 전용 상태 + 순수 reducer (투표/코멘트/sim 입력/freeze)
+├── protocol.ts   클라이언트 메시지 zod 스키마 (경계 검증, 상한 명시)
+├── token.ts      192bit 세션 토큰, timingSafeEqual 비교
+├── server.ts     HTTP + SSE, bind 정책, CSP, Origin 검사
+├── panel.ts      참여 패널 HTML/CSS/클라이언트 스크립트
+├── freeze.ts     DecisionRecord 조립 (순수)
+└── persist.ts    decision.json / snapshot.html / manifest.json 기록
+```
 
-**Decision Freeze** 출력물: `decision.json`, `snapshot.html`, `manifest.json`.
-포함 정보 — 최종 결정, 근거, 반대 의견, 미해결 항목, 선택 당시 입력값,
-담당자, 기한, source hash, spec hash, 생성 시각.
+### 결정 사항과 이유
 
-### 반드시 지킬 구분
+**WebSocket 대신 SSE + POST.** Node 코어에 WS 서버가 없어서 `ws` 런타임
+의존성이 필요한데, 이 프로젝트의 주장 자체가 "산출물이 아무것에도 의존하지
+않는다"다. 요구사항은 "WebSocket 또는 동등한 로컬 실시간 동기화"였고 SSE가
+그 동등물이다. 단방향 push + 일반 POST는 이 트래픽의 실제 모양이기도 하다.
 
-**"외부 네트워크 요청 0건"과 "참여자 간 LAN 통신"은 다른 것이다.**
-사용자가 명시적으로 요구한 사항이다. manifest와 문서에서 두 개를 섞어
-쓰면 안 된다. Portable은 진짜 0건이고, Room Mode는 외부는 0건이지만
-LAN 통신은 발생한다.
+**패널은 완성된 문서에 문자열로 주입한다.** 블록 파이프라인을 타지 않는다.
+그래서 "room 문서 = portable 문서 + 패널"이 증명 가능하고, 패널을 떼면
+Freeze snapshot이 그대로 나온다. 두 경로가 갈라져 drift하는 일이 없다.
 
-### 이미 준비된 것
+**reducer는 순수하고 타임스탬프는 인자로 받는다.** `Date.now()`를 안에서
+부르지 않으므로 테스트가 결정적이다.
 
-`src/cli/index.ts`의 `advanced` 명령이 `--portable` 아니면 "Room Mode는
-아직 없다"고 명시적으로 거부한다. 여기를 확장하면 된다.
-`meta.interaction === "live"`도 이미 Portable에서 거부하고 있다.
+### 반드시 지킬 구분 (유지됨)
 
-### 주의
+"외부 네트워크 요청 0건"과 "참여자 간 LAN 통신"은 다른 것이다. manifest는
+`session`과 `snapshot`을 별도 객체로 유지한다. 하나로 합치면 둘 중 하나에
+대해 거짓이 되고, 어느 쪽인지는 읽는 사람이 무엇을 뜻했느냐에 달린다.
+`docs/security.md`의 "Room Mode is the one networked surface" 절과
+`skills/forma/references/artifacts.md`의 두 모드 표에 같은 내용이 있다.
 
-Room Mode는 서버를 띄우고 상태를 공유하므로 지금까지의 "정적 산출물"
-전제가 처음으로 깨지는 지점이다. 기존 `preview` 명령
-(`src/cli/index.ts`, localhost 서버)이 참고가 된다.
+로 백 바인드는 주장이 아니라 검증됐다. `--lan` 없이 호스트 자신의 LAN
+주소(`10.10.7.43:4181`)로 접속하면 connection refused, `127.0.0.1`은 200.
+
+### 육안 검수에서 나온 결함 5건 (전부 테스트로 고정됨)
+
+브라우저 QA(axe/overflow/console)를 통과한 상태에서 스크린샷을 보고 찾은
+것들이다. 이 프로젝트에서 이 절차가 또 값을 했다.
+
+1. **`[hidden]`이 무력화됐다.** 패널 CSS의 `display:flex`가 UA
+   스타일시트의 `[hidden]{display:none}`을 이긴다. 그래서 JS를 끄면 패널이
+   통째로 렌더됐다 — 안의 컨트롤이 하나도 동작하지 않는 유일한 상태에서.
+2. **표결이 `1 / 1 / 0`이었다.** 라벨 없는 숫자 3개는 눈으로도 스크린
+   리더로도 읽을 수 없다. `찬성 1 · 반대 1 · 기권 0`으로 바꿨다.
+3. **호스트 절대 경로가 참여자 브라우저로 갔다.** freeze 응답이 전체
+   경로를 담았다. `--lan`이면 다른 데스크로 건너간다. basename만 보낸다.
+4. **확정 후에도 "확정하면 저장된다"는 안내가 남았다.** 이미 일어난 일에
+   대한 조언이 된다.
+5. **snapshot의 입력값이 `delayDays=30`이었다.** 1년 뒤 읽을 기록에
+   변수명이 들어가면 안 된다. spec의 `label`과 `unit`을 쓴다
+   (`정식 인증 지연 30 일`). 원시 변수명은 기계용인 `decision.json`에만
+   남는다.
+
+**테스트 함정 하나 기록.** 5번을 고정하려고 쓴 첫 테스트가 진공 통과였다.
+`expect(snapshot).toContain(label)`은 라벨이 위쪽 본문에도 있으므로 기록이
+잘못 만들어져도 통과한다. `#room-record` 구간만 잘라내고, fixture에 없는
+값(4242)을 주입해서 검증하도록 고쳤다. 스코프 없는 `toContain`은
+"항상 통과하는 규칙"의 다른 얼굴이다.
+
+### 알려진 한계
+
+**좁은 화면에서 패널이 문서 아래에 정적 배치된다.** 오버플로 0, axe 0으로
+동작은 하지만, 모바일 참여자는 투표하려면 문서 전체를 스크롤해서 지나가야
+한다. 데스크톱(고정 사이드바)만 편하다. 스티키 하단 바나 접이식 패널이
+답인데 마크업 변경이 필요해서 넣지 않았다. 요구사항에 모바일 항목이
+없었다.
+
+### 남은 것
+
+`pnpm qa`는 room 문서를 검사하지 않는다 — fixture 산출물만 돈다. room과
+snapshot의 브라우저 QA(2인 세션 실시간 동기화, axe, 오버플로, 외부 요청,
+freeze 잠금)는 이번에 scratch 스크립트로 돌려서 확인했지만 자동화되지
+않았다. PR9의 최종 QA에 넣을 후보다.
 
 ---
 
@@ -167,7 +208,7 @@ PR1~7에는 영향이 없었지만 PR9는 이 위에 서 있다. **먼저 확인
 ## 남은 완료 기준 (사용자 제시 18항목 중 미충족)
 
 ```
-[ ] advanced Decision Room 구현        ← Portable만 완료, Room Mode 남음
+[x] advanced Decision Room 구현        ← Portable + Room Mode 완료 (PR7, PR8)
 [ ] 4개 스킬 설치와 호출 검증
 [ ] artifact별 fixture와 example 제공   ← fixture는 있고 examples/ 재구성 남음
 [ ] Visual Tournament advanced quality  ← 아래 "알려진 부채" 참조
@@ -185,7 +226,7 @@ pnpm forma advanced fixtures/advanced/release-decision/forma.spec.json --portabl
 pnpm forma verify-skills
 ```
 
-앞의 다섯 개는 현재 통과한다.
+전부 통과한다.
 
 ---
 
