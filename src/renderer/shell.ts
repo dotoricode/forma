@@ -1,6 +1,6 @@
 import type { FormaSpec } from "../spec/schema.js";
 import { escapeHtml } from "../security/sanitize.js";
-import { buildStylesheet } from "../design/css.js";
+import { buildStylesheet } from "../design/foundations-css.js";
 import { buildFontFaceCss } from "../design/fonts.js";
 import { buildInteractiveScript } from "./interactive.js";
 import { composeDocument } from "./compose.js";

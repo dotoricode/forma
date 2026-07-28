@@ -7,6 +7,7 @@
  * dispatch. Registering one `defineBlock(...)` is the whole cost of adding a
  * block; nothing else has a list that can drift out of sync.
  */
+import type { ReactElement } from "react";
 import { z } from "zod";
 import type { ArtifactKind } from "../spec/artifact.js";
 import type { CompositionRoleName } from "../spec/roles.js";
@@ -15,7 +16,7 @@ import { dataBlocks } from "./data.js";
 import { decisionBlocks } from "./decision.js";
 import { diagramBlocks } from "./diagram.js";
 import { documentBlocks } from "./document.js";
-import type { BlockDefinition, BlockSchema, RenderContext } from "./types.js";
+import type { BlockSchema, RenderContext } from "./types.js";
 
 export const ALL_BLOCK_DEFINITIONS = [
   ...documentBlocks,
@@ -27,10 +28,14 @@ export const ALL_BLOCK_DEFINITIONS = [
 
 export type AnyBlockDefinition = (typeof ALL_BLOCK_DEFINITIONS)[number];
 
-/** Distributes over the definition union so each block keeps its own payload type. */
-type InferBlock<D> = D extends BlockDefinition<string, infer S extends BlockSchema>
-  ? z.infer<S>
-  : never;
+/**
+ * Distributes over the definition union so each block keeps its own payload
+ * type. Matching on the `schema` field rather than on `BlockDefinition`'s
+ * generics is deliberate: `TPrepared` appears in both `prepare`'s return and
+ * the component's props, so it is invariant and no wildcard would match
+ * every definition.
+ */
+type InferBlock<D> = D extends { schema: infer S extends BlockSchema } ? z.infer<S> : never;
 
 export type FormaBlock = InferBlock<AnyBlockDefinition>;
 export type FormaBlockType = AnyBlockDefinition["type"];
@@ -73,20 +78,51 @@ export function rolesForBlockType(type: string): readonly CompositionRoleName[] 
 }
 
 /**
- * Renders one validated block.
+ * Async work every block needs before rendering, run once up front.
+ *
+ * Rendering is a synchronous React tree, so anything asynchronous —
+ * Shiki highlighting, diff parsing — has to finish first. Blocks are
+ * prepared concurrently because they are independent by construction.
+ */
+export async function prepareBlocks(
+  blocks: readonly FormaBlock[],
+  ctx: RenderContext,
+): Promise<Map<string, unknown>> {
+  const entries = await Promise.all(
+    blocks.map(async (block) => {
+      const definition = byType.get(block.type);
+      if (!definition?.prepare) return [block.id, undefined] as const;
+      const prepare = definition.prepare as (b: FormaBlock, c: RenderContext) => Promise<unknown>;
+      return [block.id, await prepare(block, ctx)] as const;
+    }),
+  );
+  return new Map(entries);
+}
+
+/**
+ * Builds the React element for one validated block.
  *
  * The cast is the single place where the registry's per-definition typing is
  * traded for runtime dispatch. It is sound because the map key is the same
  * `type` literal the discriminated union parsed against, so the block handed
- * to a definition is always the one its schema produced.
+ * to a definition is always the one its schema produced, and the prepared
+ * value is always the one its own `prepare` returned.
  */
-export async function renderBlock(block: FormaBlock, ctx: RenderContext): Promise<string> {
+export function renderBlockElement(
+  block: FormaBlock,
+  ctx: RenderContext,
+  prepared: Map<string, unknown>,
+): ReactElement {
   const definition = byType.get(block.type);
   if (!definition) {
     throw new Error(`forma: no block definition registered for type '${block.type}'`);
   }
-  const render = definition.renderStatic as (b: FormaBlock, c: RenderContext) => string | Promise<string>;
-  return render(block, ctx);
+  const Component = definition.Component as (props: {
+    block: FormaBlock;
+    ctx: RenderContext;
+    prepared: unknown;
+  }) => ReactElement;
+  return Component({ block, ctx, prepared: prepared.get(block.id) });
 }
 
 export type { RenderContext } from "./types.js";

@@ -81,20 +81,30 @@ gzip 105,297 bytes):
 
 ### 언어 구성
 
-**소스 코드: TypeScript 100%**
+**소스 코드: TypeScript 100% (`.ts` + `.tsx`)**
 
-`src/` 아래 24개 파일 3,953줄이 전부 `.ts`다. `.html` 소스 파일도,
-`.css` 소스 파일도 없다. HTML과 CSS는 TS 템플릿 리터럴로 조립한다.
+`.html` 소스 파일도, `.css` 소스 파일도 없다. 블록은 TSX 컴포넌트이고,
+CSS는 TS 템플릿 리터럴로 조립한다.
 
 ```
-src/design/css.ts      865줄  →  CSS 문자열 전부
-src/renderer/shell.ts   67줄  →  <html> 골격
-src/renderer/blocks.ts 484줄  →  블록 20종의 HTML
-src/renderer/diagrams.ts 235줄 →  SVG 좌표 계산
+src/blocks/*.tsx              블록 20종 컴포넌트
+src/renderer/document.tsx     문서 본문 트리
+src/renderer/compose.tsx      renderToStaticMarkup 호출부
+src/design/foundations-css.ts 레이어·토큰·레이아웃
+src/design/block-css.ts       블록별 스타일
+src/design/artifact-css.ts    artifact별 오버라이드
+src/renderer/diagrams.ts      SVG 좌표 계산
 ```
 
-JSX 없음, 템플릿 엔진 없음, CSS 전처리기 없음, 번들러 없음.
-빌드는 `tsc` 하나다.
+**React는 빌드 타임에만 쓴다.** `renderToStaticMarkup`은 hydration 마커도
+런타임도 남기지 않아서, 산출물 HTML의 JS는 여전히 테마 토글과 코드 복사
+island 2.9KB뿐이다. 테스트가 이걸 강제한다(`data-reactroot` 부재, 같은 spec
+두 번 렌더 시 바이트 동일).
+
+React 버전은 **정확히 고정**했다(`19.2.0`). 이스케이프와 속성 직렬화 방식이
+출력의 일부라 마이너 업그레이드가 골든 비교를 깨뜨릴 수 있다.
+
+템플릿 엔진 없음, CSS 전처리기 없음, 번들러 없음. 빌드는 `tsc` 하나다.
 
 **결과물: HTML + CSS + 최소 JS + 인라인 SVG + 임베디드 WOFF2**
 
@@ -128,9 +138,10 @@ src/
 │
 ├── blocks/       블록 정의. 한 곳에 등록하면 나머지가 파생된다
 │   ├── registry.ts             union / 타입 / JSON Schema / dispatch 파생
-│   ├── types.ts                BlockDefinition 계약
-│   ├── shared.ts               공용 렌더 헬퍼와 라벨
-│   └── document|code|diagram|data|decision.ts   블록 20종
+│   ├── types.ts                BlockDefinition 계약 (prepare + Component)
+│   ├── primitives.tsx          Section / Measure / SourceNotes 등 공용 컴포넌트
+│   ├── strings.ts              지역화 라벨
+│   └── document|code|diagram|data|decision.tsx  블록 20종
 │
 ├── planner/      artifact가 지키기로 한 약속을 강제한다
 │   ├── plan.ts                 블록 → 역할 해석 후 계약 검사
@@ -138,12 +149,16 @@ src/
 │   └── profiles/               dashboard / report / manual / advanced
 │
 ├── design/       시각 토큰과 스타일시트
-│   ├── css.ts           865줄  @layer 7단 전체 + artifact별 오버라이드
+│   ├── foundations-css.ts      @layer 7단, 토큰, 레이아웃, 유틸리티, 인쇄
+│   ├── block-css.ts            블록별 스타일
+│   ├── artifact-css.ts         artifact별 오버라이드
 │   ├── tokens.ts        102줄  OKLCH 프리미티브, 간격/반경/모션/measure
 │   └── fonts.ts         153줄  subset-font 파이프라인
 │
 ├── renderer/     spec → HTML
 │   ├── diagrams.ts      235줄  자체 SVG 레이아웃 엔진
+│   ├── document.tsx            문서 본문 React 트리
+│   ├── static.tsx              단일 블록 렌더 (테스트·컴포넌트 검수용)
 │   ├── interactive.ts    94줄  인라인 JS island
 │   ├── compose.ts        93줄  섹션 조립 + 목차 + 폰트용 텍스트 수집
 │   ├── diff-view.ts      72줄  unified diff 파싱
@@ -464,12 +479,16 @@ Shiki 하이라이팅, diff 파싱, 인쇄 스타일, 4뷰포트 QA, axe 통과,
 "어떤 역할이 비었는지"를 지목하며 검증에 실패한다. 리포트에 카드를 얹어
 대시보드인 척하는 것보다 낫다고 판단한 결과다. PR5·PR7에서 채운다.
 
-**2. CSS는 아직 artifact별로 분리되지 않았다.**
-`data-artifact` / `data-variant` 훅으로 교체는 됐지만, 스타일 자체는 기존
-4테마 CSS를 매핑한 상태다. dashboard는 옛 workspace 레일 스타일을 임시로
-쓰고 있다. PR2에서 TSX 디자인 시스템으로 분리하면서 정리한다.
+**2. artifact별 CSS는 파일만 분리됐고 내용은 아직 옛 테마 매핑이다.**
+`artifact-css.ts`로 떼어냈지만 규칙 자체는 기존 4테마를 옮긴 것이고,
+dashboard는 옛 workspace 레일 스타일을 쓰고 있다. Signal Grid 고유의
+12열 그리드와 수치 타이포는 PR5에서 만든다.
 
-**3. 링크 끊긴 정적 목업 3개.**
+**3. Storybook은 아직 없다.**
+TSX 전환의 목적 중 하나였지만 앱 하나를 새로 세우는 작업이라 분리했다.
+PR6(품질 계층)에서 aesthetic QA와 함께 넣는다.
+
+**4. 링크 끊긴 정적 목업 3개.**
 `prototypes/{precision-workbench,developer-docs,editorial-magazine}/onboarding.html`이
 갤러리에서 참조되지 않는 상태로 남아 있다. 정리 여부 미정.
 

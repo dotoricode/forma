@@ -18,7 +18,8 @@ banned-pattern list — none of it appears here by construction.
 ## Tokens
 
 Defined in `src/design/tokens.ts` (primitives) and emitted in
-`src/design/css.ts` (`@layer tokens`). Semantic names only — component CSS
+`src/design/foundations-css.ts` (`@layer tokens`). Block styles live in
+`block-css.ts` and per-artifact overrides in `artifact-css.ts`. Semantic names only — component CSS
 never references a primitive or raw hex/OKLCH value directly.
 
 - **Color**: `--color-canvas/surface/surface-raised/text/text-muted/
@@ -60,6 +61,11 @@ never references a primitive or raw hex/OKLCH value directly.
 See `skills/forma/references/generic-ai-patterns.md` for the full list;
 the two most important structural rules:
 
+0. **Blocks are TSX components** (`src/blocks/*.tsx`), compiled to HTML with
+   `renderToStaticMarkup`. React is a build-time dependency only: the
+   shipped page contains no hydration markers and no runtime, and a test
+   asserts it. The version is pinned exactly, because escaping and
+   attribute serialization are part of the output.
 1. **No left-side bracket/hook borders.** Note rails use a plain
    `border-inline-start: 1px solid` on the element itself — never a
    `::before`/`::after` pseudo-element combining a left border with a

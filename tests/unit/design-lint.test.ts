@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { lintCss } from "../../src/qa/design-lint.js";
-import { buildStylesheet } from "../../src/design/css.js";
+import { buildStylesheet } from "../../src/design/foundations-css.js";
 
 describe("lintCss", () => {
   it("limits key-point counters to direct items so source locators do not collapse", () => {

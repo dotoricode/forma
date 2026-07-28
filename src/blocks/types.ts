@@ -11,6 +11,7 @@
  * derives the union, the type name, the JSON Schema, the artifact allowlist,
  * and the render dispatch from it.
  */
+import type { ReactElement } from "react";
 import type { z } from "zod";
 import type { ArtifactKind } from "../spec/artifact.js";
 import type { CompositionRoleName } from "../spec/roles.js";
@@ -45,8 +46,6 @@ export interface RenderContext {
   language: "ko" | "en";
 }
 
-export type StaticBlockRenderer<T> = (block: T, ctx: RenderContext) => string | Promise<string>;
-
 /**
  * A block schema must be an object carrying a `type` literal so the registry
  * can build a discriminated union from the collected definitions.
@@ -54,12 +53,31 @@ export type StaticBlockRenderer<T> = (block: T, ctx: RenderContext) => string | 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export type BlockSchema = z.ZodObject<any>;
 
-export interface BlockDefinition<TType extends string = string, TSchema extends BlockSchema = BlockSchema> {
+export interface BlockComponentProps<TBlock, TPrepared> {
+  block: TBlock;
+  ctx: RenderContext;
+  prepared: TPrepared;
+}
+
+export interface BlockDefinition<
+  TType extends string = string,
+  TSchema extends BlockSchema = BlockSchema,
+  TPrepared = undefined,
+> {
   /** Discriminator value. Must match the `type` literal inside `schema`. */
   readonly type: TType;
   readonly category: BlockCategory;
   readonly schema: TSchema;
-  readonly renderStatic: StaticBlockRenderer<z.infer<TSchema>>;
+  /**
+   * Async work a block needs before it can be rendered — syntax
+   * highlighting, diff parsing, anything that cannot happen inside a
+   * synchronous React tree. Runs once per block, before rendering starts.
+   *
+   * This lives on the definition rather than on the shared render context
+   * so that one block's needs do not leak into every other block's inputs.
+   */
+  readonly prepare?: (block: z.infer<TSchema>, ctx: RenderContext) => Promise<TPrepared>;
+  readonly Component: (props: BlockComponentProps<z.infer<TSchema>, TPrepared>) => ReactElement;
   readonly capabilities: readonly BlockCapability[];
   /** Artifacts allowed to use this block. An empty list would make it unusable. */
   readonly supportedArtifacts: readonly ArtifactKind[];
@@ -72,13 +90,12 @@ export interface BlockDefinition<TType extends string = string, TSchema extends 
 }
 
 /**
- * Declares a block definition while keeping its literal `type` and concrete
- * schema type. Without this helper the registry array widens to
- * `BlockDefinition<string, ZodObject>` and every render callback loses its
- * argument type.
+ * Declares a block definition while keeping its literal `type`, its concrete
+ * schema, and the type of whatever `prepare` produced. Without this helper
+ * the registry array widens and every component loses its prop types.
  */
-export function defineBlock<TType extends string, TSchema extends BlockSchema>(
-  definition: BlockDefinition<TType, TSchema>,
-): BlockDefinition<TType, TSchema> {
+export function defineBlock<TType extends string, TSchema extends BlockSchema, TPrepared = undefined>(
+  definition: BlockDefinition<TType, TSchema, TPrepared>,
+): BlockDefinition<TType, TSchema, TPrepared> {
   return definition;
 }

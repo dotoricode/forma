@@ -4,7 +4,7 @@
  * output stays byte-identical across runs and needs no browser at build time.
  */
 import { z } from "zod";
-import { escapeHtml, sanitizeSvg } from "../security/sanitize.js";
+import { sanitizeSvg } from "../security/sanitize.js";
 import { ARTIFACTS } from "../spec/artifact.js";
 import { BlockBase } from "../spec/source.js";
 import {
@@ -13,7 +13,7 @@ import {
   renderSequenceSvg,
 } from "../renderer/diagrams.js";
 import { defineBlock } from "./types.js";
-import { measureWrap, section, sourceNoteList } from "./shared.js";
+import { InlineSvg, Measure, Section, SourceNotes } from "./primitives.js";
 
 const flow = defineBlock({
   type: "flow",
@@ -39,12 +39,13 @@ const flow = defineBlock({
       )
       .default([]),
   }),
-  renderStatic(block, ctx) {
-    const title = block.title ? `<h2 class="blk-diagram__title">${escapeHtml(block.title)}</h2>` : "";
-    return section(
-      block.id,
-      "blk-diagram breakout",
-      `${title}<div class="blk-diagram__canvas">${sanitizeSvg(renderFlowSvg(block))}</div>${sourceNoteList(block, ctx)}`,
+  Component({ block, ctx }) {
+    return (
+      <Section id={block.id} className="blk-diagram breakout">
+        {block.title ? <h2 className="blk-diagram__title">{block.title}</h2> : null}
+        <InlineSvg className="blk-diagram__canvas" svg={sanitizeSvg(renderFlowSvg(block))} />
+        <SourceNotes block={block} ctx={ctx} />
+      </Section>
     );
   },
 });
@@ -70,12 +71,13 @@ const sequence = defineBlock({
       )
       .default([]),
   }),
-  renderStatic(block, ctx) {
-    const title = block.title ? `<h2 class="blk-diagram__title">${escapeHtml(block.title)}</h2>` : "";
-    return section(
-      block.id,
-      "blk-diagram breakout",
-      `${title}<div class="blk-diagram__canvas">${sanitizeSvg(renderSequenceSvg(block))}</div>${sourceNoteList(block, ctx)}`,
+  Component({ block, ctx }) {
+    return (
+      <Section id={block.id} className="blk-diagram breakout">
+        {block.title ? <h2 className="blk-diagram__title">{block.title}</h2> : null}
+        <InlineSvg className="blk-diagram__canvas" svg={sanitizeSvg(renderSequenceSvg(block))} />
+        <SourceNotes block={block} ctx={ctx} />
+      </Section>
     );
   },
 });
@@ -101,21 +103,23 @@ const timeline = defineBlock({
       )
       .min(1),
   }),
-  renderStatic(block, ctx) {
-    const title = block.title ? `<h2 class="blk-timeline__title">${escapeHtml(block.title)}</h2>` : "";
-    const items = block.entries
-      .map(
-        (entry) => `<li class="blk-timeline__item" data-status="${entry.status}">
-        <div class="blk-timeline__when">${escapeHtml(entry.when)}</div>
-        <div class="blk-timeline__label">${escapeHtml(entry.label)}</div>
-        ${entry.detail ? `<div class="blk-timeline__detail">${escapeHtml(entry.detail)}</div>` : ""}
-      </li>`,
-      )
-      .join("");
-    return section(
-      block.id,
-      "blk-timeline",
-      measureWrap(`${title}<ol class="blk-timeline__list">${items}</ol>${sourceNoteList(block, ctx)}`),
+  Component({ block, ctx }) {
+    return (
+      <Section id={block.id} className="blk-timeline">
+        <Measure>
+          {block.title ? <h2 className="blk-timeline__title">{block.title}</h2> : null}
+          <ol className="blk-timeline__list">
+            {block.entries.map((entry) => (
+              <li key={entry.id} className="blk-timeline__item" data-status={entry.status}>
+                <div className="blk-timeline__when">{entry.when}</div>
+                <div className="blk-timeline__label">{entry.label}</div>
+                {entry.detail ? <div className="blk-timeline__detail">{entry.detail}</div> : null}
+              </li>
+            ))}
+          </ol>
+          <SourceNotes block={block} ctx={ctx} />
+        </Measure>
+      </Section>
     );
   },
 });
@@ -140,12 +144,16 @@ const architecture = defineBlock({
       )
       .default([]),
   }),
-  renderStatic(block, ctx) {
-    const title = block.title ? `<h2 class="blk-diagram__title">${escapeHtml(block.title)}</h2>` : "";
-    return section(
-      block.id,
-      "blk-diagram breakout",
-      `${title}<div class="blk-diagram__canvas">${sanitizeSvg(renderArchitectureSvg(block))}</div>${sourceNoteList(block, ctx)}`,
+  Component({ block, ctx }) {
+    return (
+      <Section id={block.id} className="blk-diagram breakout">
+        {block.title ? <h2 className="blk-diagram__title">{block.title}</h2> : null}
+        <InlineSvg
+          className="blk-diagram__canvas"
+          svg={sanitizeSvg(renderArchitectureSvg(block))}
+        />
+        <SourceNotes block={block} ctx={ctx} />
+      </Section>
     );
   },
 });
