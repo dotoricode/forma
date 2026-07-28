@@ -16,6 +16,27 @@ import { COMPOSITION_ROLES } from "../../src/spec/roles.js";
  * that can drift out of sync with it.
  */
 describe("block registry", () => {
+  it("carries the report vocabulary", () => {
+    for (const type of [
+      "thesis",
+      "executive-summary",
+      "headline-finding",
+      "evidence-stack",
+      "option-comparison",
+      "decision-matrix",
+      "recommendation",
+      "implication",
+      "risk-register",
+      "action-plan",
+      "pull-quote",
+      "figure",
+      "appendix",
+      "source-ledger",
+    ]) {
+      expect(getBlockDefinition(type), `${type} must be registered`).toBeDefined();
+    }
+  });
+
   it("still carries every block the 0.1 spec could use", () => {
     const legacyTwenty = [
       "cover",
@@ -137,6 +158,53 @@ function minimalBlockFor(type: string): Record<string, unknown> {
     case "glossary":
       return { ...base, terms: [{ term: "t", definition: "d" }] };
     case "source-note":
+      return base;
+    case "thesis":
+      return { ...base, statement: "s" };
+    case "executive-summary":
+      return { ...base, body: "b" };
+    case "headline-finding":
+      return { ...base, claim: "c", detail: "d" };
+    case "evidence-stack":
+      return { ...base, items: [{ summary: "s" }] };
+    case "option-comparison":
+      return {
+        ...base,
+        criteria: ["cost"],
+        options: [
+          { id: "a", label: "A", cells: { cost: "low" } },
+          { id: "b", label: "B", cells: { cost: "high" } },
+        ],
+      };
+    case "decision-matrix":
+      return {
+        ...base,
+        criteria: [{ id: "c1", label: "Cost", weight: 1 }],
+        options: [
+          { id: "a", label: "A", scores: { c1: 3 } },
+          { id: "b", label: "B", scores: { c1: 2 } },
+        ],
+      };
+    case "recommendation":
+      return { ...base, statement: "s", rationale: "r" };
+    case "implication":
+      return { ...base, entries: [{ audience: "QA", effect: "e" }] };
+    case "risk-register":
+      return {
+        ...base,
+        risks: [
+          { id: "r1", description: "d", likelihood: "low", impact: "high", mitigation: "m" },
+        ],
+      };
+    case "action-plan":
+      return { ...base, items: [{ id: "a1", label: "l", owner: "o" }] };
+    case "pull-quote":
+      return { ...base, quote: "q" };
+    case "figure":
+      return { ...base, caption: "c" };
+    case "appendix":
+      return { ...base, title: "t", body: "b" };
+    case "source-ledger":
       return base;
     default:
       throw new Error(

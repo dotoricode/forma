@@ -101,6 +101,20 @@ ${fontFaceCss}
   body {
     font-variant-numeric: tabular-nums;
   }
+  /* Korean allows a line break between any two characters by default, so
+     "백그라운드" was being split as "백그라운 / 드" in headings and body
+     alike. keep-all restricts breaks to spaces, which is how Korean is
+     actually set; break-word is the escape hatch for a long unbroken
+     token (a URL, an identifier) that would otherwise overflow. */
+  html {
+    word-break: keep-all;
+    overflow-wrap: break-word;
+  }
+  /* Code is the exception: it has no word boundaries to respect and is
+     already handled by its own horizontal scroll. */
+  pre, code, kbd, samp {
+    word-break: normal;
+  }
   h1, h2, h3, h4 {
     font-weight: 700;
     text-wrap: balance;
@@ -188,6 +202,17 @@ ${fontFaceCss}
        entire document after first paint. */
     font-weight: 600;
     white-space: nowrap;
+  }
+  /* Report blocks contribute their claim sentence, which is the honest
+     label but can run three lines in a narrow rail. Clamping keeps the
+     text intact for assistive tech while the rail stays scannable. */
+  @supports (-webkit-line-clamp: 2) {
+    :root[data-artifact="report"] .side-toc .toc a {
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
   }
   .toc a:hover { color: var(--color-accent); }
   .toc a[aria-current="true"] {

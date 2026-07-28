@@ -2,11 +2,11 @@
   "generator": "forma@0.1.0",
   "specVersion": "0.2",
   "artifact": "report",
-  "purpose": "explain",
+  "purpose": "decide",
   "variant": "technical",
   "interaction": "static",
-  "title": "Forma란 무엇인가",
+  "title": "Android 17 호환성 검증 결과",
   "language": "ko",
-  "sectionCount": 8,
-  "bytes": 178852
+  "sectionCount": 14,
+  "bytes": 187116
 }

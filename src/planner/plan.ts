@@ -15,6 +15,7 @@ import { advancedProfile } from "./profiles/advanced.js";
 import { dashboardProfile } from "./profiles/dashboard.js";
 import { manualProfile } from "./profiles/manual.js";
 import { reportProfile } from "./profiles/report.js";
+import { checkClaims } from "./claims.js";
 
 export const ARTIFACT_PROFILES: Record<ArtifactKind, ArtifactProfile> = {
   dashboard: dashboardProfile,
@@ -61,6 +62,7 @@ export function planComposition(spec: FormaSpec): CompositionPlan {
   issues.push(...checkForbiddenBlocks(spec, profile));
   issues.push(...checkRequiredRoles(profile, filled));
   issues.push(...checkUnsupportedBlocks(spec));
+  issues.push(...checkClaims(spec));
 
   const roles: CompositionRole[] = profile.order
     .filter((role) => filled.has(role))
