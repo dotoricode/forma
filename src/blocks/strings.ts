@@ -308,3 +308,80 @@ export const DASHBOARD_LABEL: Record<"ko" | "en", DashboardStrings> = {
     delayed: "수집이 지연 중입니다. 잠정 수치로 보십시오.",
   },
 };
+
+/** Decision Room vocabulary. */
+export interface AdvancedStrings {
+  brief: string;
+  decideToday: string;
+  stillUnknown: string;
+  evidenceGraph: string;
+  graphLegend: string;
+  confidence: Record<"verified" | "inferred" | "unknown", string>;
+  impact: Record<"low" | "medium" | "high", string>;
+  supportedBy: string;
+  noSupport: string;
+  contradictedBy: string;
+  challenge: string;
+  unprovenAssumptions: string;
+  failureConditions: string;
+  reversalTriggers: string;
+  simulation: string;
+  simulationFallback: string;
+  decision: string;
+  decisionStatus: Record<"proposed" | "decided" | "deferred", string>;
+  owner: string;
+  due: string;
+  dissent: string;
+  revisitWhen: string;
+}
+
+export const ADVANCED_LABEL: Record<"ko" | "en", AdvancedStrings> = {
+  en: {
+    brief: "Brief",
+    decideToday: "To decide today",
+    stillUnknown: "Still unknown",
+    evidenceGraph: "Claims and evidence",
+    graphLegend: "Ordered by exposure: high impact resting on weak evidence comes first.",
+    confidence: { verified: "verified", inferred: "inferred", unknown: "unconfirmed" },
+    impact: { low: "low impact", medium: "medium impact", high: "high impact" },
+    supportedBy: "Supported by",
+    noSupport: "No supporting source.",
+    contradictedBy: "Contradicted by",
+    challenge: "The strongest case against",
+    unprovenAssumptions: "Unproven assumptions",
+    failureConditions: "What would make this fail",
+    reversalTriggers: "What would reverse the decision",
+    simulation: "If the numbers move",
+    simulationFallback: "Values shown are the current assumptions. Move a control to see the effect.",
+    decision: "Decision",
+    decisionStatus: { proposed: "Proposed", decided: "Decided", deferred: "Deferred" },
+    owner: "Owner",
+    due: "Due",
+    dissent: "Objections on record",
+    revisitWhen: "Revisit when",
+  },
+  ko: {
+    brief: "브리핑",
+    decideToday: "오늘 결정할 것",
+    stillUnknown: "아직 모르는 것",
+    evidenceGraph: "주장과 근거",
+    graphLegend: "노출도 순입니다. 영향이 크고 근거가 약한 것이 위로 옵니다.",
+    confidence: { verified: "확인됨", inferred: "추정", unknown: "미확인" },
+    impact: { low: "영향 낮음", medium: "영향 중간", high: "영향 큼" },
+    supportedBy: "근거",
+    noSupport: "뒷받침하는 출처가 없습니다.",
+    contradictedBy: "상충하는 자료",
+    challenge: "가장 강한 반론",
+    unprovenAssumptions: "검증되지 않은 가정",
+    failureConditions: "무엇이 이걸 틀리게 만드나",
+    reversalTriggers: "결정을 뒤집을 조건",
+    simulation: "숫자가 바뀌면",
+    simulationFallback: "지금 값은 현재 가정입니다. 조절하면 결과가 따라 바뀝니다.",
+    decision: "결정",
+    decisionStatus: { proposed: "제안", decided: "결정됨", deferred: "보류" },
+    owner: "책임",
+    due: "기한",
+    dissent: "기록된 반대 의견",
+    revisitWhen: "다시 볼 조건",
+  },
+};

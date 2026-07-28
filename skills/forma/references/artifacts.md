@@ -146,10 +146,25 @@ carry a `data-freshness` block — both are build errors
 carries its own `basis` and a separate `sentiment`, because cost up and
 pass rate up are both "up" and mean opposite things.
 
-`advanced` has its contract defined and enforced, but the blocks that fill
-`evidence-graph`, `simulation`, and `decision` are still being built. Until
-they land it fails validation with a named unfilled role rather than
-quietly rendering as a report with tabs.
+`advanced` has `brief`, `evidence-graph`, `challenge`, `simulation`,
+`decision-record`, and reuses the report vocabulary for options and risks.
+
+Build it with `forma advanced <spec> --portable`. Two rules matter:
+
+**Nothing calls a model at read time.** The strongest counter-argument is
+authored into the spec at build time. A Decision Room that phoned an API
+would break the confidentiality guarantee that makes it usable on internal
+material at all.
+
+**Simulation formulas are a closed AST, never a string.** `literal`,
+`variable`, and four operators — no property access, no call, no identifier
+lookup beyond the declared inputs. An expression string evaluated in the
+page would run agent-authored text with the page's privileges. The
+validator also rejects a formula reading an undeclared variable, a slider
+default outside its own range, and a division by zero at starting values.
+
+Room Mode (a localhost server with `--lan` opt-in) is not built yet.
+`forma advanced` without `--portable` says so rather than guessing.
 
 Do not work around a missing block by approximating it. A wrong-shaped
 output that validates is worse than a clear failure.

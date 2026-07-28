@@ -71,6 +71,12 @@ describe("block registry", () => {
     }
   });
 
+  it("carries the Decision Room vocabulary", () => {
+    for (const type of ["brief", "evidence-graph", "challenge", "simulation", "decision-record"]) {
+      expect(getBlockDefinition(type), `${type} must be registered`).toBeDefined();
+    }
+  });
+
   it("still carries every block the 0.1 spec could use", () => {
     const legacyTwenty = [
       "cover",
@@ -302,6 +308,23 @@ function minimalBlockFor(type: string): Record<string, unknown> {
       };
     case "data-freshness":
       return { ...base, asOf: "now", coverage: "all" };
+    case "brief":
+      return { ...base, question: "q", summary: "s", decideToday: ["d"] };
+    case "evidence-graph":
+      return {
+        ...base,
+        claims: [{ id: "c", statement: "s", confidence: "inferred", impact: "high" }],
+      };
+    case "challenge":
+      return { ...base, strongestCounterargument: "c" };
+    case "simulation":
+      return {
+        ...base,
+        inputs: [{ name: "x", label: "X", value: 1, min: 0, max: 10 }],
+        outputs: [{ label: "Y", formula: { type: "variable", name: "x" } }],
+      };
+    case "decision-record":
+      return { ...base, decision: "d", owner: "o", rationale: "r" };
     default:
       throw new Error(
         `block '${type}' was registered without a minimal fixture — add one so the registry tests cover it`,

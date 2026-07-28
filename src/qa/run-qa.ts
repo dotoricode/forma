@@ -14,7 +14,7 @@ import {
 // Legacy 0.1 fixtures plus one artifact fixture per implemented artifact.
 // The 0.1 four stay in the list on purpose: they are the regression guard
 // for the compatibility path.
-const FIXTURES = ["explain", "review", "test", "report", "report/technical", "manual/quickstart", "dashboard/release-gate"];
+const FIXTURES = ["explain", "review", "test", "report", "report/technical", "manual/quickstart", "dashboard/release-gate", "advanced/release-decision"];
 
 async function main(): Promise<void> {
   const browser = await chromium.launch();

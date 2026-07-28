@@ -1,0 +1,12 @@
+{
+  "generator": "forma@0.1.0",
+  "specVersion": "0.2",
+  "artifact": "advanced",
+  "purpose": "decide",
+  "variant": "release-decision",
+  "interaction": "islands",
+  "title": "SDK 4.2.0 출시 결정",
+  "language": "ko",
+  "sectionCount": 8,
+  "bytes": 207220
+}

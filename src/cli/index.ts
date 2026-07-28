@@ -105,6 +105,41 @@ program
   });
 
 program
+  .command("advanced <spec>")
+  .description("Build a Decision Room. --portable travels as a file with no network at all.")
+  .option("--out <dir>", "output directory", "forma-room")
+  .option("--portable", "single self-contained build, no server", false)
+  .action(async (specPath: string, opts: { out: string; portable: boolean }) => {
+    try {
+      const spec = await loadSpecFile(specPath);
+      if (spec.meta.artifact !== "advanced") {
+        throw new FormaSpecError(
+          `forma: 'advanced' needs an artifact of 'advanced'; this spec is '${spec.meta.artifact}'.`,
+        );
+      }
+      if (!opts.portable) {
+        // Room Mode binds a local server and syncs participants over the
+        // LAN. That is a different security posture from a file that makes
+        // no requests at all, so it is not the default and not implied.
+        throw new FormaSpecError(
+          "forma: only --portable is implemented. Room Mode (a localhost server with LAN opt-in) is not built yet.",
+        );
+      }
+      if (spec.meta.interaction === "live") {
+        throw new FormaSpecError(
+          "forma: interaction 'live' needs Room Mode. A portable build cannot sync participants.",
+        );
+      }
+      const outcome = await renderSpecFileToDir(specPath, opts.out, { portable: true });
+      console.log(`forma: Decision Room (portable) ${outcome.htmlPath} (${outcome.bytes} bytes)`);
+      console.log("forma: no external network requests, no telemetry, no CDN.");
+      console.log(`forma: verify it with \`forma qa ${opts.out}\`.`);
+    } catch (error) {
+      exitWithError(error);
+    }
+  });
+
+program
   .command("preview <htmlOrDir>")
   .description("Serve a rendered output directory over localhost (no network access)")
   .option("-p, --port <port>", "port", "4173")
