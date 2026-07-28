@@ -82,6 +82,16 @@ export interface BlockDefinition<
   /** Artifacts allowed to use this block. An empty list would make it unusable. */
   readonly supportedArtifacts: readonly ArtifactKind[];
   /**
+   * The label this block contributes to the table of contents.
+   *
+   * Defaults to a `title` field. Report blocks needed this hook because
+   * their headline lives under a different name — a `recommendation` has a
+   * `statement`, a `headline-finding` has a `claim` — and without it the
+   * strongest sections of a report were the ones missing from navigation.
+   * Return undefined to keep a block out of the TOC.
+   */
+  readonly navTitle?: (block: z.infer<TSchema>, language: "ko" | "en") => string | undefined;
+  /**
    * Semantic roles this block can fill in an artifact's composition contract.
    * A block with no roles is decorative-by-omission and can never satisfy a
    * required slot — that is a legitimate choice for things like `source-note`.

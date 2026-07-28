@@ -70,3 +70,90 @@ export interface BlockLike {
   sourceRefs?: string[] | undefined;
   confidence?: "verified" | "inferred" | "unknown" | undefined;
 }
+
+/**
+ * Report vocabulary. Kept separate from the shared `STRINGS` table because
+ * these are section names a reader sees as headings, not UI chrome — they
+ * change with the artifact, not with the browser.
+ */
+export interface ReportStrings {
+  executiveSummary: string;
+  evidence: string;
+  recommendation: string;
+  reversalConditions: string;
+  implications: string;
+  risks: string;
+  risk: string;
+  likelihood: string;
+  impact: string;
+  mitigation: string;
+  owner: string;
+  actions: string;
+  blocking: string;
+  option: string;
+  recommended: string;
+  decisionMatrix: string;
+  criterion: string;
+  weight: string;
+  total: string;
+  scoreOverride: string;
+  sourceLedger: string;
+  source: string;
+  covers: string;
+  limits: string;
+}
+
+export const REPORT_LABEL: Record<"ko" | "en", ReportStrings> = {
+  en: {
+    executiveSummary: "Executive summary",
+    evidence: "Evidence",
+    recommendation: "Recommendation",
+    reversalConditions: "This changes if",
+    implications: "What this means",
+    risks: "Risks",
+    risk: "Risk",
+    likelihood: "Likelihood",
+    impact: "Impact",
+    mitigation: "Mitigation",
+    owner: "Owner",
+    actions: "Actions",
+    blocking: "blocking",
+    option: "Option",
+    recommended: "recommended",
+    decisionMatrix: "Decision matrix",
+    criterion: "Criterion",
+    weight: "Weight",
+    total: "Weighted total",
+    scoreOverride: "The chosen option is not the highest-scoring one. The rationale has to carry that difference.",
+    sourceLedger: "Sources",
+    source: "Source",
+    covers: "Covers",
+    limits: "Does not cover",
+  },
+  ko: {
+    executiveSummary: "핵심 요약",
+    evidence: "근거",
+    recommendation: "권고",
+    reversalConditions: "이 판단이 바뀌는 조건",
+    implications: "무엇이 달라지나",
+    risks: "위험",
+    risk: "위험",
+    likelihood: "가능성",
+    impact: "영향",
+    mitigation: "대응",
+    owner: "담당",
+    actions: "다음 행동",
+    blocking: "선행 필요",
+    option: "선택지",
+    recommended: "권장",
+    decisionMatrix: "판단 기준표",
+    criterion: "기준",
+    weight: "가중치",
+    total: "가중 합계",
+    scoreOverride: "선택한 안이 점수 1위가 아니다. 그 차이는 근거가 설명해야 한다.",
+    sourceLedger: "출처",
+    source: "출처",
+    covers: "다루는 범위",
+    limits: "다루지 않는 것",
+  },
+};

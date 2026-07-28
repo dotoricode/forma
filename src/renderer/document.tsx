@@ -8,8 +8,7 @@
  */
 import { Fragment, type ReactElement } from "react";
 import type { FormaSpec } from "../spec/schema.js";
-import type { FormaBlock } from "../blocks/registry.js";
-import { renderBlockElement, type RenderContext } from "../blocks/registry.js";
+import { navTitleOf, renderBlockElement, type RenderContext } from "../blocks/registry.js";
 import { InlineMarkdown, Measure } from "../blocks/primitives.js";
 
 const NAV_LABEL: Record<"ko" | "en", string> = {
@@ -61,7 +60,7 @@ export function DocumentBody(props: {
 
 export function TableOfContents(props: { spec: FormaSpec }): ReactElement | null {
   const entries = props.spec.sections
-    .map((block) => ({ id: block.id, title: sectionTitle(block) }))
+    .map((block) => ({ id: block.id, title: navTitleOf(block, props.spec.meta.language) }))
     .filter((entry): entry is { id: string; title: string } => Boolean(entry.title));
   if (entries.length === 0) return null;
   return (
@@ -73,9 +72,4 @@ export function TableOfContents(props: { spec: FormaSpec }): ReactElement | null
       ))}
     </nav>
   );
-}
-
-function sectionTitle(block: FormaBlock): string | null {
-  if ("title" in block && typeof block.title === "string") return block.title;
-  return null;
 }

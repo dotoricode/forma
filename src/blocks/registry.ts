@@ -16,6 +16,7 @@ import { dataBlocks } from "./data.js";
 import { decisionBlocks } from "./decision.js";
 import { diagramBlocks } from "./diagram.js";
 import { documentBlocks } from "./document.js";
+import { reportBlocks } from "./report.js";
 import type { BlockSchema, RenderContext } from "./types.js";
 
 export const ALL_BLOCK_DEFINITIONS = [
@@ -24,6 +25,7 @@ export const ALL_BLOCK_DEFINITIONS = [
   ...diagramBlocks,
   ...dataBlocks,
   ...decisionBlocks,
+  ...reportBlocks,
 ] as const;
 
 export type AnyBlockDefinition = (typeof ALL_BLOCK_DEFINITIONS)[number];
@@ -70,6 +72,23 @@ export function blockTypesForArtifact(artifact: ArtifactKind): FormaBlockType[] 
   return ALL_BLOCK_DEFINITIONS.filter((d) => d.supportedArtifacts.includes(artifact)).map(
     (d) => d.type,
   );
+}
+
+/**
+ * The table-of-contents label for a block, or undefined when it should not
+ * appear. Falls back to a `title` field so most blocks need no hook.
+ */
+export function navTitleOf(block: FormaBlock, language: "ko" | "en"): string | undefined {
+  const definition = byType.get(block.type);
+  if (definition?.navTitle) {
+    const custom = definition.navTitle as (
+      b: FormaBlock,
+      l: "ko" | "en",
+    ) => string | undefined;
+    return custom(block, language);
+  }
+  if ("title" in block && typeof block.title === "string") return block.title;
+  return undefined;
 }
 
 /** Semantic roles a block type can satisfy in a composition contract. */

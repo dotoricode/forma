@@ -10,6 +10,16 @@ identical DOM. Four looks over one structure can change colour and spacing,
 but it cannot make a dashboard answer "what changed and where is the
 problem" while a manual answers "what do I do, in what order".
 
+## Claims and evidence
+
+`confidence: "verified"` is checked, not decorative. A block marked
+verified must cite at least one `sourceRefs` or `evidenceRefs` id, and
+every referenced id must exist in `spec.sources`. Both are build errors.
+
+`sourceRefs` answers "where did this text come from". `evidenceRefs`
+answers "what would I check to falsify this". A block may cite a source it
+merely paraphrases without claiming that source proves anything.
+
 ## How the contract works
 
 Contracts are written in **roles**, not block types. A dashboard must fill
@@ -113,7 +123,11 @@ candidates and runs a browser pass, so it must never be picked implicitly.
 
 ## Current implementation status
 
-`report` and `manual` are satisfiable with the blocks that exist today.
+`report` has its own vocabulary: `thesis`, `executive-summary`,
+`headline-finding`, `evidence-stack`, `option-comparison`,
+`decision-matrix`, `recommendation`, `implication`, `risk-register`,
+`action-plan`, `pull-quote`, `figure`, `appendix`, `source-ledger`.
+`manual` is satisfiable with the generic blocks until its own set lands.
 `dashboard` and `advanced` have their contracts defined and enforced, but
 the blocks that fill `kpi`, `change`, `driver`, `freshness`,
 `evidence-graph`, `simulation`, and `decision` are still being built. Until
