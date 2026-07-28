@@ -750,5 +750,205 @@ export function blockCss(): string {
     margin-block-end: var(--space-6);
   }
 
+  
+  /* ---- dashboard vocabulary ---------------------------------------- */
+
+  .status-header {
+    padding: var(--space-5) var(--space-6);
+    border-radius: var(--radius-md);
+    border: 1px solid var(--color-border);
+    /* The state band uses a left rule rather than a filled panel: a solid
+       colour block behind text is the thing that forces a colour choice
+       between legibility and urgency. */
+    border-inline-start-width: 4px;
+  }
+  .status-header[data-status="warning"] { border-inline-start-color: var(--color-warning); }
+  .status-header[data-status="critical"] { border-inline-start-color: var(--color-danger); }
+  .status-header[data-status="normal"] { border-inline-start-color: var(--color-success); }
+  .status-header__state {
+    font-size: 0.75rem;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--color-text-muted);
+  }
+  .status-header[data-status="critical"] .status-header__state { color: var(--color-danger-text); }
+  .status-header[data-status="warning"] .status-header__state { color: var(--color-warning-text); }
+  .status-header__headline {
+    font-size: clamp(1.375rem, 1.1rem + 1.1vw, 2rem);
+    line-height: 1.25;
+    margin-block: var(--space-2) 0;
+  }
+  .status-header__detail {
+    margin-block-start: var(--space-3);
+    color: var(--color-text-muted);
+  }
+
+  .metric-grid {
+    display: grid;
+    gap: var(--space-5);
+    grid-template-columns: repeat(auto-fit, minmax(13rem, 1fr));
+    /* Cells stretch so the sparklines share one baseline. Left to their
+       natural height they stepped down the row, following whichever metric
+       happened to carry a comparison line. */
+    align-items: stretch;
+  }
+  .metric-grid__cell {
+    display: flex;
+    flex-direction: column;
+  }
+  .metric__label {
+    font-size: 0.8125rem;
+    color: var(--color-text-muted);
+  }
+  .metric__value {
+    /* The number leads. Its size is what makes the grid scannable before
+       any label is read. */
+    font-size: clamp(1.75rem, 1.4rem + 1.4vw, 2.5rem);
+    line-height: 1.05;
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+    margin-block: var(--space-1) 0;
+  }
+  .metric__unit {
+    font-size: 0.5em;
+    font-weight: 400;
+    color: var(--color-text-muted);
+    margin-inline-start: 0.15em;
+  }
+  .metric__delta {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: var(--space-1) var(--space-2);
+    margin-block-start: var(--space-2);
+    font-size: 0.875rem;
+    font-variant-numeric: tabular-nums;
+  }
+  /* Colour follows sentiment, not direction. Cost up and pass rate up are
+     both "up" and mean opposite things. */
+  .metric__delta[data-sentiment="positive"] { color: var(--color-success-text); }
+  .metric__delta[data-sentiment="negative"] { color: var(--color-danger-text); }
+  .metric__delta[data-sentiment="neutral"] { color: var(--color-text-muted); }
+  .metric__delta-basis { color: var(--color-text-muted); font-size: 0.8125rem; }
+  .metric__period {
+    margin-block-start: var(--space-2);
+    font-size: 0.75rem;
+    color: var(--color-text-muted);
+  }
+  .metric__spark { margin-block-start: auto; padding-block-start: var(--space-3); }
+  .metric__spark svg { display: block; width: 100%; height: auto; }
+  .spark-line { stroke: var(--color-accent); stroke-width: 1.5; }
+  .spark-point, .spark-last { fill: var(--color-accent); }
+  .spark-baseline {
+    stroke: var(--color-border-strong);
+    stroke-width: 1;
+    stroke-dasharray: 3 3;
+  }
+
+  .anomaly {
+    padding-inline-start: var(--space-4);
+    border-inline-start: 3px solid var(--color-border-strong);
+  }
+  .anomaly[data-severity="high"] { border-inline-start-color: var(--color-danger); }
+  .anomaly[data-severity="medium"] { border-inline-start-color: var(--color-warning); }
+  .anomaly__meta {
+    font-size: 0.8125rem;
+    color: var(--color-text-muted);
+    font-variant-numeric: tabular-nums;
+  }
+  .anomaly__what { font-size: 1.125rem; margin-block: var(--space-1) var(--space-2); }
+  .anomaly__suspected { font-size: 0.9375rem; }
+  .anomaly__suspected span {
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+    color: var(--color-text-muted);
+    margin-inline-end: var(--space-2);
+  }
+
+  .blk-breakdown__reading {
+    max-width: var(--measure-prose);
+    margin-block-end: var(--space-4);
+  }
+  .blk-breakdown__canvas svg { display: block; width: 100%; height: auto; }
+  .breakdown-label, .breakdown-value {
+    font-family: var(--font-sans);
+    font-size: 12px;
+    fill: var(--color-text-muted);
+  }
+  .breakdown-value { font-variant-numeric: tabular-nums; }
+  .breakdown-bar[data-sign="positive"] { fill: var(--color-accent); }
+  .breakdown-bar[data-sign="negative"] { fill: var(--color-danger); }
+  /* The SVG is presentational; the same numbers exist as a list for
+     assistive tech and for print, where the chart may be dropped. */
+  .blk-breakdown__values {
+    list-style: none;
+    padding: 0;
+    margin-block-start: var(--space-4);
+    display: grid;
+    gap: var(--space-2);
+    max-width: var(--measure-prose);
+  }
+  .blk-breakdown__values li {
+    display: flex;
+    justify-content: space-between;
+    gap: var(--space-4);
+    font-size: 0.875rem;
+    padding-block-end: var(--space-2);
+    border-block-end: 1px solid var(--color-border);
+  }
+  .blk-breakdown__value { font-variant-numeric: tabular-nums; }
+
+  .blk-segmented-table__scroll { overflow-x: auto; }
+  .blk-segmented-table__table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.875rem;
+    font-variant-numeric: tabular-nums;
+  }
+  .blk-segmented-table__table th,
+  .blk-segmented-table__table td {
+    text-align: start;
+    padding: var(--space-2) var(--space-3);
+    border-block-end: 1px solid var(--color-border);
+    white-space: nowrap;
+  }
+  .blk-segmented-table__table thead th {
+    font-size: 0.75rem;
+    color: var(--color-text-muted);
+    border-block-end-color: var(--color-border-strong);
+  }
+  .blk-segmented-table__table tr[data-status="critical"] th[scope="row"] {
+    border-inline-start: 3px solid var(--color-danger);
+    padding-inline-start: var(--space-2);
+  }
+  .blk-segmented-table__table tr[data-status="warning"] th[scope="row"] {
+    border-inline-start: 3px solid var(--color-warning);
+    padding-inline-start: var(--space-2);
+  }
+  .cell-missing { color: var(--color-text-muted); font-style: normal; }
+
+  .blk-data-freshness__grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-4) var(--space-7);
+  }
+  .blk-data-freshness__grid > div { display: flex; flex-direction: column; gap: var(--space-1); }
+  .blk-data-freshness__grid dt { font-size: 0.75rem; color: var(--color-text-muted); }
+  .blk-data-freshness__grid dd { margin: 0; font-variant-numeric: tabular-nums; }
+  .blk-data-freshness__delayed {
+    margin-block-start: var(--space-4);
+    color: var(--color-warning-text);
+    font-size: 0.9375rem;
+  }
+  .blk-data-freshness__gaps-label {
+    margin-block-start: var(--space-4);
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+    color: var(--color-text-muted);
+  }
+  .blk-data-freshness__gaps { padding-inline-start: var(--space-5); font-size: 0.9375rem; }
+
   `;
 }
