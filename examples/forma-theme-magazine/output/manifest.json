@@ -1,9 +1,12 @@
 {
   "generator": "forma@0.1.0",
-  "specVersion": "0.1",
-  "mode": "manual",
+  "specVersion": "0.2",
+  "artifact": "manual",
+  "purpose": "operate",
+  "variant": "editorial",
+  "interaction": "static",
   "title": "Forma 스킬 처음 사용하기",
   "language": "ko",
   "sectionCount": 8,
-  "bytes": 168991
+  "bytes": 169631
 }

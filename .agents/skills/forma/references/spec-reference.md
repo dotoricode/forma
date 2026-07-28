@@ -5,16 +5,18 @@ JSON Schema via `forma schema`. This is a human-readable summary.
 
 ```json
 {
-  "version": "0.1",
+  "version": "0.2",
   "meta": {
     "title": "string, required",
     "subtitle": "string, optional",
-    "mode": "explain | review | test | report | manual",
-    "audience": "self | engineering | qa | manager | executive | external",
+    "artifact": "dashboard | report | manual | advanced",
+    "purpose": "monitor | diagnose | compare | decide | explain | operate | troubleshoot",
+    "audience": "self | engineering | qa | security | manager | executive | external",
     "language": "ko | en",
-    "designSystem": "simple | workspace | guide | magazine (default simple)",
-    "theme": "light | dark | auto (default light)",
+    "variant": "composition recipe inside the artifact, optional",
+    "colorMode": "light | dark | auto (default light)",
     "density": "comfortable | compact (default comfortable)",
+    "interaction": "static | islands | live (default static)",
     "confidentiality": "public | internal | confidential (default internal)"
   },
   "sources": [
@@ -31,6 +33,16 @@ JSON Schema via `forma schema`. This is a human-readable summary.
 
 Every block requires `id` (unique, used as an anchor) and `type`. Optional
 on every block: `sourceRefs: string[]`, `confidence`, `notes`.
+
+`artifact` is not a theme. It selects a composition contract the planner
+enforces: a report with no recommendation, or a dashboard with no data
+freshness, fails `forma validate`. Pick the artifact from what the output
+*is*, then pick `variant` from `references/artifacts.md`.
+
+Specs written against 0.1 still render. They are migrated on read
+(`mode`/`theme`/`designSystem` become `artifact`/`purpose`/`variant`/
+`colorMode`) and are exempt from the composition contract, with warnings
+naming what a 0.2 rewrite would add.
 
 Run `forma validate <path>` before rendering — the schema is strict and
 rejects unknown fields.

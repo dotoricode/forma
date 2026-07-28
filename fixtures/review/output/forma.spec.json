@@ -1,14 +1,16 @@
 {
-  "version": "0.1",
+  "version": "0.2",
   "meta": {
     "title": "네트워크 재연결 로직 변경 리뷰",
     "subtitle": "VPN 전환 직후 DNS 복구 로직에 재시도 상한을 도입한다",
-    "mode": "review",
+    "artifact": "report",
+    "purpose": "decide",
     "audience": "engineering",
     "language": "ko",
-    "theme": "light",
-    "designSystem": "simple",
+    "variant": "technical",
+    "colorMode": "light",
     "density": "comfortable",
+    "interaction": "static",
     "confidentiality": "internal"
   },
   "sources": [

@@ -23,13 +23,15 @@ that isn't "explain this work to a human."
 1. **Read the request and the material.** Identify what files or text are
    available. If a critical fact is genuinely missing, ask at most 3
    questions — don't block on things you can infer.
-2. **Pick a mode.** One of `explain`, `review`, `test`, `report`, `manual`.
-   Infer it from the requested job when the user does not name one. See
-   `references/modes.md` for the narrative grammar of each.
-3. **Decide theme, audience, language, density.** Choose `simple`,
-   `workspace`, `guide`, or `magazine` by reading purpose and content,
-   not by personal taste. Then choose `self | engineering | qa | manager |
-   executive | external`; `ko | en`; `comfortable | compact`.
+2. **Fix the artifact.** One of `dashboard`, `report`, `manual`,
+   `advanced`. This is not a style choice — each one owes the reader a
+   different set of answers, enforced by `forma validate`. See
+   `references/artifacts.md`.
+3. **Decide purpose, audience, language, density.** `monitor | diagnose |
+   compare | decide | explain | operate | troubleshoot`; `self |
+   engineering | qa | security | manager | executive | external`;
+   `ko | en`; `comfortable | compact`. Pick `variant` from the recipes
+   listed for your artifact.
 4. **Separate fact from inference.** Anything not directly evidenced by a
    source must be marked `confidence: "inferred"` or `"unknown"` — never
    `"verified"`. See `references/source-handling.md`.
@@ -46,7 +48,7 @@ that isn't "explain this work to a human."
    and, when a browser is available, `scripts/qa.mjs` for the full
    Playwright/axe pass. See `references/quality-gates.md` and
    `references/generic-ai-patterns.md` for what "done" means.
-10. **Report** the output path, mode, key assumptions, and what you
+10. **Report** the output path, artifact, key assumptions, and what you
     verified — including anything you did NOT check.
 
 ## Hard constraints
@@ -64,7 +66,8 @@ that isn't "explain this work to a human."
 
 ## References
 
-- `references/modes.md` — narrative order per mode
+- `references/artifacts.md` — the four artifacts and their contracts
+- `references/modes.md` — narrative order per purpose (0.1 vocabulary)
 - `references/design-grammar.md` — shared rules and four theme purposes
 - `references/typography.md` — font stack and subsetting rules
 - `references/generic-ai-patterns.md` — the banned-pattern checklist

@@ -33,23 +33,27 @@ describe("validateFormaSpec", () => {
     expect(result.ok).toBe(false);
   });
 
-  it("defaults theme, density, and confidentiality when omitted", () => {
+  it("defaults colorMode, density, interaction, and confidentiality when omitted", () => {
     const minimal = {
-      version: "0.1",
+      version: "0.2",
       meta: {
         title: "Minimal",
-        mode: "explain",
+        artifact: "report",
+        purpose: "explain",
         audience: "self",
         language: "en",
       },
       narrative: { question: "q", summary: "s" },
       sections: [{ id: "a", type: "prose", body: "hello" }],
     };
-    const result = validateFormaSpec(minimal);
+    // Composition is skipped so this stays a test of schema defaults rather
+    // than of the report contract, which a one-block spec cannot satisfy.
+    const result = validateFormaSpec(minimal, { skipComposition: true });
     expect(result.ok).toBe(true);
     if (result.ok) {
-      expect(result.spec.meta.theme).toBe("light");
+      expect(result.spec.meta.colorMode).toBe("light");
       expect(result.spec.meta.density).toBe("comfortable");
+      expect(result.spec.meta.interaction).toBe("static");
       expect(result.spec.meta.confidentiality).toBe("internal");
     }
   });
@@ -61,20 +65,52 @@ describe("validateFormaSpec", () => {
     expect(result.ok).toBe(false);
   });
 
-  it("accepts manual as a document mode", () => {
-    const manual = structuredClone(STARTER_SPEC);
-    manual.meta.mode = "manual";
-    const result = validateFormaSpec(manual);
-    expect(result.ok).toBe(true);
+  it("rejects a variant that belongs to a different artifact", () => {
+    const mismatched = structuredClone(STARTER_SPEC);
+    mismatched.meta.variant = "quickstart"; // a manual variant on a report
+    const result = validateFormaSpec(mismatched);
+    expect(result.ok).toBe(false);
+    if (!result.ok) {
+      expect(result.issues.some((i) => i.path.includes("variant-artifact-mismatch"))).toBe(true);
+    }
   });
 
-  it("normalizes legacy design-system names to everyday theme names", () => {
-    const legacy = structuredClone(STARTER_SPEC) as unknown as {
-      meta: { designSystem: string };
+  it("renders a 0.1 spec by migrating it rather than rejecting it", () => {
+    const legacy = {
+      version: "0.1",
+      meta: {
+        title: "Legacy onboarding guide",
+        mode: "manual",
+        audience: "engineering",
+        language: "ko",
+        theme: "dark",
+        designSystem: "developer-docs",
+      },
+      narrative: { question: "q", summary: "s" },
+      sections: [{ id: "a", type: "prose", body: "hello" }],
     };
-    legacy.meta.designSystem = "developer-docs";
     const result = validateFormaSpec(legacy);
     expect(result.ok).toBe(true);
-    if (result.ok) expect(result.spec.meta.designSystem).toBe("guide");
+    if (result.ok) {
+      expect(result.migrated).toBe(true);
+      expect(result.spec.meta.artifact).toBe("manual");
+      expect(result.spec.meta.variant).toBe("procedural");
+      expect(result.spec.meta.purpose).toBe("operate");
+      expect(result.spec.meta.colorMode).toBe("dark");
+    }
+  });
+
+  it("reports a legacy spec's unmet contract as a warning, not a failure", () => {
+    const legacy = {
+      version: "0.1",
+      meta: { title: "Legacy", mode: "manual", audience: "engineering", language: "ko" },
+      narrative: { question: "q", summary: "s" },
+      sections: [{ id: "a", type: "prose", body: "hello" }],
+    };
+    const result = validateFormaSpec(legacy);
+    expect(result.ok).toBe(true);
+    if (result.ok) {
+      expect(result.warnings.some((w) => w.field.includes("unfilled-role"))).toBe(true);
+    }
   });
 });

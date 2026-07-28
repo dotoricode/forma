@@ -1,9 +1,10 @@
 import type { FormaSpec } from "../spec/schema.js";
 import { escapeHtml } from "../security/sanitize.js";
-import { buildStylesheet } from "../design/css.js";
+import { buildStylesheet } from "../design/foundations-css.js";
 import { buildFontFaceCss } from "../design/fonts.js";
 import { buildInteractiveScript } from "./interactive.js";
 import { composeDocument } from "./compose.js";
+import { DEFAULT_VARIANT } from "../spec/artifact.js";
 
 const THEME_LABEL: Record<"ko" | "en", string> = { en: "Toggle dark mode", ko: "다크 모드 전환" };
 const SKIP_LABEL: Record<"ko" | "en", string> = {
@@ -26,10 +27,14 @@ export async function renderSpecToHtml(spec: FormaSpec): Promise<RenderResult> {
   const script = buildInteractiveScript();
   const lang = spec.meta.language;
   const htmlLangAttr = lang === "ko" ? "ko" : "en";
-  const themeAttr = spec.meta.theme === "light" || spec.meta.theme === "dark"
-    ? ` data-theme="${spec.meta.theme}"`
-    : "";
-  const designAttr = ` data-design="${spec.meta.designSystem}"`;
+  const themeAttr =
+    spec.meta.colorMode === "light" || spec.meta.colorMode === "dark"
+      ? ` data-theme="${spec.meta.colorMode}"`
+      : "";
+  // Artifact and variant are separate hooks so a stylesheet can address
+  // "every report" without repeating itself once per variant.
+  const variant = spec.meta.variant ?? DEFAULT_VARIANT[spec.meta.artifact];
+  const designAttr = ` data-artifact="${spec.meta.artifact}" data-variant="${variant}"`;
 
   const html = `<!doctype html>
 <html lang="${htmlLangAttr}"${themeAttr}${designAttr}>

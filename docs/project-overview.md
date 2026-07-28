@@ -81,20 +81,30 @@ gzip 105,297 bytes):
 
 ### 언어 구성
 
-**소스 코드: TypeScript 100%**
+**소스 코드: TypeScript 100% (`.ts` + `.tsx`)**
 
-`src/` 아래 24개 파일 3,953줄이 전부 `.ts`다. `.html` 소스 파일도,
-`.css` 소스 파일도 없다. HTML과 CSS는 TS 템플릿 리터럴로 조립한다.
+`.html` 소스 파일도, `.css` 소스 파일도 없다. 블록은 TSX 컴포넌트이고,
+CSS는 TS 템플릿 리터럴로 조립한다.
 
 ```
-src/design/css.ts      865줄  →  CSS 문자열 전부
-src/renderer/shell.ts   67줄  →  <html> 골격
-src/renderer/blocks.ts 484줄  →  블록 20종의 HTML
-src/renderer/diagrams.ts 235줄 →  SVG 좌표 계산
+src/blocks/*.tsx              블록 20종 컴포넌트
+src/renderer/document.tsx     문서 본문 트리
+src/renderer/compose.tsx      renderToStaticMarkup 호출부
+src/design/foundations-css.ts 레이어·토큰·레이아웃
+src/design/block-css.ts       블록별 스타일
+src/design/artifact-css.ts    artifact별 오버라이드
+src/renderer/diagrams.ts      SVG 좌표 계산
 ```
 
-JSX 없음, 템플릿 엔진 없음, CSS 전처리기 없음, 번들러 없음.
-빌드는 `tsc` 하나다.
+**React는 빌드 타임에만 쓴다.** `renderToStaticMarkup`은 hydration 마커도
+런타임도 남기지 않아서, 산출물 HTML의 JS는 여전히 테마 토글과 코드 복사
+island 2.9KB뿐이다. 테스트가 이걸 강제한다(`data-reactroot` 부재, 같은 spec
+두 번 렌더 시 바이트 동일).
+
+React 버전은 **정확히 고정**했다(`19.2.0`). 이스케이프와 속성 직렬화 방식이
+출력의 일부라 마이너 업그레이드가 골든 비교를 깨뜨릴 수 있다.
+
+템플릿 엔진 없음, CSS 전처리기 없음, 번들러 없음. 빌드는 `tsc` 하나다.
 
 **결과물: HTML + CSS + 최소 JS + 인라인 SVG + 임베디드 WOFF2**
 
@@ -117,19 +127,38 @@ JS를 꺼도 문서는 전부 읽히고 탐색된다. JS는 오직 편의 기능
 ```
 src/
 ├── spec/         입력 계약. 여기를 통과 못 한 건 렌더러가 보지 않는다
-│   ├── schema.ts        330줄  Zod 스키마 전부 (meta, 20블록, narrative)
-│   ├── mode.ts           87줄  지시문에서 mode 추론
-│   ├── validate.ts       27줄  사람이 읽는 오류 포매터
-│   └── json-schema.ts     9줄  z.toJSONSchema 내보내기
+│   ├── schema.ts               meta + narrative. 블록은 registry에서 가져온다
+│   ├── artifact.ts             artifact / purpose / variant / colorMode
+│   ├── roles.ts                composition role 어휘
+│   ├── source.ts               source, confidence, BlockBase
+│   ├── migrations.ts           0.1 → 0.2 정규화 (모호하면 경고)
+│   ├── infer-artifact.ts       지시문에서 artifact 추론 (CLI 스캐폴딩용)
+│   ├── validate.ts             마이그레이션 → 스키마 → 계약 3단 검증
+│   └── json-schema.ts          z.toJSONSchema 내보내기
+│
+├── blocks/       블록 정의. 한 곳에 등록하면 나머지가 파생된다
+│   ├── registry.ts             union / 타입 / JSON Schema / dispatch 파생
+│   ├── types.ts                BlockDefinition 계약 (prepare + Component)
+│   ├── primitives.tsx          Section / Measure / SourceNotes 등 공용 컴포넌트
+│   ├── strings.ts              지역화 라벨
+│   └── document|code|diagram|data|decision.tsx  블록 20종
+│
+├── planner/      artifact가 지키기로 한 약속을 강제한다
+│   ├── plan.ts                 블록 → 역할 해석 후 계약 검사
+│   ├── profile.ts              ArtifactProfile 계약
+│   └── profiles/               dashboard / report / manual / advanced
 │
 ├── design/       시각 토큰과 스타일시트
-│   ├── css.ts           865줄  @layer 7단 전체 + 테마 4종
+│   ├── foundations-css.ts      @layer 7단, 토큰, 레이아웃, 유틸리티, 인쇄
+│   ├── block-css.ts            블록별 스타일
+│   ├── artifact-css.ts         artifact별 오버라이드
 │   ├── tokens.ts        102줄  OKLCH 프리미티브, 간격/반경/모션/measure
 │   └── fonts.ts         153줄  subset-font 파이프라인
 │
 ├── renderer/     spec → HTML
-│   ├── blocks.ts        484줄  블록별 렌더 함수
 │   ├── diagrams.ts      235줄  자체 SVG 레이아웃 엔진
+│   ├── document.tsx            문서 본문 React 트리
+│   ├── static.tsx              단일 블록 렌더 (테스트·컴포넌트 검수용)
 │   ├── interactive.ts    94줄  인라인 JS island
 │   ├── compose.ts        93줄  섹션 조립 + 목차 + 폰트용 텍스트 수집
 │   ├── diff-view.ts      72줄  unified diff 파싱
@@ -195,16 +224,17 @@ vitest 8개 파일 **52개 테스트** 전부 통과. 가장 큰 축은
 
 ```jsonc
 {
-  "version": "0.1",
+  "version": "0.2",
   "meta": {
     "title":        "필수",
-    "subtitle":     "선택",
-    "mode":         "explain | review | test | report | manual",
-    "audience":     "self | engineering | qa | manager | executive | external",
+    "artifact":     "dashboard | report | manual | advanced",   // 결과물이 무엇인가
+    "purpose":      "monitor | diagnose | compare | decide | explain | operate | troubleshoot",
+    "audience":     "self | engineering | qa | security | manager | executive | external",
     "language":     "ko | en",
-    "theme":        "light | dark | auto",        // 기본 light
-    "designSystem": "simple | workspace | guide | magazine",  // 기본 simple
+    "variant":      "artifact 안의 구성 recipe (선택)",
+    "colorMode":    "light | dark | auto",
     "density":      "comfortable | compact",
+    "interaction":  "static | islands | live",
     "confidentiality": "public | internal | confidential"
   },
   "sources":   [ { "id", "label", "path?", "kind?" } ],
@@ -212,6 +242,9 @@ vitest 8개 파일 **52개 테스트** 전부 통과. 가장 큰 축은
   "sections":  [ /* 블록 1개 이상 */ ]
 }
 ```
+
+0.1 스펙(`mode` / `theme` / `designSystem`)은 읽을 때 자동 변환되고 계속
+렌더된다. 변환이 모호하면 추론하지 않고 경고를 낸다.
 
 `sections`는 `type`으로 판별하는 discriminated union이고, 모든 블록이
 공통으로 `id`(앵커), `sourceRefs[]`(출처), `confidence`(verified /
@@ -274,28 +307,37 @@ hue가 0이라 파란 accent(hue 250)를 흰색과 섞으면 250에서 0으로 �
 페이지 중간에서 잘렸던 건 `@media (min-width: 1280px)`의
 `max-height: calc(100vh - ...)`가 계속 살아 있었기 때문이다.
 
-### 5-3. 테마 = CSS 변형, 렌더러 분기가 아님
+### 5-3. artifact = 정보 구조, CSS 스킨이 아님
 
-`meta.designSystem`은 `<html data-design="...">` 속성 하나로만 나타난다.
+`meta.artifact`와 `meta.variant`는 `<html>` 속성 두 개로 나타난다.
 
 ```html
-<html lang="ko" data-theme="light" data-design="workspace">
+<html lang="ko" data-theme="light" data-artifact="report" data-variant="technical">
 ```
 
-**네 테마 모두 완전히 동일한 DOM을 만든다.** 블록 렌더러는 테마를 알지
-못한다. 테마를 추가한다는 것은 `[data-design="..."]` 아래에 CSS를 쓴다는
-뜻이지, 병렬 렌더러를 만든다는 뜻이 아니다.
-
-| 테마 | 용도 | 구성 |
+| artifact | 아트 디렉션 | 구성 |
 |---|---|---|
-| `simple` | 혼합 독자용 일반 문서 | 강한 도입부 괘선, 안정적 읽기 기준선, 넉넉한 여백 |
-| `workspace` | 밀도 높은 리뷰·테스트 근거 | 좌측 고정 레일, 압축된 리듬, 근거만 카드로 띄움 |
-| `guide` | 매뉴얼, 단계별 설명 | 방향 안내 우선 레일, 좁은 measure, 큰 콜아웃 |
-| `magazine` | 서사형 보고서, 롱폼 | 디스플레이 세리프, 비대칭 표지, 편집 괘선 |
+| `dashboard` | Signal Grid | 밀도 높은 수치 그리드, 상태 우선, 긴 표지 금지 |
+| `report` | Editorial Brief | 결론 선행, 편집 괘선, 인쇄·PDF 대응 |
+| `manual` | Guided Path | 방향 안내 레일, 좁은 measure, 기대 결과가 붙은 단계 |
+| `advanced` | Decision Room | 근거 그래프, 시뮬레이션, 결정 기록 |
 
-과거 이름(`quiet-editorial`, `precision-workbench`, `developer-docs`,
-`editorial-magazine`)은 스키마 경계에서 자동 변환된다
-(`LEGACY_DESIGN_SYSTEMS`).
+**중요한 차이:** artifact는 CSS 스킨이 아니다. 0.1의 `designSystem`이
+그랬고, 그게 한계였다. 동일한 DOM 위에 네 가지 외양을 입히는 방식으로는
+대시보드가 "무엇이 변했고 어디가 문제인가"에 답하는 동안 매뉴얼이
+"무엇을 어떤 순서로"에 답하게 만들 수 없다.
+
+각 artifact는 `src/planner/profiles/`에 composition contract를 갖고 있고,
+검증 단계에서 강제된다. 예를 들어 권고가 없는 report, 데이터 기준 시각이
+없는 dashboard는 `forma validate`에서 실패한다.
+
+계약은 블록 타입이 아니라 **의미 역할**로 쓴다. "대시보드는 `change` 역할을
+채워야 한다"고 쓰면 `metric-delta`든 `anomaly`든 `trend-chart`든 채울 수
+있다. 블록 타입으로 쓰면 계약이 오늘의 블록 목록에 묶인다.
+
+0.1의 `designSystem` 값과 옛 이름(`quiet-editorial` 등)은
+`src/spec/migrations.ts`에서 자동 변환되고, 계약 검사에서 면제된 legacy
+경로로 렌더된다.
 
 ### 5-4. 레이아웃 문법
 
@@ -423,36 +465,32 @@ axe 위반 0, 스크린샷.
 
 ### 동작하는 것
 
-spec 검증, 20블록 렌더, 4테마 x 라이트/다크, 폰트 subset, 다이어그램 SVG,
+spec 검증, registry 기반 블록 20종 렌더, artifact 4종 계약 강제,
+0.1 하위 호환, 라이트/다크, 폰트 subset, 다이어그램 SVG,
 Shiki 하이라이팅, diff 파싱, 인쇄 스타일, 4뷰포트 QA, axe 통과,
 디자인 lint, 스킬 동기화. fixture 4종 + example 5종이 렌더된 상태로 있다.
 
 ### 알려진 문제
 
-**1. `mode`가 렌더링에 아무 영향이 없다.**
-`grep`으로 확인한 결과 `spec.meta.mode`는 `render.ts:54`에서 manifest에
-기록되는 것과 `forma generate` 스캐폴딩에서만 쓰인다. `DESIGN.md`의
-"Mode composition" 표는 **의도이지 구현이 아니다.** 지금은 Agent가
-블록을 그 순서로 배치해주기를 기대하는 것뿐이고, 강제하는 코드가 없다.
+**1. `dashboard`와 `advanced`는 계약만 있고 블록이 없다.**
+두 artifact의 composition contract는 정의돼 있고 planner가 강제하지만,
+`kpi` / `change` / `driver` / `freshness` / `evidence-graph` / `simulation` /
+`decision` 역할을 채울 블록이 아직 없다. 그래서 지금 dashboard 스펙을 쓰면
+"어떤 역할이 비었는지"를 지목하며 검증에 실패한다. 리포트에 카드를 얹어
+대시보드인 척하는 것보다 낫다고 판단한 결과다. PR5·PR7에서 채운다.
 
-**2. 테마 배정이 전적으로 Agent 재량이다.**
-`mode`에서 테마를 유도하는 로직이 없고, 스키마 기본값 `simple`이 전부다.
-`SKILL.md` 3단계의 지침 한 줄과 `design-grammar.md`의 테마당 한 줄이
-근거의 전부라, 같은 문서를 두 번 만들면 테마가 달라질 수 있다.
+**2. artifact별 CSS는 파일만 분리됐고 내용은 아직 옛 테마 매핑이다.**
+`artifact-css.ts`로 떼어냈지만 규칙 자체는 기존 4테마를 옮긴 것이고,
+dashboard는 옛 workspace 레일 스타일을 쓰고 있다. Signal Grid 고유의
+12열 그리드와 수치 타이포는 PR5에서 만든다.
 
-**3. 테마 이름과 모드 이름이 겹칠 위험.**
-테마를 `report` / `dashboard` / `manual`로 개편하자는 논의가 있는데,
-`report`와 `manual`은 이미 `mode` 값이다. 또 "대시보드"를 표방하려면
-지표 타일·스파크라인 블록이 필요한데 현재 20블록은 전부 문서 블록이다.
+**3. Storybook은 아직 없다.**
+TSX 전환의 목적 중 하나였지만 앱 하나를 새로 세우는 작업이라 분리했다.
+PR6(품질 계층)에서 aesthetic QA와 함께 넣는다.
 
-**4. 문서 drift.**
-`DESIGN.md`가 `--measure-prose`를 아직 `70ch`로 적고 있다. 실제 값은
-`42rem`이다(`src/design/tokens.ts`).
-
-**5. 링크 끊긴 정적 목업 3개.**
+**4. 링크 끊긴 정적 목업 3개.**
 `prototypes/{precision-workbench,developer-docs,editorial-magazine}/onboarding.html`이
-갤러리에서 참조되지 않는 상태로 남아 있다. 삭제할지 "손으로 그린 원안"으로
-보존할지 미정.
+갤러리에서 참조되지 않는 상태로 남아 있다. 정리 여부 미정.
 
 ### 하려다 만 것
 
@@ -479,8 +517,10 @@ node scripts/check-naming.mjs
 
 | 알고 싶은 것 | 볼 파일 |
 |---|---|
-| 입력에 무엇을 쓸 수 있나 | `src/spec/schema.ts` |
-| 블록이 어떤 HTML이 되나 | `src/renderer/blocks.ts` |
+| 입력에 무엇을 쓸 수 있나 | `src/spec/schema.ts`, `src/spec/artifact.ts` |
+| 블록이 어떤 HTML이 되나 | `src/blocks/*.ts` |
+| 블록을 새로 추가하려면 | `src/blocks/registry.ts`와 같은 폴더의 정의 파일 |
+| artifact가 무엇을 약속하나 | `src/planner/profiles/` |
 | 색·간격·타이포 값 | `src/design/tokens.ts` |
 | 스타일 전부 | `src/design/css.ts` |
 | 하면 안 되는 것 | `src/qa/design-lint.ts`, `skills/forma/references/generic-ai-patterns.md` |

@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="ko" data-theme="light" data-design="simple">
+<html lang="ko" data-theme="light" data-artifact="report" data-variant="technical">
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -682,22 +682,22 @@
 
   /* Simple — the default edited-memo treatment. A strong opening rule and
      tight display type create one leverage point without adding decoration. */
-  :root[data-design="simple"] .blk-cover {
+  :root[data-artifact="report"]:not([data-variant="editorial"]) .blk-cover {
     border-block-start: 3px solid var(--color-text);
     padding-block-start: var(--space-7);
   }
-  :root[data-design="simple"] .blk-cover__title {
+  :root[data-artifact="report"]:not([data-variant="editorial"]) .blk-cover__title {
     max-width: 48rem;
     letter-spacing: -0.025em;
   }
-  :root[data-design="simple"] .blk-summary__title {
+  :root[data-artifact="report"]:not([data-variant="editorial"]) .blk-summary__title {
     font-size: clamp(1.35rem, 1.1rem + 0.7vw, 1.75rem);
   }
 
   /* Workspace — tool-like navigation and a denser rhythm. Raised surfaces
      are reserved for visual evidence; ordinary prose stays on the canvas so
      the entire document does not collapse into a uniform card stack. */
-  :root[data-design="workspace"] {
+  :root[data-artifact="dashboard"] {
     --shadow: 0 1px 2px oklch(0% 0 0 / 0.05), 0 4px 16px oklch(0% 0 0 / 0.08);
     --color-canvas: oklch(96.5% 0.003 90);
     --workspace-rail: var(--color-canvas);
@@ -706,20 +706,20 @@
     --workspace-rail-text-strong: var(--color-text);
     --workspace-rail-active: var(--color-surface);
   }
-  [data-theme="dark"]:root[data-design="workspace"] {
+  [data-theme="dark"]:root[data-artifact="dashboard"] {
     --color-canvas: oklch(9% 0.003 90);
   }
   @media (prefers-color-scheme: dark) {
-    :root[data-design="workspace"]:not([data-theme="light"]) {
+    :root[data-artifact="dashboard"]:not([data-theme="light"]) {
       --color-canvas: oklch(9% 0.003 90);
     }
   }
-  :root[data-design="workspace"] .layout {
+  :root[data-artifact="dashboard"] .layout {
     grid-template-columns: 224px minmax(0, 1fr);
     max-width: none;
     align-items: stretch;
   }
-  :root[data-design="workspace"] .layout > .side-toc {
+  :root[data-artifact="dashboard"] .layout > .side-toc {
     order: -1;
     align-self: stretch;
     position: static;
@@ -731,7 +731,7 @@
     padding: var(--space-6) var(--space-4);
     margin-inline-start: calc(-1 * var(--space-5));
   }
-  :root[data-design="workspace"] .side-toc .toc {
+  :root[data-artifact="dashboard"] .side-toc .toc {
     position: sticky;
     inset-block-start: var(--space-5);
     max-height: calc(100vh - var(--space-8));
@@ -740,24 +740,24 @@
     flex-wrap: nowrap;
     gap: var(--space-1);
   }
-  :root[data-design="workspace"] .side-toc .toc a {
+  :root[data-artifact="dashboard"] .side-toc .toc a {
     color: var(--workspace-rail-text);
     padding: 0.5em 0.75em;
     border-radius: var(--radius-sm);
   }
-  :root[data-design="workspace"] .side-toc .toc a:hover {
+  :root[data-artifact="dashboard"] .side-toc .toc a:hover {
     color: var(--workspace-rail-text-strong);
   }
-  :root[data-design="workspace"] .side-toc .toc a[aria-current="true"] {
+  :root[data-artifact="dashboard"] .side-toc .toc a[aria-current="true"] {
     background: var(--workspace-rail-active);
     box-shadow: var(--shadow);
   }
-  :root[data-design="workspace"] .layout > .doc { padding-block: var(--space-6); }
-  :root[data-design="workspace"] .section {
+  :root[data-artifact="dashboard"] .layout > .doc { padding-block: var(--space-6); }
+  :root[data-artifact="dashboard"] .section {
     border-block-end: 1px solid var(--color-border);
     padding: var(--space-6) 0;
   }
-  :root[data-design="workspace"] .section:is(
+  :root[data-artifact="dashboard"] .section:is(
     .blk-diagram,
     .blk-chart,
     .blk-test-matrix,
@@ -773,12 +773,12 @@
 
   /* Guide — light left nav rail, callout-style finding/decision
      blocks, tighter reading measure like a docs site's center column. */
-  :root[data-design="guide"] .layout {
+  :root[data-artifact="manual"] .layout {
     grid-template-columns: 232px minmax(0, 1fr);
     max-width: none;
     gap: var(--space-7);
   }
-  :root[data-design="guide"] .layout > .side-toc {
+  :root[data-artifact="manual"] .layout > .side-toc {
     order: -1;
     position: sticky;
     inset-block-start: var(--space-5);
@@ -789,52 +789,52 @@
     border-block-end: none;
     padding-inline-end: var(--space-4);
   }
-  :root[data-design="guide"] .side-toc .toc {
+  :root[data-artifact="manual"] .side-toc .toc {
     flex-direction: column;
     flex-wrap: nowrap;
     gap: var(--space-1);
   }
-  :root[data-design="guide"] .side-toc .toc a {
+  :root[data-artifact="manual"] .side-toc .toc a {
     border-radius: var(--radius-sm);
     padding: 0.4em 0.65em;
   }
-  :root[data-design="guide"] .side-toc .toc a[aria-current="true"] {
+  :root[data-artifact="manual"] .side-toc .toc a[aria-current="true"] {
     background: color-mix(in oklab, var(--color-accent) 10%, transparent);
     color: var(--color-text);
     border-inline-start: 3px solid var(--color-accent);
   }
-  :root[data-design="guide"] .measure { max-width: 38rem; }
-  :root[data-design="guide"] .blk-finding,
-  :root[data-design="guide"] .blk-decision .decision-strip {
+  :root[data-artifact="manual"] .measure { max-width: 38rem; }
+  :root[data-artifact="manual"] .blk-finding,
+  :root[data-artifact="manual"] .blk-decision .decision-strip {
     background: color-mix(in oklab, var(--color-accent) 6%, var(--color-surface));
     border-radius: var(--radius-md);
     padding: var(--space-4) var(--space-5);
   }
-  :root[data-design="guide"] .blk-decision .decision-strip { border-inline-start-width: 3px; }
+  :root[data-artifact="manual"] .blk-decision .decision-strip { border-inline-start-width: 3px; }
 
   /* Magazine — serif display type, a high-leverage cover, and an editorial
      opening rhythm without decorative images or motion. */
-  :root[data-design="magazine"] {
+  :root[data-artifact="report"][data-variant="editorial"] {
     --font-serif: Georgia, "Nanum Myeongjo", serif;
   }
-  :root[data-design="magazine"] .doc { max-width: 52rem; }
-  :root[data-design="magazine"] h1,
-  :root[data-design="magazine"] h2,
-  :root[data-design="magazine"] h3,
-  :root[data-design="magazine"] .blk-cover__title,
-  :root[data-design="magazine"] .blk-narrative__question {
+  :root[data-artifact="report"][data-variant="editorial"] .doc { max-width: 52rem; }
+  :root[data-artifact="report"][data-variant="editorial"] h1,
+  :root[data-artifact="report"][data-variant="editorial"] h2,
+  :root[data-artifact="report"][data-variant="editorial"] h3,
+  :root[data-artifact="report"][data-variant="editorial"] .blk-cover__title,
+  :root[data-artifact="report"][data-variant="editorial"] .blk-narrative__question {
     font-family: var(--font-serif);
     font-weight: 400;
   }
-  :root[data-design="magazine"] .blk-cover {
+  :root[data-artifact="report"][data-variant="editorial"] .blk-cover {
     border-block-start: 5px solid var(--color-text);
   }
-  :root[data-design="magazine"] .blk-cover__title {
+  :root[data-artifact="report"][data-variant="editorial"] .blk-cover__title {
     font-size: clamp(2.15rem, 1.3rem + 3.2vw, 4rem);
     letter-spacing: -0.035em;
   }
-  :root[data-design="magazine"] .blk-narrative__question { font-size: 1.5rem; }
-  :root[data-design="magazine"] .blk-narrative__summary p:first-of-type::first-letter {
+  :root[data-artifact="report"][data-variant="editorial"] .blk-narrative__question { font-size: 1.5rem; }
+  :root[data-artifact="report"][data-variant="editorial"] .blk-narrative__summary p:first-of-type::first-letter {
     font-family: var(--font-serif);
     font-size: 3.4em;
     font-weight: 700;
@@ -842,7 +842,7 @@
     line-height: 0.8;
     padding-inline-end: var(--space-2);
   }
-  :root[data-design="magazine"] .blk-takeaways {
+  :root[data-artifact="report"][data-variant="editorial"] .blk-takeaways {
     font-family: var(--font-serif);
     font-size: 1.0625rem;
     border-block: 1px solid var(--color-text);
@@ -850,19 +850,19 @@
   }
 
   @media (min-width: 800px) {
-    :root[data-design="magazine"] .blk-cover {
+    :root[data-artifact="report"][data-variant="editorial"] .blk-cover {
       display: grid;
       grid-template-columns: minmax(0, 2.4fr) minmax(12rem, 1fr);
       column-gap: var(--space-7);
       align-items: start;
     }
-    :root[data-design="magazine"] .blk-cover__eyebrow,
-    :root[data-design="magazine"] .blk-cover__title,
-    :root[data-design="magazine"] .blk-cover__subtitle,
-    :root[data-design="magazine"] .blk-cover > .confidence-tag {
+    :root[data-artifact="report"][data-variant="editorial"] .blk-cover__eyebrow,
+    :root[data-artifact="report"][data-variant="editorial"] .blk-cover__title,
+    :root[data-artifact="report"][data-variant="editorial"] .blk-cover__subtitle,
+    :root[data-artifact="report"][data-variant="editorial"] .blk-cover > .confidence-tag {
       grid-column: 1;
     }
-    :root[data-design="magazine"] .blk-cover__meta {
+    :root[data-artifact="report"][data-variant="editorial"] .blk-cover__meta {
       grid-column: 2;
       grid-row: 2 / span 3;
       border-block-start: 1px solid var(--color-text);
@@ -872,14 +872,14 @@
   }
 
   @media (max-width: 900px) {
-    :root[data-design="workspace"] .layout,
-    :root[data-design="guide"] .layout {
+    :root[data-artifact="dashboard"] .layout,
+    :root[data-artifact="manual"] .layout {
       grid-template-columns: minmax(0, 1fr);
       gap: var(--space-4);
       padding-inline: var(--space-4);
     }
-    :root[data-design="workspace"] .layout > .side-toc,
-    :root[data-design="guide"] .layout > .side-toc {
+    :root[data-artifact="dashboard"] .layout > .side-toc,
+    :root[data-artifact="manual"] .layout > .side-toc {
       order: -1;
       position: static;
       max-height: none;
@@ -889,8 +889,8 @@
       margin-inline-start: 0;
       padding: 0 0 var(--space-4);
     }
-    :root[data-design="workspace"] .side-toc .toc,
-    :root[data-design="guide"] .side-toc .toc {
+    :root[data-artifact="dashboard"] .side-toc .toc,
+    :root[data-artifact="manual"] .side-toc .toc {
       position: static;
       max-height: none;
       overflow-x: auto;
@@ -898,8 +898,8 @@
       flex-direction: row;
       flex-wrap: nowrap;
     }
-    :root[data-design="workspace"] .side-toc .toc a,
-    :root[data-design="guide"] .side-toc .toc a {
+    :root[data-artifact="dashboard"] .side-toc .toc a,
+    :root[data-artifact="manual"] .side-toc .toc a {
       white-space: nowrap;
     }
   }
@@ -914,14 +914,7 @@
 </header>
 <div class="layout">
   <main class="doc" id="main" data-density="comfortable">
-<section class="section blk-cover" id="cover"><p class="blk-cover__eyebrow">REVIEW · #482 · INTERNAL</p><h1 class="blk-cover__title">네트워크 재연결 로직 변경 리뷰</h1><p class="blk-cover__subtitle">VPN 전환 시 DNS 복구 로직에 재시도 상한을 도입한다</p><ul class="blk-cover__meta"><li>4개 파일 변경</li><li>위험도: 중간</li><li>테스트 12/14 통과</li></ul></section>
-<section class="section blk-narrative" id="narrative"><div class="measure">
-    <p class="blk-narrative__question">이 변경이 VPN 전환 직후의 네트워크 오류를 안전하게 해결하는가?</p>
-    <div class="blk-narrative__summary"><p>연결 상태를 명시적으로 재초기화하고 재시도 횟수를 3회로 제한한다. 단일 스레드 테스트는 모두 통과했지만 동시성 테스트는 아직 추가되지 않았다.</p></div>
-    <ul class="blk-takeaways"><li>오류 복구 범위가 명시적으로 분리되었다.</li><li>재시도가 무한 루프에서 최대 3회로 제한되었다.</li><li>동시성 테스트가 병합 전에 추가로 필요하다.</li></ul>
-  </div></section>
-<section class="section blk-comparison" id="before-after"><h2 class="blk-comparison__title">Before / After</h2><div class="comparison__grid"><div class="comparison__col"><h3>Before</h3><ul><li>네트워크 변경 시 무제한으로 재연결을 시도한다.</li><li>연결 상태가 암묵적으로 남아 있어 재초기화되지 않는다.</li></ul></div><div class="comparison__col"><h3>After</h3><ul><li>재시도 횟수를 최대 3회로 제한한다.</li><li>네트워크 변경 시 연결 상태를 명시적으로 재초기화한다.</li></ul></div></div></section>
-<section class="section blk-diff breakout" id="diff"><h2 class="blk-diff__title">핵심 변경: ConnectionManager.kt</h2><div class="blk-diff__frame"><div class="blk-diff__hunk"><div class="blk-diff__hunk-header">@@ -40,9 +40,11 @@</div><div class="blk-diff__row" data-op="context">
+<section class="section blk-cover" id="cover"><p class="blk-cover__eyebrow">REVIEW · #482 · INTERNAL</p><h1 class="blk-cover__title">네트워크 재연결 로직 변경 리뷰</h1><p class="blk-cover__subtitle">VPN 전환 시 DNS 복구 로직에 재시도 상한을 도입한다</p><ul class="blk-cover__meta"><li>4개 파일 변경</li><li>위험도: 중간</li><li>테스트 12/14 통과</li></ul></section><section class="section blk-narrative" id="narrative"><div class="measure"><p class="blk-narrative__question">이 변경이 VPN 전환 직후의 네트워크 오류를 안전하게 해결하는가?</p><div class="blk-narrative__summary"><p>연결 상태를 명시적으로 재초기화하고 재시도 횟수를 3회로 제한한다. 단일 스레드 테스트는 모두 통과했지만 동시성 테스트는 아직 추가되지 않았다.</p></div><ul class="blk-takeaways"><li>오류 복구 범위가 명시적으로 분리되었다.</li><li>재시도가 무한 루프에서 최대 3회로 제한되었다.</li><li>동시성 테스트가 병합 전에 추가로 필요하다.</li></ul></div></section><section class="section blk-comparison" id="before-after"><h2 class="blk-comparison__title">Before / After</h2><div class="comparison__grid"><div class="comparison__col"><h3>Before</h3><ul><li>네트워크 변경 시 무제한으로 재연결을 시도한다.</li><li>연결 상태가 암묵적으로 남아 있어 재초기화되지 않는다.</li></ul></div><div class="comparison__col"><h3>After</h3><ul><li>재시도 횟수를 최대 3회로 제한한다.</li><li>네트워크 변경 시 연결 상태를 명시적으로 재초기화한다.</li></ul></div></div></section><section class="section blk-diff breakout" id="diff"><h2 class="blk-diff__title">핵심 변경: ConnectionManager.kt</h2><div class="blk-diff__frame"><div class="blk-diff__hunk"><div class="blk-diff__hunk-header">@@ -40,9 +40,11 @@</div><div class="blk-diff__row" data-op="context">
             <span class="blk-diff__ln">40</span>
             <span class="blk-diff__ln">40</span>
             <span class="blk-diff__code">    fun onNetworkChanged(network: Network) {</span>
@@ -985,12 +978,7 @@
             <span class="blk-diff__ln">48</span>
             <span class="blk-diff__ln">50</span>
             <span class="blk-diff__code">    }</span>
-          </div></div></div><div class="blk-source-note" aria-label="출처"><ul><li><span class="blk-source-note__label">connection-reset.diff</span><code class="blk-source-note__locator">fixtures/review/inputs/change.diff</code></li></ul></div></section>
-<section class="section blk-risk" id="impact"><div class="measure"><p class="blk-risk__badge">가능성 중간 · 영향 중간<span class="confidence-tag" data-confidence="inferred">추정</span></p><h3 class="blk-risk__title">동시에 여러 네트워크 변경 이벤트가 도착하면 상태 재초기화가 겹칠 수 있다</h3><dl class="blk-risk__grid"><div><dt>대응</dt><dd>resetConnectionState()에 mutex를 적용하거나, 동일 프레임 내 중복 이벤트를 debounce한다.</dd></div></dl><div class="blk-source-note" aria-label="출처"><ul><li><span class="blk-source-note__label">connection-reset.diff</span><code class="blk-source-note__locator">fixtures/review/inputs/change.diff</code></li></ul></div></div></section>
-<section class="section blk-test-summary" id="tests"><h2>테스트 증거</h2><div class="test-band"><div class="test-band__stat" ><span class="test-band__value">14</span><span class="test-band__label">전체</span></div><div class="test-band__stat" data-tone="pass"><span class="test-band__value">12</span><span class="test-band__label">성공</span></div><div class="test-band__stat" ><span class="test-band__value">0</span><span class="test-band__label">실패</span></div><div class="test-band__stat" ><span class="test-band__value">2</span><span class="test-band__label">건너뜀</span></div></div><div class="blk-source-note" aria-label="출처"><ul><li><span class="blk-source-note__label">concurrency-tests/results.xml</span><code class="blk-source-note__locator">fixtures/review/inputs/results.xml</code></li></ul></div></section>
-<section class="section blk-finding" id="open-questions"><div class="measure"><div data-severity="high"><p class="blk-finding__badge">높은 심각도<span class="confidence-tag" data-confidence="verified">확인됨</span></p><h3 class="blk-finding__title">동시성 테스트가 아직 스킵 상태다</h3><div><p><code>ConnectionManagerConcurrencyTest</code>의 2개 케이스가 <code>@Ignore</code>로 스킵되어 있다. 병합 전 활성화하거나, 활성화 계획을 결정에 명시해야 한다.</p></div></div><div class="blk-source-note" aria-label="출처"><ul><li><span class="blk-source-note__label">concurrency-tests/results.xml</span><code class="blk-source-note__locator">fixtures/review/inputs/results.xml</code></li></ul></div></div></section>
-<section class="section blk-decision" id="decision"><div class="measure"><div class="decision-strip"><p class="decision-strip__status">권장<span class="confidence-tag" data-confidence="inferred">추정</span></p><h3 class="decision-strip__title">동시성 테스트를 추가한 뒤 병합한다</h3><p><p>재시도 상한 로직 자체는 검증되었지만, 동시 네트워크 변경 시나리오가 테스트되지 않은 상태로 병합하면 회귀를 놓칠 위험이 있다.</p></p></div></div></section>
-<section class="section blk-source-note" id="sources"><div class="measure"><h2 class="blk-source-note__title">원본 출처</h2><ul><li><span class="blk-source-note__label">connection-reset.diff</span><code class="blk-source-note__locator">fixtures/review/inputs/change.diff</code></li><li><span class="blk-source-note__label">concurrency-tests/results.xml</span><code class="blk-source-note__locator">fixtures/review/inputs/results.xml</code></li></ul></div></section>
+          </div></div></div><div class="blk-source-note" aria-label="출처"><ul><li><span class="blk-source-note__label">connection-reset.diff</span><code class="blk-source-note__locator">fixtures/review/inputs/change.diff</code></li></ul></div></section><section class="section blk-risk" id="impact"><div class="measure"><p class="blk-risk__badge">가능성 중간 · 영향 중간<span class="confidence-tag" data-confidence="inferred">추정</span></p><h3 class="blk-risk__title">동시에 여러 네트워크 변경 이벤트가 도착하면 상태 재초기화가 겹칠 수 있다</h3><dl class="blk-risk__grid"><div><dt>대응</dt><dd>resetConnectionState()에 mutex를 적용하거나, 동일 프레임 내 중복 이벤트를 debounce한다.</dd></div></dl><div class="blk-source-note" aria-label="출처"><ul><li><span class="blk-source-note__label">connection-reset.diff</span><code class="blk-source-note__locator">fixtures/review/inputs/change.diff</code></li></ul></div></div></section><section class="section blk-test-summary" id="tests"><h2>테스트 증거</h2><div class="test-band"><div class="test-band__stat"><span class="test-band__value">14</span><span class="test-band__label">전체</span></div><div class="test-band__stat" data-tone="pass"><span class="test-band__value">12</span><span class="test-band__label">성공</span></div><div class="test-band__stat"><span class="test-band__value">0</span><span class="test-band__label">실패</span></div><div class="test-band__stat"><span class="test-band__value">2</span><span class="test-band__label">건너뜀</span></div></div><div class="blk-source-note" aria-label="출처"><ul><li><span class="blk-source-note__label">concurrency-tests/results.xml</span><code class="blk-source-note__locator">fixtures/review/inputs/results.xml</code></li></ul></div></section><section class="section blk-finding" id="open-questions"><div class="measure"><div data-severity="high"><p class="blk-finding__badge">높은 심각도<span class="confidence-tag" data-confidence="verified">확인됨</span></p><h3 class="blk-finding__title">동시성 테스트가 아직 스킵 상태다</h3><div><p><code>ConnectionManagerConcurrencyTest</code>의 2개 케이스가 <code>@Ignore</code>로 스킵되어 있다. 병합 전 활성화하거나, 활성화 계획을 결정에 명시해야 한다.</p></div></div><div class="blk-source-note" aria-label="출처"><ul><li><span class="blk-source-note__label">concurrency-tests/results.xml</span><code class="blk-source-note__locator">fixtures/review/inputs/results.xml</code></li></ul></div></div></section><section class="section blk-decision" id="decision"><div class="measure"><div class="decision-strip"><p class="decision-strip__status">권장<span class="confidence-tag" data-confidence="inferred">추정</span></p><h3 class="decision-strip__title">동시성 테스트를 추가한 뒤 병합한다</h3><div><p>재시도 상한 로직 자체는 검증되었지만, 동시 네트워크 변경 시나리오가 테스트되지 않은 상태로 병합하면 회귀를 놓칠 위험이 있다.</p></div></div></div></section><section class="section blk-source-note" id="sources"><div class="measure"><h2 class="blk-source-note__title">원본 출처</h2><ul><li><span class="blk-source-note__label">connection-reset.diff</span><code class="blk-source-note__locator">fixtures/review/inputs/change.diff</code></li><li><span class="blk-source-note__label">concurrency-tests/results.xml</span><code class="blk-source-note__locator">fixtures/review/inputs/results.xml</code></li></ul></div></section>
   </main>
   <aside class="side-toc no-print"><nav class="toc" aria-label="섹션 이동"><a href="#cover">네트워크 재연결 로직 변경 리뷰</a><a href="#before-after">Before / After</a><a href="#diff">핵심 변경: ConnectionManager.kt</a><a href="#impact">동시에 여러 네트워크 변경 이벤트가 도착하면 상태 재초기화가 겹칠 수 있다</a><a href="#tests">테스트 증거</a><a href="#open-questions">동시성 테스트가 아직 스킵 상태다</a><a href="#decision">동시성 테스트를 추가한 뒤 병합한다</a><a href="#sources">원본 출처</a></nav></aside>
 </div>

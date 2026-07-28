@@ -1,15 +1,21 @@
 # Design grammar
 
-Forma has one shared foundation and four purpose-led themes. Modes decide
-the story; themes decide its visual composition.
+Forma has one shared foundation and four artifacts. An artifact decides
+both the information structure and its visual composition; `variant` picks
+a recipe inside it.
 
-- `simple`: calm reading for explanations and short reports.
-- `workspace`: compact tool rail and raised evidence for reviews and tests.
-- `guide`: persistent orientation and narrow reading measure for manuals.
-- `magazine`: strong display hierarchy and asymmetric rhythm for narrative
-  reports. Use it only when the content supports a deliberate editorial pace.
+- `dashboard` (Signal Grid): dense, numeric, state-first. No long cover.
+- `report` (Editorial Brief): strong typography, conclusion up front.
+- `manual` (Guided Path): navigation-first, narrow measure, steps with
+  expected results.
+- `advanced` (Decision Room): interactive evidence, simulation, and a
+  recorded decision.
 
-All themes share the following rules:
+These are not four CSS skins over one DOM. That was the 0.1 `designSystem`
+field, and it could not make a dashboard answer "what changed and where is
+the problem" while a manual answers "what do I do, in what order".
+
+All artifacts share the following rules:
 
 - Prose measure is 66–72ch. Only code, tables, and diagrams break out wider.
 - Heading hierarchy comes from weight + measure + line-height + space, not

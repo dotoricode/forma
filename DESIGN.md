@@ -1,10 +1,11 @@
 # DESIGN.md — Forma's design system
 
 Single source of truth for Forma's visual language. Every Rendered Output
-shares the same semantic tokens, accessibility rules, block markup, and
-offline guarantees, then chooses one of four understandable themes:
-`simple`, `workspace`, `guide`, or `magazine`. See
-`docs/design-research-2026.md` for the research and naming rationale.
+shares the same semantic tokens, accessibility rules, and offline
+guarantees, then belongs to one of four artifacts: `dashboard`, `report`,
+`manual`, or `advanced`. See `docs/design-research-2026.md` for the research
+and naming rationale, and `skills/forma/references/artifacts.md` for each
+artifact's composition contract.
 
 ## Design intent
 
@@ -17,7 +18,8 @@ banned-pattern list — none of it appears here by construction.
 ## Tokens
 
 Defined in `src/design/tokens.ts` (primitives) and emitted in
-`src/design/css.ts` (`@layer tokens`). Semantic names only — component CSS
+`src/design/foundations-css.ts` (`@layer tokens`). Block styles live in
+`block-css.ts` and per-artifact overrides in `artifact-css.ts`. Semantic names only — component CSS
 never references a primitive or raw hex/OKLCH value directly.
 
 - **Color**: `--color-canvas/surface/surface-raised/text/text-muted/
@@ -25,8 +27,11 @@ never references a primitive or raw hex/OKLCH value directly.
   danger/info`. All OKLCH. One accent hue (restrained ink-blue). At most 3
   surface levels in either theme.
 - **Typography**: `--font-sans` (Geist → IBM Plex Sans KR → system-ui),
-  `--font-mono` (Geist Mono → system mono). `--measure-prose` (70ch),
-  `--measure-wide` (96ch cap for the whole document).
+  `--font-mono` (Geist Mono → system mono). `--measure-prose` (42rem),
+  `--measure-wide` (`min(100%, 64rem)`). These are rem, not ch: `ch` is the
+  advance width of "0", so it rescales with each block's own font-size and
+  fits roughly half as much Korean per line. `src/qa/design-lint.ts` rejects
+  ch-based measures.
 - **Spacing**: `--space-1`…`--space-9`, an 8px-rooted scale.
 - **Radius**: `--radius-sm/md/lg` — small, functional rounding only, never
   a decorative "everything is a pill" default.
@@ -35,8 +40,9 @@ never references a primitive or raw hex/OKLCH value directly.
 
 ## Layout grammar
 
-- Prose measure 66–72ch (`.measure`). Only code, tables, and diagrams use
-  `.breakout` (up to `--measure-wide`).
+- Prose measure `--measure-prose` (`.measure`). Only code, tables, and
+  diagrams use `.breakout`. Width caps never centre: `margin-inline` stays
+  `0` so every block shares one left baseline.
 - Section headings are, where the content supports it, complete claims
   ("The change resets connection state explicitly") rather than bare
   labels ("Overview") — this is a content decision the Agent Skill makes,
@@ -55,6 +61,11 @@ never references a primitive or raw hex/OKLCH value directly.
 See `skills/forma/references/generic-ai-patterns.md` for the full list;
 the two most important structural rules:
 
+0. **Blocks are TSX components** (`src/blocks/*.tsx`), compiled to HTML with
+   `renderToStaticMarkup`. React is a build-time dependency only: the
+   shipped page contains no hydration markers and no runtime, and a test
+   asserts it. The version is pinned exactly, because escaping and
+   attribute serialization are part of the output.
 1. **No left-side bracket/hook borders.** Note rails use a plain
    `border-inline-start: 1px solid` on the element itself — never a
    `::before`/`::after` pseudo-element combining a left border with a
@@ -63,31 +74,35 @@ the two most important structural rules:
 2. **No decorative oversized brackets.** No `content: "["`, `content:
    "{"`, `content: "</>"` anywhere. Also lint-checked.
 
-## Themes
+## Artifacts
 
-| Theme | Best for | Composition |
+| Artifact | Direction | Composition |
 |---|---|---|
-| `simple` | Mixed-audience documents | Strong opening rule, stable reading edge, generous pauses |
-| `workspace` | Dense technical review and test evidence | Persistent tool rail, compact rhythm, raised evidence only |
-| `guide` | Manuals and step-by-step explanations | Orientation-first rail, narrow measure, prominent callouts |
-| `magazine` | Narrative reports and long-form explainers | Display serif, asymmetric cover, editorial rules |
+| `dashboard` | Signal Grid | Dense numeric grid, state first, no long cover |
+| `report` | Editorial Brief | Conclusion up front, editorial rules, print-aware |
+| `manual` | Guided Path | Orientation rail, narrow measure, steps with results |
+| `advanced` | Decision Room | Evidence graph, simulation, recorded decision |
 
-Legacy identifiers remain accepted at the schema boundary and normalize to
-these names. New specs and documentation only use the four names above.
+The stylesheet hooks are `data-artifact` and `data-variant` on `<html>`,
+kept separate so a rule can address every report without repeating itself
+per variant.
 
-## Mode composition
+An artifact is not a CSS skin. The 0.1 `designSystem` field was, and that
+was the limitation: four looks over one identical DOM could not give a
+dashboard and a manual different information structures. Composition
+contracts live in `src/planner/profiles/` and are enforced at validation.
 
-| Mode | Emphasis |
-|---|---|
-| `explain` | Narrative first, diagram/code close together, glossary at the end |
-| `review` | Decision-relevant material up front: comparison, diff, risk, test evidence, decision strip |
-| `test` | Result band → matrix → chart → failure evidence → limitations/actions |
-| `report` | Executive summary → timeline/findings → options → decision → actions |
-| `manual` | Outcome → prerequisites → procedure → checkpoints → troubleshooting → verification |
+Legacy 0.1 identifiers migrate at the schema boundary
+(`src/spec/migrations.ts`) and render under a legacy-compatible path that
+is exempt from the contract, with warnings naming the gaps.
 
-All five render through the same `src/design/css.ts` stylesheet and the
-same 20 block renderers in `src/renderer/blocks.ts` — there is no
-per-mode CSS file or theme swap beyond `data-density` and `data-theme`.
+## Composition contract
+
+`src/planner/plan.ts` resolves each block onto the semantic roles it can
+fill, then checks the artifact's profile against the result. This is what
+the 0.1 `mode` field was supposed to be: `mode` was recorded in the
+manifest and changed nothing, so `mode: "report"` guaranteed no
+report-shaped output.
 
 ## Dark mode
 

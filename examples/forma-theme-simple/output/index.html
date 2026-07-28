@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="ko" data-theme="light" data-design="simple">
+<html lang="ko" data-theme="light" data-artifact="manual" data-variant="technical">
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -682,22 +682,22 @@
 
   /* Simple — the default edited-memo treatment. A strong opening rule and
      tight display type create one leverage point without adding decoration. */
-  :root[data-design="simple"] .blk-cover {
+  :root[data-artifact="report"]:not([data-variant="editorial"]) .blk-cover {
     border-block-start: 3px solid var(--color-text);
     padding-block-start: var(--space-7);
   }
-  :root[data-design="simple"] .blk-cover__title {
+  :root[data-artifact="report"]:not([data-variant="editorial"]) .blk-cover__title {
     max-width: 48rem;
     letter-spacing: -0.025em;
   }
-  :root[data-design="simple"] .blk-summary__title {
+  :root[data-artifact="report"]:not([data-variant="editorial"]) .blk-summary__title {
     font-size: clamp(1.35rem, 1.1rem + 0.7vw, 1.75rem);
   }
 
   /* Workspace — tool-like navigation and a denser rhythm. Raised surfaces
      are reserved for visual evidence; ordinary prose stays on the canvas so
      the entire document does not collapse into a uniform card stack. */
-  :root[data-design="workspace"] {
+  :root[data-artifact="dashboard"] {
     --shadow: 0 1px 2px oklch(0% 0 0 / 0.05), 0 4px 16px oklch(0% 0 0 / 0.08);
     --color-canvas: oklch(96.5% 0.003 90);
     --workspace-rail: var(--color-canvas);
@@ -706,20 +706,20 @@
     --workspace-rail-text-strong: var(--color-text);
     --workspace-rail-active: var(--color-surface);
   }
-  [data-theme="dark"]:root[data-design="workspace"] {
+  [data-theme="dark"]:root[data-artifact="dashboard"] {
     --color-canvas: oklch(9% 0.003 90);
   }
   @media (prefers-color-scheme: dark) {
-    :root[data-design="workspace"]:not([data-theme="light"]) {
+    :root[data-artifact="dashboard"]:not([data-theme="light"]) {
       --color-canvas: oklch(9% 0.003 90);
     }
   }
-  :root[data-design="workspace"] .layout {
+  :root[data-artifact="dashboard"] .layout {
     grid-template-columns: 224px minmax(0, 1fr);
     max-width: none;
     align-items: stretch;
   }
-  :root[data-design="workspace"] .layout > .side-toc {
+  :root[data-artifact="dashboard"] .layout > .side-toc {
     order: -1;
     align-self: stretch;
     position: static;
@@ -731,7 +731,7 @@
     padding: var(--space-6) var(--space-4);
     margin-inline-start: calc(-1 * var(--space-5));
   }
-  :root[data-design="workspace"] .side-toc .toc {
+  :root[data-artifact="dashboard"] .side-toc .toc {
     position: sticky;
     inset-block-start: var(--space-5);
     max-height: calc(100vh - var(--space-8));
@@ -740,24 +740,24 @@
     flex-wrap: nowrap;
     gap: var(--space-1);
   }
-  :root[data-design="workspace"] .side-toc .toc a {
+  :root[data-artifact="dashboard"] .side-toc .toc a {
     color: var(--workspace-rail-text);
     padding: 0.5em 0.75em;
     border-radius: var(--radius-sm);
   }
-  :root[data-design="workspace"] .side-toc .toc a:hover {
+  :root[data-artifact="dashboard"] .side-toc .toc a:hover {
     color: var(--workspace-rail-text-strong);
   }
-  :root[data-design="workspace"] .side-toc .toc a[aria-current="true"] {
+  :root[data-artifact="dashboard"] .side-toc .toc a[aria-current="true"] {
     background: var(--workspace-rail-active);
     box-shadow: var(--shadow);
   }
-  :root[data-design="workspace"] .layout > .doc { padding-block: var(--space-6); }
-  :root[data-design="workspace"] .section {
+  :root[data-artifact="dashboard"] .layout > .doc { padding-block: var(--space-6); }
+  :root[data-artifact="dashboard"] .section {
     border-block-end: 1px solid var(--color-border);
     padding: var(--space-6) 0;
   }
-  :root[data-design="workspace"] .section:is(
+  :root[data-artifact="dashboard"] .section:is(
     .blk-diagram,
     .blk-chart,
     .blk-test-matrix,
@@ -773,12 +773,12 @@
 
   /* Guide — light left nav rail, callout-style finding/decision
      blocks, tighter reading measure like a docs site's center column. */
-  :root[data-design="guide"] .layout {
+  :root[data-artifact="manual"] .layout {
     grid-template-columns: 232px minmax(0, 1fr);
     max-width: none;
     gap: var(--space-7);
   }
-  :root[data-design="guide"] .layout > .side-toc {
+  :root[data-artifact="manual"] .layout > .side-toc {
     order: -1;
     position: sticky;
     inset-block-start: var(--space-5);
@@ -789,52 +789,52 @@
     border-block-end: none;
     padding-inline-end: var(--space-4);
   }
-  :root[data-design="guide"] .side-toc .toc {
+  :root[data-artifact="manual"] .side-toc .toc {
     flex-direction: column;
     flex-wrap: nowrap;
     gap: var(--space-1);
   }
-  :root[data-design="guide"] .side-toc .toc a {
+  :root[data-artifact="manual"] .side-toc .toc a {
     border-radius: var(--radius-sm);
     padding: 0.4em 0.65em;
   }
-  :root[data-design="guide"] .side-toc .toc a[aria-current="true"] {
+  :root[data-artifact="manual"] .side-toc .toc a[aria-current="true"] {
     background: color-mix(in oklab, var(--color-accent) 10%, transparent);
     color: var(--color-text);
     border-inline-start: 3px solid var(--color-accent);
   }
-  :root[data-design="guide"] .measure { max-width: 38rem; }
-  :root[data-design="guide"] .blk-finding,
-  :root[data-design="guide"] .blk-decision .decision-strip {
+  :root[data-artifact="manual"] .measure { max-width: 38rem; }
+  :root[data-artifact="manual"] .blk-finding,
+  :root[data-artifact="manual"] .blk-decision .decision-strip {
     background: color-mix(in oklab, var(--color-accent) 6%, var(--color-surface));
     border-radius: var(--radius-md);
     padding: var(--space-4) var(--space-5);
   }
-  :root[data-design="guide"] .blk-decision .decision-strip { border-inline-start-width: 3px; }
+  :root[data-artifact="manual"] .blk-decision .decision-strip { border-inline-start-width: 3px; }
 
   /* Magazine — serif display type, a high-leverage cover, and an editorial
      opening rhythm without decorative images or motion. */
-  :root[data-design="magazine"] {
+  :root[data-artifact="report"][data-variant="editorial"] {
     --font-serif: Georgia, "Nanum Myeongjo", serif;
   }
-  :root[data-design="magazine"] .doc { max-width: 52rem; }
-  :root[data-design="magazine"] h1,
-  :root[data-design="magazine"] h2,
-  :root[data-design="magazine"] h3,
-  :root[data-design="magazine"] .blk-cover__title,
-  :root[data-design="magazine"] .blk-narrative__question {
+  :root[data-artifact="report"][data-variant="editorial"] .doc { max-width: 52rem; }
+  :root[data-artifact="report"][data-variant="editorial"] h1,
+  :root[data-artifact="report"][data-variant="editorial"] h2,
+  :root[data-artifact="report"][data-variant="editorial"] h3,
+  :root[data-artifact="report"][data-variant="editorial"] .blk-cover__title,
+  :root[data-artifact="report"][data-variant="editorial"] .blk-narrative__question {
     font-family: var(--font-serif);
     font-weight: 400;
   }
-  :root[data-design="magazine"] .blk-cover {
+  :root[data-artifact="report"][data-variant="editorial"] .blk-cover {
     border-block-start: 5px solid var(--color-text);
   }
-  :root[data-design="magazine"] .blk-cover__title {
+  :root[data-artifact="report"][data-variant="editorial"] .blk-cover__title {
     font-size: clamp(2.15rem, 1.3rem + 3.2vw, 4rem);
     letter-spacing: -0.035em;
   }
-  :root[data-design="magazine"] .blk-narrative__question { font-size: 1.5rem; }
-  :root[data-design="magazine"] .blk-narrative__summary p:first-of-type::first-letter {
+  :root[data-artifact="report"][data-variant="editorial"] .blk-narrative__question { font-size: 1.5rem; }
+  :root[data-artifact="report"][data-variant="editorial"] .blk-narrative__summary p:first-of-type::first-letter {
     font-family: var(--font-serif);
     font-size: 3.4em;
     font-weight: 700;
@@ -842,7 +842,7 @@
     line-height: 0.8;
     padding-inline-end: var(--space-2);
   }
-  :root[data-design="magazine"] .blk-takeaways {
+  :root[data-artifact="report"][data-variant="editorial"] .blk-takeaways {
     font-family: var(--font-serif);
     font-size: 1.0625rem;
     border-block: 1px solid var(--color-text);
@@ -850,19 +850,19 @@
   }
 
   @media (min-width: 800px) {
-    :root[data-design="magazine"] .blk-cover {
+    :root[data-artifact="report"][data-variant="editorial"] .blk-cover {
       display: grid;
       grid-template-columns: minmax(0, 2.4fr) minmax(12rem, 1fr);
       column-gap: var(--space-7);
       align-items: start;
     }
-    :root[data-design="magazine"] .blk-cover__eyebrow,
-    :root[data-design="magazine"] .blk-cover__title,
-    :root[data-design="magazine"] .blk-cover__subtitle,
-    :root[data-design="magazine"] .blk-cover > .confidence-tag {
+    :root[data-artifact="report"][data-variant="editorial"] .blk-cover__eyebrow,
+    :root[data-artifact="report"][data-variant="editorial"] .blk-cover__title,
+    :root[data-artifact="report"][data-variant="editorial"] .blk-cover__subtitle,
+    :root[data-artifact="report"][data-variant="editorial"] .blk-cover > .confidence-tag {
       grid-column: 1;
     }
-    :root[data-design="magazine"] .blk-cover__meta {
+    :root[data-artifact="report"][data-variant="editorial"] .blk-cover__meta {
       grid-column: 2;
       grid-row: 2 / span 3;
       border-block-start: 1px solid var(--color-text);
@@ -872,14 +872,14 @@
   }
 
   @media (max-width: 900px) {
-    :root[data-design="workspace"] .layout,
-    :root[data-design="guide"] .layout {
+    :root[data-artifact="dashboard"] .layout,
+    :root[data-artifact="manual"] .layout {
       grid-template-columns: minmax(0, 1fr);
       gap: var(--space-4);
       padding-inline: var(--space-4);
     }
-    :root[data-design="workspace"] .layout > .side-toc,
-    :root[data-design="guide"] .layout > .side-toc {
+    :root[data-artifact="dashboard"] .layout > .side-toc,
+    :root[data-artifact="manual"] .layout > .side-toc {
       order: -1;
       position: static;
       max-height: none;
@@ -889,8 +889,8 @@
       margin-inline-start: 0;
       padding: 0 0 var(--space-4);
     }
-    :root[data-design="workspace"] .side-toc .toc,
-    :root[data-design="guide"] .side-toc .toc {
+    :root[data-artifact="dashboard"] .side-toc .toc,
+    :root[data-artifact="manual"] .side-toc .toc {
       position: static;
       max-height: none;
       overflow-x: auto;
@@ -898,8 +898,8 @@
       flex-direction: row;
       flex-wrap: nowrap;
     }
-    :root[data-design="workspace"] .side-toc .toc a,
-    :root[data-design="guide"] .side-toc .toc a {
+    :root[data-artifact="dashboard"] .side-toc .toc a,
+    :root[data-artifact="manual"] .side-toc .toc a {
       white-space: nowrap;
     }
   }
@@ -914,15 +914,7 @@
 </header>
 <div class="layout">
   <main class="doc" id="main" data-density="comfortable">
-<section class="section blk-cover" id="cover"><p class="blk-cover__eyebrow">EXPLAIN · ONBOARDING</p><h1 class="blk-cover__title">Forma 스킬 처음 사용하기</h1><p class="blk-cover__subtitle">언제 쓰고, 어떻게 쓰는가</p><ul class="blk-cover__meta"><li>5분 안에 이해하기</li><li>Codex + Claude Code 공용</li></ul></section>
-<section class="section blk-narrative" id="narrative"><div class="measure">
-    <p class="blk-narrative__question">Forma 스킬은 언제 쓰는 것이고, 실제로 어떻게 사용하는가?</p>
-    <div class="blk-narrative__summary"><p>Forma는 문서·코드·diff·테스트결과를 읽기 쉬운 오프라인 HTML 한 장으로 만들어주는 스킬이다. 작업 지시를 읽어 explain/review/test/report/manual 모드를 정하고, 실제 HTML 작성은 Forma가 대신한다.</p></div>
-    <ul class="blk-takeaways"><li>브라우저로 읽을 결과물이 필요할 때 쓴다. 슬랙 메시지나 커밋 메시지로 충분하면 굳이 쓰지 않는다.</li><li>Codex에서는 $forma, Claude Code에서는 /forma로 부른다.</li><li>결과 HTML은 완전히 오프라인이며 외부로 아무것도 전송하지 않는다.</li></ul>
-  </div></section>
-<section class="section blk-key-points" id="what-it-does"><h2 class="blk-key-points__title">Forma가 하는 일</h2><ol><li>문서, 코드, diff, 테스트 결과, 회의 메모 같은 자료를 읽기 쉬운 HTML 한 장으로 바꾼다.</li><li>사용자는 자료와 모드만 정하면 되고, HTML/CSS는 Forma가 직접 쓰지 않고 정해진 렌더러가 만든다.</li><li>결과물은 인터넷 없이도 열리는 단일 HTML 파일이다.</li></ol><div class="blk-source-note" aria-label="출처"><ul><li><span class="blk-source-note__label">skills/forma/SKILL.md</span><code class="blk-source-note__locator">skills/forma/SKILL.md</code></li></ul></div></section>
-<section class="section blk-comparison" id="when"><h2 class="blk-comparison__title">언제 쓰고, 언제 쓰지 않는가</h2><div class="comparison__grid"><div class="comparison__col"><h3>이럴 때 쓴다</h3><ul><li>코드리뷰 회의에서 화면 공유할 자료가 필요할 때</li><li>테스트 결과를 팀에 한눈에 보이게 공유하고 싶을 때</li><li>설계나 코드 흐름을 팀원에게 설명해야 할 때</li><li>조사·분석 내용을 상사나 동료에게 보고할 때</li></ul></div><div class="comparison__col"><h3>이럴 땐 안 쓴다</h3><ul><li>슬랙 메시지 한두 줄로 충분한 간단한 공유</li><li>마케팅 랜딩페이지나 실제 서비스 화면 제작</li><li>PDF나 프레젠테이션 파일이 반드시 필요한 경우</li><li>결과를 실시간으로 여러 명이 같이 편집해야 하는 경우</li></ul></div></div><div class="blk-source-note" aria-label="출처"><ul><li><span class="blk-source-note__label">skills/forma/SKILL.md</span><code class="blk-source-note__locator">skills/forma/SKILL.md</code></li></ul></div></section>
-<section class="section blk-diagram breakout" id="how"><h2 class="blk-diagram__title">실제 사용 흐름</h2><div class="blk-diagram__canvas"><svg viewBox="0 0 288 560" width="288" height="560" xmlns="http://www.w3.org/2000/svg"><defs><marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" class="diagram-accent"></path></marker></defs><line x1="144" y1="88" x2="144" y2="136" class="diagram-line" marker-end="url(#arrow)" stroke-width="1.5"></line>
+<section class="section blk-cover" id="cover"><p class="blk-cover__eyebrow">EXPLAIN · ONBOARDING</p><h1 class="blk-cover__title">Forma 스킬 처음 사용하기</h1><p class="blk-cover__subtitle">언제 쓰고, 어떻게 쓰는가</p><ul class="blk-cover__meta"><li>5분 안에 이해하기</li><li>Codex + Claude Code 공용</li></ul></section><section class="section blk-narrative" id="narrative"><div class="measure"><p class="blk-narrative__question">Forma 스킬은 언제 쓰는 것이고, 실제로 어떻게 사용하는가?</p><div class="blk-narrative__summary"><p>Forma는 문서·코드·diff·테스트결과를 읽기 쉬운 오프라인 HTML 한 장으로 만들어주는 스킬이다. 작업 지시를 읽어 explain/review/test/report/manual 모드를 정하고, 실제 HTML 작성은 Forma가 대신한다.</p></div><ul class="blk-takeaways"><li>브라우저로 읽을 결과물이 필요할 때 쓴다. 슬랙 메시지나 커밋 메시지로 충분하면 굳이 쓰지 않는다.</li><li>Codex에서는 $forma, Claude Code에서는 /forma로 부른다.</li><li>결과 HTML은 완전히 오프라인이며 외부로 아무것도 전송하지 않는다.</li></ul></div></section><section class="section blk-key-points" id="what-it-does"><h2 class="blk-key-points__title">Forma가 하는 일</h2><ol><li>문서, 코드, diff, 테스트 결과, 회의 메모 같은 자료를 읽기 쉬운 HTML 한 장으로 바꾼다.</li><li>사용자는 자료와 모드만 정하면 되고, HTML/CSS는 Forma가 직접 쓰지 않고 정해진 렌더러가 만든다.</li><li>결과물은 인터넷 없이도 열리는 단일 HTML 파일이다.</li></ol><div class="blk-source-note" aria-label="출처"><ul><li><span class="blk-source-note__label">skills/forma/SKILL.md</span><code class="blk-source-note__locator">skills/forma/SKILL.md</code></li></ul></div></section><section class="section blk-comparison" id="when"><h2 class="blk-comparison__title">언제 쓰고, 언제 쓰지 않는가</h2><div class="comparison__grid"><div class="comparison__col"><h3>이럴 때 쓴다</h3><ul><li>코드리뷰 회의에서 화면 공유할 자료가 필요할 때</li><li>테스트 결과를 팀에 한눈에 보이게 공유하고 싶을 때</li><li>설계나 코드 흐름을 팀원에게 설명해야 할 때</li><li>조사·분석 내용을 상사나 동료에게 보고할 때</li></ul></div><div class="comparison__col"><h3>이럴 땐 안 쓴다</h3><ul><li>슬랙 메시지 한두 줄로 충분한 간단한 공유</li><li>마케팅 랜딩페이지나 실제 서비스 화면 제작</li><li>PDF나 프레젠테이션 파일이 반드시 필요한 경우</li><li>결과를 실시간으로 여러 명이 같이 편집해야 하는 경우</li></ul></div></div><div class="blk-source-note" aria-label="출처"><ul><li><span class="blk-source-note__label">skills/forma/SKILL.md</span><code class="blk-source-note__locator">skills/forma/SKILL.md</code></li></ul></div></section><section class="section blk-diagram breakout" id="how"><h2 class="blk-diagram__title">실제 사용 흐름</h2><div class="blk-diagram__canvas"><svg viewBox="0 0 288 560" width="288" height="560" xmlns="http://www.w3.org/2000/svg"><defs><marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" class="diagram-accent"></path></marker></defs><line x1="144" y1="88" x2="144" y2="136" class="diagram-line" marker-end="url(#arrow)" stroke-width="1.5"></line>
 <line x1="144" y1="200" x2="144" y2="248" class="diagram-line" marker-end="url(#arrow)" stroke-width="1.5"></line>
 <line x1="144" y1="312" x2="144" y2="360" class="diagram-line" marker-end="url(#arrow)" stroke-width="1.5"></line>
 <line x1="144" y1="424" x2="144" y2="472" class="diagram-line" marker-end="url(#arrow)" stroke-width="1.5"></line>
@@ -930,11 +922,7 @@
 <rect x="24" y="136" width="240" height="64" rx="8" class="diagram-node" stroke-width="1.25"></rect><text x="144" y="172" text-anchor="middle" font-size="13" class="diagram-node-label"><tspan x="144" dy="-7">Forma가 모드를 정함</tspan><tspan x="144" dy="14">(explain/review/test/report/manual)</tspan></text>
 <rect x="24" y="248" width="240" height="64" rx="8" class="diagram-node" stroke-width="1.25"></rect><text x="144" y="284" text-anchor="middle" font-size="13" class="diagram-node-label"><tspan x="144" dy="-14">Forma가</tspan><tspan x="144" dy="14">forma.spec.json</tspan><tspan x="144" dy="14">작성</tspan></text>
 <rect x="24" y="360" width="240" height="64" rx="8" class="diagram-node" stroke-width="1.25"></rect><text x="144" y="396" text-anchor="middle" font-size="13" class="diagram-node-label"><tspan x="144" dy="0">렌더러가 HTML로 변환</tspan></text>
-<rect x="24" y="472" width="240" height="64" rx="8" class="diagram-node diagram-node--terminal" stroke-width="1.25"></rect><text x="144" y="508" text-anchor="middle" font-size="13" class="diagram-node-label diagram-node-label--invert"><tspan x="144" dy="-7">브라우저로 확인 후 필요하면</tspan><tspan x="144" dy="14">수정 요청</tspan></text></svg></div><div class="blk-source-note" aria-label="출처"><ul><li><span class="blk-source-note__label">skills/forma/SKILL.md</span><code class="blk-source-note__locator">skills/forma/SKILL.md</code></li></ul></div></section>
-<section class="section blk-code breakout" id="try-it"><h2 class="blk-code__title">실제로 이렇게 부른다</h2><div class="blk-code__frame" data-has-notes="true"><div class="blk-code__scroll"><pre><ol class="blk-code__lines"><li class="blk-code__line" data-highlight="false"><span style="--shiki-light:#6A737D;--shiki-dark:#6A737D"># Codex에서</span></li><li class="blk-code__line" data-highlight="true"><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">$forma 이 PR diff를 내일 코드리뷰 자료로 만들어줘</span></li><li class="blk-code__line" data-highlight="false"></li><li class="blk-code__line" data-highlight="false"><span style="--shiki-light:#6A737D;--shiki-dark:#6A737D"># Claude Code에서</span></li><li class="blk-code__line" data-highlight="true"><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0">/forma</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF"> 이</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF"> 테스트</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF"> 결과</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF"> 폴더를</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF"> 팀</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF"> 공유용</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF"> 리포트로</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF"> 만들어줘</span></li><li class="blk-code__line" data-highlight="false"></li><li class="blk-code__line" data-highlight="false"><span style="--shiki-light:#6A737D;--shiki-dark:#6A737D"># 결과 확인 (CLI를 직접 쓸 수도 있다)</span></li><li class="blk-code__line" data-highlight="false"><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0">pnpm</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF"> forma</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF"> preview</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF"> fixtures/review/output</span></li></ol></pre></div><dl class="blk-code__notes"><dt>L2</dt><dd>Codex는 $ 뒤에 스킬 이름을 붙여서 부른다.</dd><dt>L5</dt><dd>Claude Code는 슬래시 명령으로 부른다. 둘 다 같은 렌더러를 사용한다.</dd></dl></div><div class="blk-source-note" aria-label="출처"><ul><li><span class="blk-source-note__label">README.md</span><code class="blk-source-note__locator">README.md</code></li></ul></div></section>
-<section class="section blk-finding" id="misconceptions"><div class="measure"><div data-severity="info"><p class="blk-finding__badge">정보<span class="confidence-tag" data-confidence="verified">확인됨</span></p><h3 class="blk-finding__title">가장 흔한 오해: Forma가 매번 새로운 디자인을 그려준다</h3><div><p>Forma는 요청마다 HTML/CSS를 새로 발명하지 않는다. 항상 같은 디자인 시스템(Quiet Editorial) 위에서 어떤 블록을 쓸지만 고른다. 그래서 결과물이 요청마다 들쭉날쭉해지지 않고, 접근성·성능 검증도 매번 같은 기준으로 통과한다.</p></div></div><div class="blk-source-note" aria-label="출처"><ul><li><span class="blk-source-note__label">skills/forma/SKILL.md</span><code class="blk-source-note__locator">skills/forma/SKILL.md</code></li></ul></div></div></section>
-<section class="section blk-glossary" id="glossary"><h2 class="blk-glossary__title">처음 보면 헷갈리는 용어</h2><dl><dt>모드 (mode)</dt><dd>이 문서가 어떤 목적인지: explain(설명) · review(리뷰) · test(테스트 결과) · report(보고) · manual(절차 안내).</dd><dt>블록 (block)</dt><dd>문서를 구성하는 단위. 표, 코드, diff, 다이어그램처럼 내용 종류별로 20가지가 있다.</dd><dt>forma.spec.json</dt><dd>Forma가 실제로 작성하는 파일. 이 파일 하나가 최종 HTML을 결정한다.</dd><dt>confidence</dt><dd>각 내용이 원본에서 확인된 사실인지, 추정인지 표시하는 값. 추정을 사실처럼 보여주지 않기 위한 장치다.</dd></dl></section>
-<section class="section blk-source-note" id="sources"><div class="measure"><h2 class="blk-source-note__title">원본 출처</h2><ul><li><span class="blk-source-note__label">skills/forma/SKILL.md</span><code class="blk-source-note__locator">skills/forma/SKILL.md</code></li><li><span class="blk-source-note__label">skills/forma/references/modes.md</span><code class="blk-source-note__locator">skills/forma/references/modes.md</code></li><li><span class="blk-source-note__label">README.md</span><code class="blk-source-note__locator">README.md</code></li></ul></div></section>
+<rect x="24" y="472" width="240" height="64" rx="8" class="diagram-node diagram-node--terminal" stroke-width="1.25"></rect><text x="144" y="508" text-anchor="middle" font-size="13" class="diagram-node-label diagram-node-label--invert"><tspan x="144" dy="-7">브라우저로 확인 후 필요하면</tspan><tspan x="144" dy="14">수정 요청</tspan></text></svg></div><div class="blk-source-note" aria-label="출처"><ul><li><span class="blk-source-note__label">skills/forma/SKILL.md</span><code class="blk-source-note__locator">skills/forma/SKILL.md</code></li></ul></div></section><section class="section blk-code breakout" id="try-it"><h2 class="blk-code__title">실제로 이렇게 부른다</h2><div class="blk-code__frame" data-has-notes="true"><div class="blk-code__scroll"><pre><ol class="blk-code__lines"><li class="blk-code__line" data-highlight="false"><span style="--shiki-light:#6A737D;--shiki-dark:#6A737D"># Codex에서</span></li><li class="blk-code__line" data-highlight="true"><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">$forma 이 PR diff를 내일 코드리뷰 자료로 만들어줘</span></li><li class="blk-code__line" data-highlight="false"></li><li class="blk-code__line" data-highlight="false"><span style="--shiki-light:#6A737D;--shiki-dark:#6A737D"># Claude Code에서</span></li><li class="blk-code__line" data-highlight="true"><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0">/forma</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF"> 이</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF"> 테스트</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF"> 결과</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF"> 폴더를</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF"> 팀</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF"> 공유용</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF"> 리포트로</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF"> 만들어줘</span></li><li class="blk-code__line" data-highlight="false"></li><li class="blk-code__line" data-highlight="false"><span style="--shiki-light:#6A737D;--shiki-dark:#6A737D"># 결과 확인 (CLI를 직접 쓸 수도 있다)</span></li><li class="blk-code__line" data-highlight="false"><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0">pnpm</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF"> forma</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF"> preview</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF"> fixtures/review/output</span></li></ol></pre></div><dl class="blk-code__notes"><dt>L2</dt><dd>Codex는 $ 뒤에 스킬 이름을 붙여서 부른다.</dd><dt>L5</dt><dd>Claude Code는 슬래시 명령으로 부른다. 둘 다 같은 렌더러를 사용한다.</dd></dl></div><div class="blk-source-note" aria-label="출처"><ul><li><span class="blk-source-note__label">README.md</span><code class="blk-source-note__locator">README.md</code></li></ul></div></section><section class="section blk-finding" id="misconceptions"><div class="measure"><div data-severity="info"><p class="blk-finding__badge">정보<span class="confidence-tag" data-confidence="verified">확인됨</span></p><h3 class="blk-finding__title">가장 흔한 오해: Forma가 매번 새로운 디자인을 그려준다</h3><div><p>Forma는 요청마다 HTML/CSS를 새로 발명하지 않는다. 항상 같은 디자인 시스템(Quiet Editorial) 위에서 어떤 블록을 쓸지만 고른다. 그래서 결과물이 요청마다 들쭉날쭉해지지 않고, 접근성·성능 검증도 매번 같은 기준으로 통과한다.</p></div></div><div class="blk-source-note" aria-label="출처"><ul><li><span class="blk-source-note__label">skills/forma/SKILL.md</span><code class="blk-source-note__locator">skills/forma/SKILL.md</code></li></ul></div></div></section><section class="section blk-glossary" id="glossary"><h2 class="blk-glossary__title">처음 보면 헷갈리는 용어</h2><dl><dt>모드 (mode)</dt><dd>이 문서가 어떤 목적인지: explain(설명) · review(리뷰) · test(테스트 결과) · report(보고) · manual(절차 안내).</dd><dt>블록 (block)</dt><dd>문서를 구성하는 단위. 표, 코드, diff, 다이어그램처럼 내용 종류별로 20가지가 있다.</dd><dt>forma.spec.json</dt><dd>Forma가 실제로 작성하는 파일. 이 파일 하나가 최종 HTML을 결정한다.</dd><dt>confidence</dt><dd>각 내용이 원본에서 확인된 사실인지, 추정인지 표시하는 값. 추정을 사실처럼 보여주지 않기 위한 장치다.</dd></dl></section><section class="section blk-source-note" id="sources"><div class="measure"><h2 class="blk-source-note__title">원본 출처</h2><ul><li><span class="blk-source-note__label">skills/forma/SKILL.md</span><code class="blk-source-note__locator">skills/forma/SKILL.md</code></li><li><span class="blk-source-note__label">skills/forma/references/modes.md</span><code class="blk-source-note__locator">skills/forma/references/modes.md</code></li><li><span class="blk-source-note__label">README.md</span><code class="blk-source-note__locator">README.md</code></li></ul></div></section>
   </main>
   <aside class="side-toc no-print"><nav class="toc" aria-label="섹션 이동"><a href="#cover">Forma 스킬 처음 사용하기</a><a href="#what-it-does">Forma가 하는 일</a><a href="#when">언제 쓰고, 언제 쓰지 않는가</a><a href="#how">실제 사용 흐름</a><a href="#try-it">실제로 이렇게 부른다</a><a href="#misconceptions">가장 흔한 오해: Forma가 매번 새로운 디자인을 그려준다</a><a href="#glossary">처음 보면 헷갈리는 용어</a><a href="#sources">원본 출처</a></nav></aside>
 </div>
