@@ -127,7 +127,16 @@ candidates and runs a browser pass, so it must never be picked implicitly.
 `headline-finding`, `evidence-stack`, `option-comparison`,
 `decision-matrix`, `recommendation`, `implication`, `risk-register`,
 `action-plan`, `pull-quote`, `figure`, `appendix`, `source-ledger`.
-`manual` is satisfiable with the generic blocks until its own set lands.
+`manual` has its own vocabulary too: `task-map`, `audience-scope`,
+`prerequisite`, `environment-selector`, `quick-path`, `step`, `checkpoint`,
+`decision-tree`, `troubleshooting`, `compatibility-matrix`, `version-note`,
+`completion-check`, `next-task`.
+
+A `step` must be checkable. Give it an `expectedResult`, a `verification`,
+or put a `checkpoint` after it — otherwise `forma validate` fails with
+`manual-step-without-verification`. Environment branching is a field
+(`environments: ["macos"]`), not a sentence in the middle of a paragraph;
+the selector island filters on it and shows everything when JS is off.
 `dashboard` and `advanced` have their contracts defined and enforced, but
 the blocks that fill `kpi`, `change`, `driver`, `freshness`,
 `evidence-graph`, `simulation`, and `decision` are still being built. Until

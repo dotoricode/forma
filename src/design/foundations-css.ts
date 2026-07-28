@@ -38,6 +38,10 @@ ${fontFaceCss}
     --color-warning: ${primitiveColor.warning500};
     --color-danger: ${primitiveColor.danger500};
     --color-info: ${primitiveColor.info500};
+    --color-success-text: ${primitiveColor.success700};
+    --color-warning-text: ${primitiveColor.warning700};
+    --color-danger-text: ${primitiveColor.danger700};
+    --color-info-text: ${primitiveColor.info700};
 
     --font-sans: "Geist", "IBM Plex Sans KR", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
     --font-mono: "Geist Mono", ui-monospace, "SFMono-Regular", Consolas, "Liberation Mono", monospace;
@@ -70,6 +74,10 @@ ${fontFaceCss}
     --color-accent: ${primitiveColor.accent400};
     --color-accent-strong: ${primitiveColor.accent500};
     --color-on-accent: ${primitiveColor.neutral950};
+    --color-success-text: ${primitiveColor.success300};
+    --color-warning-text: ${primitiveColor.warning300};
+    --color-danger-text: ${primitiveColor.danger300};
+    --color-info-text: ${primitiveColor.info300};
     color-scheme: dark;
   }
 

@@ -1,0 +1,12 @@
+{
+  "generator": "forma@0.1.0",
+  "specVersion": "0.2",
+  "artifact": "manual",
+  "purpose": "operate",
+  "variant": "quickstart",
+  "interaction": "islands",
+  "title": "Forma 첫 문서 만들기",
+  "language": "ko",
+  "sectionCount": 17,
+  "bytes": 191377
+}

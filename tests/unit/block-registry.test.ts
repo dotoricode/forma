@@ -37,6 +37,26 @@ describe("block registry", () => {
     }
   });
 
+  it("carries the manual vocabulary", () => {
+    for (const type of [
+      "task-map",
+      "audience-scope",
+      "prerequisite",
+      "environment-selector",
+      "quick-path",
+      "step",
+      "checkpoint",
+      "decision-tree",
+      "troubleshooting",
+      "compatibility-matrix",
+      "version-note",
+      "completion-check",
+      "next-task",
+    ]) {
+      expect(getBlockDefinition(type), `${type} must be registered`).toBeDefined();
+    }
+  });
+
   it("still carries every block the 0.1 spec could use", () => {
     const legacyTwenty = [
       "cover",
@@ -206,6 +226,50 @@ function minimalBlockFor(type: string): Record<string, unknown> {
       return { ...base, title: "t", body: "b" };
     case "source-ledger":
       return base;
+    case "task-map":
+      return { ...base, outcomes: ["o"] };
+    case "audience-scope":
+      return { ...base, appliesTo: ["a"] };
+    case "prerequisite":
+      return { ...base, items: [{ label: "l" }] };
+    case "environment-selector":
+      return {
+        ...base,
+        label: "OS",
+        options: [
+          { id: "mac", label: "macOS" },
+          { id: "win", label: "Windows" },
+        ],
+      };
+    case "quick-path":
+      return { ...base, steps: ["s"] };
+    case "step":
+      return { ...base, number: 1, title: "t", instruction: "i" };
+    case "checkpoint":
+      return { ...base, conditions: ["c"] };
+    case "decision-tree":
+      return {
+        ...base,
+        question: "q",
+        branches: [
+          { condition: "a", action: "x" },
+          { condition: "b", action: "y" },
+        ],
+      };
+    case "troubleshooting":
+      return { ...base, entries: [{ symptom: "s", fix: "f" }] };
+    case "compatibility-matrix":
+      return {
+        ...base,
+        columns: ["v1"],
+        rows: [{ id: "r", label: "l", cells: { v1: "supported" } }],
+      };
+    case "version-note":
+      return { ...base, appliesFrom: "1.0", note: "n" };
+    case "completion-check":
+      return { ...base, check: "c", expected: "e" };
+    case "next-task":
+      return { ...base, tasks: [{ label: "l" }] };
     default:
       throw new Error(
         `block '${type}' was registered without a minimal fixture — add one so the registry tests cover it`,

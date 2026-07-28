@@ -16,11 +16,19 @@ const NAV_LABEL: Record<"ko" | "en", string> = {
   ko: "섹션 이동",
 };
 
-export function Narrative(props: { spec: FormaSpec }) {
-  const { narrative } = props.spec;
+export function Narrative(props: { spec: FormaSpec; showTitle: boolean }) {
+  const { narrative, meta } = props.spec;
   return (
     <section className="section blk-narrative" id="narrative">
       <Measure>
+        {/* A `cover` block supplies the h1. Artifacts that open with
+            something else — a manual's task map, a dashboard's status
+            header — left the page with no level-one heading at all, which
+            axe flags and which leaves the document nameless on screen. */}
+        {props.showTitle ? <h1 className="blk-narrative__title">{meta.title}</h1> : null}
+        {props.showTitle && meta.subtitle ? (
+          <p className="blk-narrative__subtitle">{meta.subtitle}</p>
+        ) : null}
         <p className="blk-narrative__question">{narrative.question}</p>
         <InlineMarkdown className="blk-narrative__summary" text={narrative.summary} />
         {narrative.takeaways.length > 0 ? (
@@ -49,10 +57,11 @@ export function DocumentBody(props: {
   // leads with a `cover` block, the question/summary narrative slots in
   // right after it instead of floating above the title.
   const leadsWithCover = spec.sections[0]?.type === "cover";
+  const hasCover = spec.sections.some((block) => block.type === "cover");
   return (
     <>
       {leadsWithCover ? blocks[0] : null}
-      <Narrative spec={spec} />
+      <Narrative spec={spec} showTitle={!hasCover} />
       {leadsWithCover ? blocks.slice(1) : blocks}
     </>
   );

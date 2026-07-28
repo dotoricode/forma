@@ -29,6 +29,21 @@ export const primitiveColor = {
   warning500: "oklch(72% 0.15 80)",
   danger500: "oklch(58% 0.18 25)",
   info500: "oklch(60% 0.10 235)",
+
+  // Text-weight status colours. The 500 ramp was tuned for fills and large
+  // numerals, where 3:1 is the bar. As 14px body text on the light canvas
+  // it measured 3.84:1 and failed WCAG AA, so status words get their own
+  // darker step rather than being nudged case by case.
+  success700: "oklch(43% 0.12 152)",
+  warning700: "oklch(48% 0.12 80)",
+  danger700: "oklch(45% 0.17 25)",
+  info700: "oklch(45% 0.11 235)",
+
+  // The same four for dark surfaces, where the text must be lighter.
+  success300: "oklch(80% 0.13 152)",
+  warning300: "oklch(84% 0.13 80)",
+  danger300: "oklch(78% 0.14 25)",
+  info300: "oklch(80% 0.10 235)",
 } as const;
 
 export const spacing = {
@@ -99,4 +114,8 @@ export const semanticTokenNames = [
   "--color-warning",
   "--color-danger",
   "--color-info",
+  "--color-success-text",
+  "--color-warning-text",
+  "--color-danger-text",
+  "--color-info-text",
 ] as const;
