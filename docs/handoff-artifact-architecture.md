@@ -20,7 +20,7 @@ artifact 계약은 `skills/forma/references/artifacts.md`.
 | 6 | DOM lint 8종 + 후보 선택 계층 | 머지됨 (#6) |
 | 7 | Decision Room 블록 5종 + Portable 모드 | 머지됨 (#7) |
 | 8 | Room Mode + 협업 + Decision Freeze | **PR 열림 (`feat/room-mode`)** |
-| 9 | Codex/Claude 스킬 패키징 + 최종 QA | 미착수 |
+| 9 | Codex/Claude 스킬 패키징 + 최종 QA | **패키징 완료, 실호출 검증 남음** |
 
 브랜치: `feat/room-mode`
 
@@ -257,11 +257,48 @@ enterprise. 플러그인 스킬은 `plugin-name:skill-name`으로 namespace되�
 
 ---
 
+### 구현 결과 (PR10)
+
+```
+skills-src/
+├── _shared/{references,scripts,assets}/    4종이 공유
+└── {dashboard,report,manual,advanced}/
+    ├── skill.json        호스트 중립 메타 (id, description, whenToUse, explicitOnly)
+    └── instructions.md   frontmatter 없는 본문
+
+src/skills/{source.ts, adapters.ts, build.ts}
+pnpm forma build-skills → dist/skills/{claude/forma, codex/forma-*}
+```
+
+**frontmatter를 소스에서 뺀 것이 설계의 핵심이다.** 호스트마다 달라지는
+유일한 부분이라서, 한 번 저자가 쓰면 최소 한 호스트에 대해 거짓이 된다.
+`skill.json`의 `id` 하나에서 Claude는 `dashboard`, Codex는
+`forma-dashboard`를 파생시킨다. `explicitOnly: true` 하나가 Claude에서는
+frontmatter의 `disable-model-invocation`, Codex에서는
+`agents/openai.yaml`의 policy가 된다.
+
+검사는 **생성된 파일**에 대해 돈다. 입력만 보는 규칙은 어댑터가 이름을
+잘못 파생시키는 경우를 못 잡는데, 이 계층이 존재하는 이유가 바로 그거다.
+
+**남은 것: 실제 호스트에서 호출 검증.** 생성물의 모양과 규격 준수는
+테스트로 고정했지만, Claude Code에 플러그인을 설치해 `/forma:dashboard`가
+실제로 뜨는지, Codex에서 `$forma-advanced`가 자동 호출되지 않는지는
+확인하지 않았다. 세션 재시작이 필요하고 사용자 전역 설정을 건드리는
+일이라 하지 않았다.
+
+**`skills/forma/`(단일 스킬)와 `skills-src/_shared/`에 참조 11개가
+중복된다.** `install-skills`가 아직 전자를 동기화하므로 지웠다가 설치
+경로가 끊긴다. 대신 두 사본이 갈라지면 테스트가 실패하도록 했다
+(`tests/unit/skill-packaging.test.ts`). 근본 해결은 `install-skills`가
+`skills-src`에서 조립하게 만드는 것이다.
+
+---
+
 ## 남은 완료 기준 (사용자 제시 18항목 중 미충족)
 
 ```
 [x] advanced Decision Room 구현        ← Portable + Room Mode 완료 (PR7, PR8)
-[ ] 4개 스킬 설치와 호출 검증
+[~] 4개 스킬 설치와 호출 검증   ← 생성·검사는 됨. 실제 호스트에서 호출은 미검증
 [x] artifact별 fixture와 example 제공
 [ ] Visual Tournament advanced quality  ← 아래 "알려진 부채" 참조
 [ ] 관련 문서와 실제 코드의 drift 제거

@@ -298,6 +298,26 @@ program
   });
 
 program
+  .command("build-skills")
+  .description("Generate the Claude Code plugin and Codex skill packages from skills-src/")
+  .option("--out <dir>", "output directory", "dist/skills")
+  .action(async (opts: { out: string }) => {
+    try {
+      const { buildSkills } = await import("../skills/build.js");
+      const result = await buildSkills(process.cwd(), opts.out);
+      console.log(`forma: wrote ${result.fileCount} files to ${result.outDir}`);
+      for (const skill of result.skills) {
+        console.log(`  ${skill.invocation.padEnd(20)} ${skill.dir}`);
+      }
+      console.log("");
+      console.log("forma: Claude Code — install the plugin directory under dist/skills/claude/forma");
+      console.log("forma: Codex — copy dist/skills/codex/* into .agents/skills or ~/.codex/skills");
+    } catch (error) {
+      exitWithError(error);
+    }
+  });
+
+program
   .command("verify-skills")
   .description("Check installed skill copies match the canonical checksum")
   .action(async () => {

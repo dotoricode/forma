@@ -56,6 +56,28 @@ document per artifact, and all four are about Forma itself: its current
 state, why it compiles a spec instead of letting an agent write HTML, how to
 drive it from an agent skill, and an open decision it has not made yet.
 
+## Agent skills
+
+`skills-src/` holds four logical skills, one per artifact, and
+`forma build-skills` emits a package for each host:
+
+| Logical | Claude Code | Codex |
+|---|---|---|
+| dashboard | `/forma:dashboard` | `$forma-dashboard` |
+| report | `/forma:report` | `$forma-report` |
+| manual | `/forma:manual` | `$forma-manual` |
+| advanced | `/forma:advanced` | `$forma-advanced` |
+
+The two hosts need different `name` values for the same skill: the Agent
+Skills spec requires `name` to match the parent directory, and Claude
+namespaces plugin skills as `plugin:skill` while Codex reads the bare
+directory name. So the frontmatter is generated per host rather than
+authored — `skills-src/*/instructions.md` carries no frontmatter at all.
+
+`advanced` is explicit-invocation only, which also lands in two different
+places: `disable-model-invocation` in Claude's frontmatter, and
+`policy.allow_implicit_invocation: false` in `agents/openai.yaml` for Codex.
+
 ## CLI
 
 ```bash
@@ -66,8 +88,9 @@ forma qa <html|dir>             # browser/axe/responsive/offline checks
 forma preview <dir>             # serve rendered output over localhost
 forma generate <input> --instruction "..." # infer mode and write a starter spec
 forma build <spec>              # render + static design lint
-forma install-skills            # sync skills/forma/ → Codex + Claude Code
+forma install-skills            # sync skills/forma/ → repo + machine-wide targets
 forma verify-skills             # check the synced copies aren't stale
+forma build-skills              # skills-src/ → Claude Code plugin + Codex packages
 forma schema                    # print the Forma Spec JSON Schema
 forma doctor                    # check the local environment
 ```

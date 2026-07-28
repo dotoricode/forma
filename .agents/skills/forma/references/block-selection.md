@@ -1,7 +1,13 @@
 # Block selection
 
-Twenty semantic blocks. Pick the one that matches the *meaning* of the
-content, not whatever looks convenient.
+59 semantic blocks: 34 shared by every artifact and 25 that belong to one.
+Pick the one that matches the *meaning* of the content, not whatever looks
+convenient.
+
+`forma validate` rejects a block the chosen artifact does not allow, so the
+error tells you when you have reached for the wrong vocabulary. The table
+below covers the shared set; `references/artifacts.md` lists what each
+artifact adds.
 
 | Block | Use for |
 |---|---|

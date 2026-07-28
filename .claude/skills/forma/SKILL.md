@@ -36,9 +36,10 @@ that isn't "explain this work to a human."
 4. **Separate fact from inference.** Anything not directly evidenced by a
    source must be marked `confidence: "inferred"` or `"unknown"` — never
    `"verified"`. See `references/source-handling.md`.
-5. **Choose blocks, not layouts.** Pick from the 20 semantic blocks in
-   `references/block-selection.md`. Do not invent new visual patterns; if a
-   block doesn't fit, use the closest existing one and say so in `notes`.
+5. **Choose blocks, not layouts.** Pick from the 59 semantic blocks — 34
+   shared, 25 belonging to one artifact. See `references/block-selection.md`
+   and `references/artifacts.md`. Do not invent visual patterns and do not
+   approximate a block that does not exist; say what you could not express.
 6. **Write `forma.spec.json`.** Follow `references/spec-reference.md`
    exactly — the schema is strict and will reject unknown shapes.
 7. **Validate.** Run `scripts/validate.mjs <path-to-spec>` (wraps
@@ -68,13 +69,13 @@ that isn't "explain this work to a human."
 ## References
 
 - `references/artifacts.md` — the four artifacts and their contracts
-- `references/modes.md` — narrative order per purpose (0.1 vocabulary)
-- `references/design-grammar.md` — shared rules and four theme purposes
+- `references/modes.md` — narrative order per purpose (0.1 vocabulary, kept for migrated specs)
+- `references/design-grammar.md` — shared rules and per-artifact direction
 - `references/typography.md` — font stack and subsetting rules
 - `references/generic-ai-patterns.md` — the banned-pattern checklist
 - `references/technology-policy.md` — what's allowed in the toolchain
 - `references/performance-budget.md` — size/perf targets
-- `references/block-selection.md` — the 20 blocks and when to use each
+- `references/block-selection.md` — the shared block vocabulary
 - `references/spec-reference.md` — the full `forma.spec.json` shape
 - `references/source-handling.md` — provenance and confidence rules
 - `references/quality-gates.md` — the QA checklist before reporting "done"
