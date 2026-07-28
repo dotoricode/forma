@@ -13,6 +13,7 @@ import { BlockSchemaUnion, type FormaBlock } from "../blocks/registry.js";
 import {
   ArtifactSchema,
   ColorModeSchema,
+  DensitySchema,
   InteractionSchema,
   PurposeSchema,
   VariantSchema,
@@ -35,7 +36,6 @@ export const AudienceSchema = z.enum([
 export type FormaAudience = z.infer<typeof AudienceSchema>;
 
 export const LanguageSchema = z.enum(["ko", "en"]);
-export const DensitySchema = z.enum(["comfortable", "compact"]);
 export const ConfidentialitySchema = z.enum(["public", "internal", "confidential"]);
 
 export const NarrativeSchema = z.object({
@@ -90,8 +90,9 @@ export function safeParseFormaSpec(json: unknown) {
 export type { FormaBlock, FormaBlockType } from "../blocks/registry.js";
 export type { FormaSource, Confidence } from "./source.js";
 export { SourceSchema, ConfidenceSchema } from "./source.js";
-export type { ArtifactKind, Purpose, Variant, ColorMode, Interaction } from "./artifact.js";
+export type { ArtifactKind, Purpose, Variant, ColorMode, Interaction, Density } from "./artifact.js";
 export {
+  DensitySchema,
   ArtifactSchema,
   PurposeSchema,
   VariantSchema,
