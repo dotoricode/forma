@@ -1,14 +1,16 @@
 {
-  "version": "0.1",
+  "version": "0.2",
   "meta": {
     "title": "Forma 스킬 처음 사용하기",
     "subtitle": "언제 쓰고, 어떻게 쓰는가",
-    "mode": "manual",
+    "artifact": "manual",
+    "purpose": "operate",
     "audience": "engineering",
     "language": "ko",
-    "theme": "light",
-    "designSystem": "guide",
+    "variant": "procedural",
+    "colorMode": "light",
     "density": "comfortable",
+    "interaction": "static",
     "confidentiality": "public"
   },
   "sources": [

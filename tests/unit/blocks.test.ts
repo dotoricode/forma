@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { renderBlock, type RenderContext } from "../../src/renderer/blocks.js";
+import { renderBlock, type RenderContext } from "../../src/blocks/registry.js";
 import type { FormaSource } from "../../src/spec/schema.js";
 
 function context(sources: FormaSource[]): RenderContext {

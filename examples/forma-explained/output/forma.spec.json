@@ -1,14 +1,16 @@
 {
-  "version": "0.1",
+  "version": "0.2",
   "meta": {
     "title": "Forma란 무엇인가",
     "subtitle": "복잡한 업무를 명확한 형태로 바꾸는 spec-first HTML 컴파일러",
-    "mode": "explain",
+    "artifact": "report",
+    "purpose": "explain",
     "audience": "engineering",
     "language": "ko",
-    "theme": "light",
-    "designSystem": "quiet-editorial",
+    "variant": "technical",
+    "colorMode": "light",
     "density": "comfortable",
+    "interaction": "static",
     "confidentiality": "public"
   },
   "sources": [
@@ -48,7 +50,7 @@
     "summary": "Forma는 문서·코드·리뷰·테스트결과·보고자료를 읽어 forma.spec.json이라는 구조화된 사양으로 정리하고, 결정론적 렌더러가 그 사양을 항상 같은 디자인 시스템으로 HTML로 컴파일하는 도구다. Agent는 내용과 블록 선택만 담당하고, 스타일과 품질은 렌더러가 책임진다.",
     "takeaways": [
       "Agent는 HTML/CSS를 직접 쓰지 않는다. spec만 쓰고 렌더러가 나머지를 담당한다.",
-      "20개 의미 기반 블록과 4개 모드(explain/review/test/report)가 하나의 디자인 시스템 위에서 조합만 달라진다.",
+      "20개 의미 기반 블록과 5개 모드(explain/review/test/report/manual)가 네 가지 목적별 테마 위에서 조합된다.",
       "결과물은 폰트까지 포함해 완전히 오프라인 단일 HTML이며 외부 네트워크 요청이 0건이다."
     ]
   },
@@ -62,7 +64,7 @@
       "subtitle": "Turn complex work into clear form.",
       "meta": [
         "spec-first 컴파일러",
-        "20개 블록 · 4개 모드",
+        "20개 블록 · 5개 모드",
         "MIT License"
       ]
     },

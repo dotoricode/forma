@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="ko" data-theme="light" data-design="simple">
+<html lang="ko" data-theme="light" data-artifact="manual" data-variant="technical">
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -682,22 +682,22 @@
 
   /* Simple — the default edited-memo treatment. A strong opening rule and
      tight display type create one leverage point without adding decoration. */
-  :root[data-design="simple"] .blk-cover {
+  :root[data-artifact="report"]:not([data-variant="editorial"]) .blk-cover {
     border-block-start: 3px solid var(--color-text);
     padding-block-start: var(--space-7);
   }
-  :root[data-design="simple"] .blk-cover__title {
+  :root[data-artifact="report"]:not([data-variant="editorial"]) .blk-cover__title {
     max-width: 48rem;
     letter-spacing: -0.025em;
   }
-  :root[data-design="simple"] .blk-summary__title {
+  :root[data-artifact="report"]:not([data-variant="editorial"]) .blk-summary__title {
     font-size: clamp(1.35rem, 1.1rem + 0.7vw, 1.75rem);
   }
 
   /* Workspace — tool-like navigation and a denser rhythm. Raised surfaces
      are reserved for visual evidence; ordinary prose stays on the canvas so
      the entire document does not collapse into a uniform card stack. */
-  :root[data-design="workspace"] {
+  :root[data-artifact="dashboard"] {
     --shadow: 0 1px 2px oklch(0% 0 0 / 0.05), 0 4px 16px oklch(0% 0 0 / 0.08);
     --color-canvas: oklch(96.5% 0.003 90);
     --workspace-rail: var(--color-canvas);
@@ -706,20 +706,20 @@
     --workspace-rail-text-strong: var(--color-text);
     --workspace-rail-active: var(--color-surface);
   }
-  [data-theme="dark"]:root[data-design="workspace"] {
+  [data-theme="dark"]:root[data-artifact="dashboard"] {
     --color-canvas: oklch(9% 0.003 90);
   }
   @media (prefers-color-scheme: dark) {
-    :root[data-design="workspace"]:not([data-theme="light"]) {
+    :root[data-artifact="dashboard"]:not([data-theme="light"]) {
       --color-canvas: oklch(9% 0.003 90);
     }
   }
-  :root[data-design="workspace"] .layout {
+  :root[data-artifact="dashboard"] .layout {
     grid-template-columns: 224px minmax(0, 1fr);
     max-width: none;
     align-items: stretch;
   }
-  :root[data-design="workspace"] .layout > .side-toc {
+  :root[data-artifact="dashboard"] .layout > .side-toc {
     order: -1;
     align-self: stretch;
     position: static;
@@ -731,7 +731,7 @@
     padding: var(--space-6) var(--space-4);
     margin-inline-start: calc(-1 * var(--space-5));
   }
-  :root[data-design="workspace"] .side-toc .toc {
+  :root[data-artifact="dashboard"] .side-toc .toc {
     position: sticky;
     inset-block-start: var(--space-5);
     max-height: calc(100vh - var(--space-8));
@@ -740,24 +740,24 @@
     flex-wrap: nowrap;
     gap: var(--space-1);
   }
-  :root[data-design="workspace"] .side-toc .toc a {
+  :root[data-artifact="dashboard"] .side-toc .toc a {
     color: var(--workspace-rail-text);
     padding: 0.5em 0.75em;
     border-radius: var(--radius-sm);
   }
-  :root[data-design="workspace"] .side-toc .toc a:hover {
+  :root[data-artifact="dashboard"] .side-toc .toc a:hover {
     color: var(--workspace-rail-text-strong);
   }
-  :root[data-design="workspace"] .side-toc .toc a[aria-current="true"] {
+  :root[data-artifact="dashboard"] .side-toc .toc a[aria-current="true"] {
     background: var(--workspace-rail-active);
     box-shadow: var(--shadow);
   }
-  :root[data-design="workspace"] .layout > .doc { padding-block: var(--space-6); }
-  :root[data-design="workspace"] .section {
+  :root[data-artifact="dashboard"] .layout > .doc { padding-block: var(--space-6); }
+  :root[data-artifact="dashboard"] .section {
     border-block-end: 1px solid var(--color-border);
     padding: var(--space-6) 0;
   }
-  :root[data-design="workspace"] .section:is(
+  :root[data-artifact="dashboard"] .section:is(
     .blk-diagram,
     .blk-chart,
     .blk-test-matrix,
@@ -773,12 +773,12 @@
 
   /* Guide — light left nav rail, callout-style finding/decision
      blocks, tighter reading measure like a docs site's center column. */
-  :root[data-design="guide"] .layout {
+  :root[data-artifact="manual"] .layout {
     grid-template-columns: 232px minmax(0, 1fr);
     max-width: none;
     gap: var(--space-7);
   }
-  :root[data-design="guide"] .layout > .side-toc {
+  :root[data-artifact="manual"] .layout > .side-toc {
     order: -1;
     position: sticky;
     inset-block-start: var(--space-5);
@@ -789,52 +789,52 @@
     border-block-end: none;
     padding-inline-end: var(--space-4);
   }
-  :root[data-design="guide"] .side-toc .toc {
+  :root[data-artifact="manual"] .side-toc .toc {
     flex-direction: column;
     flex-wrap: nowrap;
     gap: var(--space-1);
   }
-  :root[data-design="guide"] .side-toc .toc a {
+  :root[data-artifact="manual"] .side-toc .toc a {
     border-radius: var(--radius-sm);
     padding: 0.4em 0.65em;
   }
-  :root[data-design="guide"] .side-toc .toc a[aria-current="true"] {
+  :root[data-artifact="manual"] .side-toc .toc a[aria-current="true"] {
     background: color-mix(in oklab, var(--color-accent) 10%, transparent);
     color: var(--color-text);
     border-inline-start: 3px solid var(--color-accent);
   }
-  :root[data-design="guide"] .measure { max-width: 38rem; }
-  :root[data-design="guide"] .blk-finding,
-  :root[data-design="guide"] .blk-decision .decision-strip {
+  :root[data-artifact="manual"] .measure { max-width: 38rem; }
+  :root[data-artifact="manual"] .blk-finding,
+  :root[data-artifact="manual"] .blk-decision .decision-strip {
     background: color-mix(in oklab, var(--color-accent) 6%, var(--color-surface));
     border-radius: var(--radius-md);
     padding: var(--space-4) var(--space-5);
   }
-  :root[data-design="guide"] .blk-decision .decision-strip { border-inline-start-width: 3px; }
+  :root[data-artifact="manual"] .blk-decision .decision-strip { border-inline-start-width: 3px; }
 
   /* Magazine — serif display type, a high-leverage cover, and an editorial
      opening rhythm without decorative images or motion. */
-  :root[data-design="magazine"] {
+  :root[data-artifact="report"][data-variant="editorial"] {
     --font-serif: Georgia, "Nanum Myeongjo", serif;
   }
-  :root[data-design="magazine"] .doc { max-width: 52rem; }
-  :root[data-design="magazine"] h1,
-  :root[data-design="magazine"] h2,
-  :root[data-design="magazine"] h3,
-  :root[data-design="magazine"] .blk-cover__title,
-  :root[data-design="magazine"] .blk-narrative__question {
+  :root[data-artifact="report"][data-variant="editorial"] .doc { max-width: 52rem; }
+  :root[data-artifact="report"][data-variant="editorial"] h1,
+  :root[data-artifact="report"][data-variant="editorial"] h2,
+  :root[data-artifact="report"][data-variant="editorial"] h3,
+  :root[data-artifact="report"][data-variant="editorial"] .blk-cover__title,
+  :root[data-artifact="report"][data-variant="editorial"] .blk-narrative__question {
     font-family: var(--font-serif);
     font-weight: 400;
   }
-  :root[data-design="magazine"] .blk-cover {
+  :root[data-artifact="report"][data-variant="editorial"] .blk-cover {
     border-block-start: 5px solid var(--color-text);
   }
-  :root[data-design="magazine"] .blk-cover__title {
+  :root[data-artifact="report"][data-variant="editorial"] .blk-cover__title {
     font-size: clamp(2.15rem, 1.3rem + 3.2vw, 4rem);
     letter-spacing: -0.035em;
   }
-  :root[data-design="magazine"] .blk-narrative__question { font-size: 1.5rem; }
-  :root[data-design="magazine"] .blk-narrative__summary p:first-of-type::first-letter {
+  :root[data-artifact="report"][data-variant="editorial"] .blk-narrative__question { font-size: 1.5rem; }
+  :root[data-artifact="report"][data-variant="editorial"] .blk-narrative__summary p:first-of-type::first-letter {
     font-family: var(--font-serif);
     font-size: 3.4em;
     font-weight: 700;
@@ -842,7 +842,7 @@
     line-height: 0.8;
     padding-inline-end: var(--space-2);
   }
-  :root[data-design="magazine"] .blk-takeaways {
+  :root[data-artifact="report"][data-variant="editorial"] .blk-takeaways {
     font-family: var(--font-serif);
     font-size: 1.0625rem;
     border-block: 1px solid var(--color-text);
@@ -850,19 +850,19 @@
   }
 
   @media (min-width: 800px) {
-    :root[data-design="magazine"] .blk-cover {
+    :root[data-artifact="report"][data-variant="editorial"] .blk-cover {
       display: grid;
       grid-template-columns: minmax(0, 2.4fr) minmax(12rem, 1fr);
       column-gap: var(--space-7);
       align-items: start;
     }
-    :root[data-design="magazine"] .blk-cover__eyebrow,
-    :root[data-design="magazine"] .blk-cover__title,
-    :root[data-design="magazine"] .blk-cover__subtitle,
-    :root[data-design="magazine"] .blk-cover > .confidence-tag {
+    :root[data-artifact="report"][data-variant="editorial"] .blk-cover__eyebrow,
+    :root[data-artifact="report"][data-variant="editorial"] .blk-cover__title,
+    :root[data-artifact="report"][data-variant="editorial"] .blk-cover__subtitle,
+    :root[data-artifact="report"][data-variant="editorial"] .blk-cover > .confidence-tag {
       grid-column: 1;
     }
-    :root[data-design="magazine"] .blk-cover__meta {
+    :root[data-artifact="report"][data-variant="editorial"] .blk-cover__meta {
       grid-column: 2;
       grid-row: 2 / span 3;
       border-block-start: 1px solid var(--color-text);
@@ -872,14 +872,14 @@
   }
 
   @media (max-width: 900px) {
-    :root[data-design="workspace"] .layout,
-    :root[data-design="guide"] .layout {
+    :root[data-artifact="dashboard"] .layout,
+    :root[data-artifact="manual"] .layout {
       grid-template-columns: minmax(0, 1fr);
       gap: var(--space-4);
       padding-inline: var(--space-4);
     }
-    :root[data-design="workspace"] .layout > .side-toc,
-    :root[data-design="guide"] .layout > .side-toc {
+    :root[data-artifact="dashboard"] .layout > .side-toc,
+    :root[data-artifact="manual"] .layout > .side-toc {
       order: -1;
       position: static;
       max-height: none;
@@ -889,8 +889,8 @@
       margin-inline-start: 0;
       padding: 0 0 var(--space-4);
     }
-    :root[data-design="workspace"] .side-toc .toc,
-    :root[data-design="guide"] .side-toc .toc {
+    :root[data-artifact="dashboard"] .side-toc .toc,
+    :root[data-artifact="manual"] .side-toc .toc {
       position: static;
       max-height: none;
       overflow-x: auto;
@@ -898,8 +898,8 @@
       flex-direction: row;
       flex-wrap: nowrap;
     }
-    :root[data-design="workspace"] .side-toc .toc a,
-    :root[data-design="guide"] .side-toc .toc a {
+    :root[data-artifact="dashboard"] .side-toc .toc a,
+    :root[data-artifact="manual"] .side-toc .toc a {
       white-space: nowrap;
     }
   }

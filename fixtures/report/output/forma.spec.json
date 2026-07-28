@@ -1,14 +1,16 @@
 {
-  "version": "0.1",
+  "version": "0.2",
   "meta": {
     "title": "7월 21일 알림 발송 지연 장애: 원인 분석과 개선 제안",
     "subtitle": "평균 발송 지연 40분, 영향받은 사용자 약 3.2만 명",
-    "mode": "report",
+    "artifact": "report",
+    "purpose": "decide",
     "audience": "manager",
     "language": "ko",
-    "theme": "light",
-    "designSystem": "simple",
+    "variant": "technical",
+    "colorMode": "light",
     "density": "comfortable",
+    "interaction": "static",
     "confidentiality": "internal"
   },
   "sources": [

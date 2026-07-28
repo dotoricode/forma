@@ -1,6 +1,7 @@
 import { mkdir, stat, writeFile } from "node:fs/promises";
 import path from "node:path";
-import type { FormaMode, FormaSource, FormaSpec } from "../spec/schema.js";
+import type { ArtifactKind, FormaSource, FormaSpec, Purpose } from "../spec/schema.js";
+import { DEFAULT_VARIANT } from "../spec/artifact.js";
 import { STARTER_SPEC } from "./starter-spec.js";
 
 function sourceKind(input: string): FormaSource["kind"] {
@@ -13,7 +14,8 @@ function sourceKind(input: string): FormaSource["kind"] {
 
 export async function writeGeneratedSpec(options: {
   input: string;
-  mode: FormaMode;
+  artifact: ArtifactKind;
+  purpose: Purpose;
   out: string;
 }): Promise<FormaSpec> {
   const inputPath = path.resolve(options.input);
@@ -27,7 +29,9 @@ export async function writeGeneratedSpec(options: {
     meta: {
       ...STARTER_SPEC.meta,
       title: `Forma: ${inputLabel}`,
-      mode: options.mode,
+      artifact: options.artifact,
+      purpose: options.purpose,
+      variant: DEFAULT_VARIANT[options.artifact],
     },
     sources: [
       {

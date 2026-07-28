@@ -7,14 +7,33 @@
  * (a few dozen nodes) without needing a heavyweight dependency.
  */
 import { escapeHtml } from "../security/sanitize.js";
-import type {
-  FormaBlock,
-} from "../spec/schema.js";
 
-type FlowBlock = Extract<FormaBlock, { type: "flow" }>;
-type SequenceBlock = Extract<FormaBlock, { type: "sequence" }>;
-type ArchitectureBlock = Extract<FormaBlock, { type: "architecture" }>;
-type ChartBlock = Extract<FormaBlock, { type: "chart" }>;
+/**
+ * Input shapes are declared structurally rather than pulled from the spec
+ * types. The block registry owns the schemas and imports this module to
+ * render them, so importing `FormaBlock` back would close a cycle
+ * (spec -> registry -> diagram block -> diagrams -> spec) and collapse the
+ * inference for every block in it. Structural types also keep the layout
+ * engine usable on its own.
+ */
+export interface FlowBlock {
+  nodes: readonly { id: string; label: string; kind: "start" | "step" | "decision" | "end" }[];
+  edges: readonly { from: string; to: string; label?: string | undefined }[];
+}
+export interface SequenceBlock {
+  participants: readonly { id: string; label: string }[];
+  messages: readonly { from: string; to: string; label: string; kind: "call" | "return" | "async" }[];
+}
+export interface ArchitectureBlock {
+  nodes: readonly { id: string; label: string; group?: string | undefined }[];
+  edges: readonly { from: string; to: string; label?: string | undefined }[];
+}
+export interface ChartBlock {
+  kind: "bar" | "line";
+  categories: readonly string[];
+  series: readonly { label: string; values: readonly number[] }[];
+  unit?: string | undefined;
+}
 
 const NODE_W = 240;
 const NODE_H = 64;
@@ -109,7 +128,8 @@ export function renderSequenceSvg(block: SequenceBlock): string {
 }
 
 export function renderArchitectureSvg(block: ArchitectureBlock): string {
-  const groups = new Map<string, typeof block.nodes>();
+  type ArchNode = ArchitectureBlock["nodes"][number];
+  const groups = new Map<string, ArchNode[]>();
   for (const node of block.nodes) {
     const key = node.group ?? "_";
     const list = groups.get(key) ?? [];

@@ -1,9 +1,12 @@
 {
   "generator": "forma@0.1.0",
-  "specVersion": "0.1",
-  "mode": "report",
+  "specVersion": "0.2",
+  "artifact": "report",
+  "purpose": "decide",
+  "variant": "technical",
+  "interaction": "static",
   "title": "7월 21일 알림 발송 지연 장애: 원인 분석과 개선 제안",
   "language": "ko",
   "sectionCount": 8,
-  "bytes": 161777
+  "bytes": 162445
 }

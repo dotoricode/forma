@@ -1,9 +1,12 @@
 {
   "generator": "forma@0.1.0",
-  "specVersion": "0.1",
-  "mode": "explain",
+  "specVersion": "0.2",
+  "artifact": "report",
+  "purpose": "explain",
+  "variant": "technical",
+  "interaction": "static",
   "title": "Forma란 무엇인가",
   "language": "ko",
   "sectionCount": 8,
-  "bytes": 166395
+  "bytes": 171225
 }

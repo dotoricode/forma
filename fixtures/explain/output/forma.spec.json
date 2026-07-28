@@ -1,14 +1,16 @@
 {
-  "version": "0.1",
+  "version": "0.2",
   "meta": {
     "title": "모바일 SDK 초기화와 서버 정책 확인 흐름",
     "subtitle": "앱이 켜질 때 SDK가 무엇을, 어떤 순서로 확인하는가",
-    "mode": "explain",
+    "artifact": "report",
+    "purpose": "explain",
     "audience": "engineering",
     "language": "ko",
-    "theme": "light",
-    "designSystem": "simple",
+    "variant": "technical",
+    "colorMode": "light",
     "density": "comfortable",
+    "interaction": "static",
     "confidentiality": "public"
   },
   "sources": [

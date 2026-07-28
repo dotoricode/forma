@@ -51,7 +51,10 @@ export async function renderSpecFileToDir(specPath: string, outDir: string): Pro
   const manifest = {
     generator: "forma@0.1.0",
     specVersion: FORMA_SPEC_VERSION,
-    mode: spec.meta.mode,
+    artifact: spec.meta.artifact,
+    purpose: spec.meta.purpose,
+    variant: spec.meta.variant ?? null,
+    interaction: spec.meta.interaction,
     title: spec.meta.title,
     language: spec.meta.language,
     sectionCount: spec.sections.length,

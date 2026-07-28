@@ -1,14 +1,16 @@
 {
-  "version": "0.1",
+  "version": "0.2",
   "meta": {
     "title": "단말·OS 버전별 위협 탐지 회귀 테스트",
     "subtitle": "Android 10~15, 6개 단말에서의 탐지 정확도와 배터리 영향",
-    "mode": "test",
+    "artifact": "report",
+    "purpose": "diagnose",
     "audience": "qa",
     "language": "ko",
-    "theme": "light",
-    "designSystem": "simple",
+    "variant": "release-gate",
+    "colorMode": "light",
     "density": "compact",
+    "interaction": "static",
     "confidentiality": "internal"
   },
   "sources": [

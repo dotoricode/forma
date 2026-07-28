@@ -38,7 +38,7 @@ src/
    `redactSecrets()` and `stripHomeDirectory()` before writing it to disk
    (defense in depth; block renderers already escape/sanitize per-field).
 7. **Write** — `index.html`, a copy of the validated `forma.spec.json`, and
-   `manifest.json` (generator version, mode, byte size) land in the output
+   `manifest.json` (generator version, artifact, purpose, byte size) land in the output
    directory.
 8. **QA** — `run-qa.ts` (Playwright: viewports, console errors, external
    requests, overflow, heading order, axe-core) and `run-lighthouse.ts`
@@ -60,7 +60,7 @@ deterministic: the same spec always produces the same bytes (modulo the
   `spec/schema.ts`, add a render function in `renderer/blocks.ts`, add its
   CSS to the `componentCss()` function in `design/css.ts`, add a unit test
   and (ideally) a fixture section exercising it.
-- **New mode**: modes are a narrative-grammar convention documented in
+- **New purpose**: purposes are a narrative-grammar convention documented in
   `skills/forma/references/modes.md` — they don't require renderer code
   changes, since composition is entirely spec-side (which blocks, what
   order).

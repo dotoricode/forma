@@ -7,7 +7,7 @@ import { loadSpecFile, renderSpecFileToDir, FormaSpecError } from "../renderer/r
 import { buildFormaJsonSchema } from "../spec/json-schema.js";
 import { installSkills, verifySkills } from "./skills.js";
 import { writeStarterSpecFile } from "./starter-spec.js";
-import { inferFormaMode, parseFormaMode } from "../spec/mode.js";
+import { inferArtifact, parseArtifact } from "../spec/infer-artifact.js";
 import { writeGeneratedSpec } from "./generate.js";
 
 const program = new Command();
@@ -166,30 +166,33 @@ program
 program
   .command("generate")
   .description("Structured-input scaffolding only — does not call any LLM")
-  .option("--mode <mode>", "auto | explain | review | test | report | manual", "auto")
-  .option("--instruction <text>", "task instruction used to choose a mode automatically")
+  .option("--artifact <artifact>", "auto | dashboard | report | manual | advanced", "auto")
+  .option("--instruction <text>", "task instruction used to choose an artifact automatically")
   .option("--out <path>", "output spec path")
   .argument("<input>", "input file or directory")
-  .action(async (input: string, opts: { mode: string; instruction?: string; out?: string }) => {
-    const mode =
-      opts.mode === "auto"
-        ? inferFormaMode(opts.instruction ?? "", input)
-        : parseFormaMode(opts.mode);
-    if (!mode) {
+  .action(async (input: string, opts: { artifact: string; instruction?: string; out?: string }) => {
+    const inferred = inferArtifact(opts.instruction ?? "", input);
+    const artifact = opts.artifact === "auto" ? inferred.artifact : parseArtifact(opts.artifact);
+    if (!artifact) {
       exitWithError(
         new FormaSpecError(
-          `forma: invalid mode '${opts.mode}' (expected auto, explain, review, test, report, or manual)`,
+          `forma: invalid artifact '${opts.artifact}' (expected auto, dashboard, report, manual, or advanced)`,
         ),
       );
+      return;
     }
+    // Purpose only follows the inference when the artifact did too; an
+    // explicitly named artifact should not silently inherit a purpose
+    // guessed for a different one.
+    const purpose = artifact === inferred.artifact ? inferred.purpose : "explain";
     console.log(
-      `forma: 'generate' only scaffolds a starter spec from ${input} (mode=${mode}).\n` +
+      `forma: 'generate' only scaffolds a starter spec from ${input} (artifact=${artifact}).\n` +
         "forma: it does not call an LLM. For narrative composition, use the Forma Agent Skill\n" +
-        "forma: (Codex: $forma, Claude Code: /forma) to read the input and author forma.spec.json.",
+        "forma: (Codex: $forma-report, Claude Code: /forma:report) to read the input and author forma.spec.json.",
     );
     const out = opts.out ?? `${path.basename(input).replace(/\.[^.]+$/, "")}.forma.spec.json`;
     try {
-      await writeGeneratedSpec({ input, mode, out });
+      await writeGeneratedSpec({ input, artifact, purpose, out });
       console.log(`forma: wrote scaffold ${out}`);
       console.log(`forma: next run \`pnpm forma validate ${out}\`, then author its narrative with $forma.`);
     } catch (error) {

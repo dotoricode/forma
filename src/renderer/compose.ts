@@ -1,5 +1,5 @@
 import type { FormaSpec, FormaSource } from "../spec/schema.js";
-import { renderBlock, type RenderContext } from "./blocks.js";
+import { renderBlock, type RenderContext } from "../blocks/registry.js";
 import { escapeHtml, renderInlineMarkdown } from "../security/sanitize.js";
 
 export interface ComposedDocument {
