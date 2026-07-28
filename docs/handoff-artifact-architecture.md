@@ -262,7 +262,7 @@ enterprise. 플러그인 스킬은 `plugin-name:skill-name`으로 namespace되�
 ```
 [x] advanced Decision Room 구현        ← Portable + Room Mode 완료 (PR7, PR8)
 [ ] 4개 스킬 설치와 호출 검증
-[ ] artifact별 fixture와 example 제공   ← fixture는 있고 examples/ 재구성 남음
+[x] artifact별 fixture와 example 제공
 [ ] Visual Tournament advanced quality  ← 아래 "알려진 부채" 참조
 [ ] 관련 문서와 실제 코드의 drift 제거
 ```
@@ -291,10 +291,11 @@ pnpm forma verify-skills
 모든 후보가 같은 증거로 채점된다. `src/cli/index.ts`의 해당 블록 주석과
 PR #6 본문에 명시해뒀다. **없는 걸 있는 척하지 말 것.**
 
-**2. `examples/`가 아직 0.1 구조다.**
-`fixtures/`는 artifact별로 재구성했지만 `examples/forma-theme-*`는
-옛 테마 이름을 그대로 쓰고 있다. 마이그레이션으로 렌더는 되지만
-이름이 거짓말이다.
+**2. ~~`examples/`가 아직 0.1 구조다.~~ 해소됨.**
+`examples/forma-theme-*` 9개를 지우고 artifact별 4개로 다시 만들었다.
+내용도 전부 forma 자신을 설명하는 것으로 바꿨다: 현재 상태(dashboard),
+왜 spec 우선인가(report), Agent Skill로 쓰기(manual), 아직 안 한 결정
+하나(advanced). 4종 모두 검증·렌더·design lint·브라우저 QA를 통과한다.
 
 **3. artifact별 CSS가 아직 옛 4테마 매핑이다.**
 `src/design/artifact-css.ts`로 파일은 분리했지만 규칙 자체는 옛

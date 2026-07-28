@@ -1,0 +1,361 @@
+{
+  "version": "0.2",
+  "meta": {
+    "title": "Visual Tournament 축 연결 판단",
+    "artifact": "advanced",
+    "purpose": "decide",
+    "audience": "engineering",
+    "language": "ko",
+    "variant": "architecture-review",
+    "colorMode": "light",
+    "density": "comfortable",
+    "interaction": "islands",
+    "confidentiality": "public"
+  },
+  "sources": [
+    {
+      "id": "candidates",
+      "label": "후보 생성과 채점",
+      "path": "src/qa/candidates.ts",
+      "kind": "file"
+    },
+    {
+      "id": "artifactcss",
+      "label": "artifact별 CSS",
+      "path": "src/design/artifact-css.ts",
+      "kind": "file"
+    },
+    {
+      "id": "handoff",
+      "label": "핸드오프 문서의 부채 목록",
+      "path": "docs/handoff-artifact-architecture.md",
+      "kind": "note"
+    }
+  ],
+  "narrative": {
+    "question": "축을 먼저 연결할 것인가, 민감도를 먼저 잴 것인가?",
+    "summary": "선택 계층은 실제로 동작하지만 축이 렌더러에 연결되지 않아 후보 8개가 모두 같은 증거로 채점된다. 지금 연결할지, 먼저 artifact CSS의 옛 매핑을 정리할지 정해야 한다.",
+    "takeaways": [
+      "후보 생성·채점·승자 선택은 동작하고 테스트로 고정돼 있다",
+      "축 4개가 연결되지 않아 후보를 바꿔도 렌더 결과가 같다",
+      "artifact CSS가 아직 옛 4테마 매핑이라 축을 지금 얹으면 두 번 고치게 된다"
+    ]
+  },
+  "sections": [
+    {
+      "id": "brief",
+      "type": "brief",
+      "question": "후보 축 4개를 스타일시트로 내려서 Visual Tournament를 실제 비교로 만들 것인가?",
+      "summary": "`density` / `measure` / `figurePlacement` / `typeScale` 네 축이 후보 객체에는 있지만 렌더러가 읽지 않는다. 그래서 후보 8개가 전부 동일한 HTML을 만들고 동일한 증거로 채점된다. **선택 계층은 진짜고, 비교 대상이 가짜다.**",
+      "decideToday": [
+        "축을 지금 연결할 것인가, 아니면 artifact CSS 정리 뒤로 미룰 것인가",
+        "네 축을 한 번에 연결할 것인가, 하나씩 할 것인가",
+        "연결 전까지 CLI 출력에서 tournament를 감출 것인가"
+      ],
+      "stillUnknown": [
+        "축 조합이 실제로 채점을 갈라놓을 만큼 렌더를 바꾸는지 아직 측정하지 않았다",
+        "artifact CSS 정리 범위가 얼마나 큰지 산정되지 않았다",
+        "후보 8개를 각각 렌더하면 build 시간이 얼마나 늘어나는지 모른다"
+      ],
+      "sourceRefs": [
+        "candidates",
+        "handoff"
+      ]
+    },
+    {
+      "id": "evidence",
+      "type": "evidence-graph",
+      "title": "지금 확실한 것과 그렇지 않은 것",
+      "claims": [
+        {
+          "id": "selection-works",
+          "statement": "후보 생성, 채점, 승자 선택은 실제로 동작하고 테스트로 고정돼 있다.",
+          "confidence": "verified",
+          "impact": "medium",
+          "supportedBy": [
+            "candidates"
+          ],
+          "contradictedBy": []
+        },
+        {
+          "id": "axes-dead",
+          "statement": "축 4개가 렌더러에 연결되지 않아 후보가 서로 다른 결과를 내지 않는다.",
+          "confidence": "verified",
+          "impact": "high",
+          "supportedBy": [
+            "candidates"
+          ],
+          "contradictedBy": []
+        },
+        {
+          "id": "css-stale",
+          "statement": "artifact별 CSS가 아직 옛 simple/workspace/guide/magazine 매핑을 옮긴 것이다.",
+          "confidence": "verified",
+          "impact": "high",
+          "supportedBy": [
+            "artifactcss",
+            "handoff"
+          ],
+          "contradictedBy": []
+        },
+        {
+          "id": "axes-matter",
+          "statement": "네 축을 연결하면 채점이 유의미하게 갈린다.",
+          "confidence": "unknown",
+          "impact": "high",
+          "supportedBy": [],
+          "contradictedBy": []
+        },
+        {
+          "id": "cost-small",
+          "statement": "축 연결 비용이 artifact CSS 정리보다 작다.",
+          "confidence": "inferred",
+          "impact": "medium",
+          "supportedBy": [
+            "candidates"
+          ],
+          "contradictedBy": [
+            "artifactcss"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "challenge",
+      "type": "challenge",
+      "title": "가장 강한 반론",
+      "strongestCounterargument": "축이 채점을 갈라놓는다는 것을 아무도 확인하지 않았다. 네 축을 연결한 뒤에도 점수가 거의 같게 나오면, 우리는 build 시간을 8배로 늘리고 얻은 것이 없게 된다. 순서가 틀렸다. 먼저 두 후보를 손으로 렌더해서 점수가 갈리는지 재고, 갈릴 때만 연결하는 것이 맞다.",
+      "unprovenAssumptions": [
+        "채점 함수가 축 변화에 민감하다",
+        "후보 8개를 각각 렌더해도 build 시간이 감당 가능하다",
+        "artifact CSS를 나중에 정리해도 축 연결이 그대로 살아남는다"
+      ],
+      "failureConditions": [
+        "네 축을 연결했는데 후보 간 점수 차가 측정 잡음보다 작다",
+        "후보별 렌더 때문에 build가 지금의 몇 배로 늘어 CI에서 쓸 수 없게 된다",
+        "artifact CSS 정리가 축 연결부를 전부 다시 쓰게 만든다"
+      ],
+      "reversalTriggers": [
+        "손으로 만든 두 후보의 점수 차가 3점 미만이면 연결을 접고 tournament를 CLI에서 감춘다",
+        "artifact CSS 정리 산정이 축 연결의 두 배를 넘으면 순서를 바꾼다"
+      ],
+      "sourceRefs": [
+        "candidates"
+      ]
+    },
+    {
+      "id": "sim",
+      "type": "simulation",
+      "title": "후보 수와 build 시간",
+      "description": "후보를 각각 렌더하면 build 시간이 후보 수에 비례한다. 지금 렌더 1회 시간과 후보 수를 바꿔가며 총 시간과 CI 여유를 본다. 계산은 아래 입력만 쓰고 외부로 나가는 요청은 없다.",
+      "inputs": [
+        {
+          "name": "renderMs",
+          "label": "렌더 1회",
+          "value": 2600,
+          "min": 500,
+          "max": 8000,
+          "step": 100,
+          "unit": "ms"
+        },
+        {
+          "name": "candidates",
+          "label": "후보 수",
+          "value": 8,
+          "min": 1,
+          "max": 16,
+          "step": 1,
+          "unit": "개"
+        },
+        {
+          "name": "budgetSec",
+          "label": "build에 허용할 시간",
+          "value": 60,
+          "min": 10,
+          "max": 300,
+          "step": 5,
+          "unit": "초"
+        }
+      ],
+      "outputs": [
+        {
+          "label": "후보 전체 렌더 시간",
+          "unit": "초",
+          "precision": 1,
+          "formula": {
+            "type": "operation",
+            "operator": "divide",
+            "left": {
+              "type": "operation",
+              "operator": "multiply",
+              "left": {
+                "type": "variable",
+                "name": "renderMs"
+              },
+              "right": {
+                "type": "variable",
+                "name": "candidates"
+              }
+            },
+            "right": {
+              "type": "literal",
+              "value": 1000
+            }
+          }
+        },
+        {
+          "label": "남는 여유",
+          "unit": "초",
+          "precision": 1,
+          "formula": {
+            "type": "operation",
+            "operator": "subtract",
+            "left": {
+              "type": "variable",
+              "name": "budgetSec"
+            },
+            "right": {
+              "type": "operation",
+              "operator": "divide",
+              "left": {
+                "type": "operation",
+                "operator": "multiply",
+                "left": {
+                  "type": "variable",
+                  "name": "renderMs"
+                },
+                "right": {
+                  "type": "variable",
+                  "name": "candidates"
+                }
+              },
+              "right": {
+                "type": "literal",
+                "value": 1000
+              }
+            }
+          }
+        }
+      ],
+      "sourceRefs": [
+        "candidates"
+      ]
+    },
+    {
+      "id": "options",
+      "type": "option-comparison",
+      "title": "선택지",
+      "criteria": [
+        "먼저 얻는 것",
+        "위험",
+        "되돌리기",
+        "순서 의존"
+      ],
+      "options": [
+        {
+          "id": "a",
+          "label": "A. 축 4개를 지금 연결",
+          "cells": {
+            "먼저 얻는 것": "tournament가 실제 비교가 된다",
+            "위험": "artifact CSS 정리에서 다시 쓰게 될 수 있다",
+            "되돌리기": "쉽다. 축을 안 읽으면 원래대로",
+            "순서 의존": "높음"
+          }
+        },
+        {
+          "id": "b",
+          "label": "B. 두 후보만 손으로 재서 민감도 확인",
+          "cells": {
+            "먼저 얻는 것": "축이 점수를 갈라놓는지에 대한 답",
+            "위험": "거의 없음. 버리는 코드가 적다",
+            "되돌리기": "필요 없음",
+            "순서 의존": "없음"
+          }
+        },
+        {
+          "id": "c",
+          "label": "C. artifact CSS 정리 먼저",
+          "cells": {
+            "먼저 얻는 것": "네 artifact의 고유 art direction",
+            "위험": "tournament가 그동안 계속 반쪽인 채로 남는다",
+            "되돌리기": "어렵다. 범위가 넓다",
+            "순서 의존": "낮음"
+          }
+        }
+      ]
+    },
+    {
+      "id": "risks",
+      "type": "risk-register",
+      "risks": [
+        {
+          "id": "r1",
+          "description": "축을 연결했는데 후보 간 점수 차가 잡음 수준이다",
+          "likelihood": "medium",
+          "impact": "high",
+          "mitigation": "선택지 B로 먼저 두 후보만 재서 민감도를 확인한다",
+          "owner": "미정"
+        },
+        {
+          "id": "r2",
+          "description": "후보별 렌더로 build 시간이 CI에서 감당 불가능해진다",
+          "likelihood": "medium",
+          "impact": "medium",
+          "mitigation": "위 시뮬레이션으로 상한을 먼저 정하고, 넘으면 후보 수를 줄인다",
+          "owner": "미정"
+        },
+        {
+          "id": "r3",
+          "description": "반쪽 상태가 완성된 기능으로 오해된다",
+          "likelihood": "high",
+          "impact": "medium",
+          "mitigation": "CLI 출력, 코드 주석, 핸드오프 세 곳에 이미 명시했다. 이 문서가 네 번째다",
+          "owner": "미정"
+        }
+      ]
+    },
+    {
+      "id": "decision",
+      "type": "decision-record",
+      "decision": "선택지 B를 먼저 한다. 두 후보를 손으로 렌더해 점수 차를 재고, 유의미할 때만 축을 연결한다.",
+      "owner": "미정",
+      "rationale": "축 연결의 전제가 검증되지 않았다. 검증 비용이 연결 비용보다 훨씬 작으므로 순서를 바꾸는 것이 싸다. 이 프로젝트에서 검증되지 않은 전제 위에 작업을 쌓아 한 번 손해를 봤고, 같은 실수를 반복할 이유가 없다.",
+      "dissent": [
+        {
+          "who": "반론 기록",
+          "objection": "민감도 측정도 결국 축을 부분적으로 연결해야 가능하다. 두 번 일하는 것 아닌가."
+        }
+      ],
+      "revisitWhen": [
+        "두 후보의 점수 차가 3점 이상이면 즉시 네 축 연결로 넘어간다",
+        "artifact CSS 정리가 먼저 시작되면 이 결정을 다시 본다"
+      ],
+      "status": "proposed",
+      "sourceRefs": [
+        "candidates",
+        "handoff"
+      ]
+    },
+    {
+      "id": "ledger",
+      "type": "source-ledger",
+      "entries": [
+        {
+          "sourceRef": "candidates",
+          "covers": "후보 생성, 채점, 승자 선택의 현재 동작",
+          "limits": "축이 렌더러에 연결되지 않은 상태의 코드다"
+        },
+        {
+          "sourceRef": "artifactcss",
+          "covers": "artifact별 CSS의 현재 규칙",
+          "limits": "옛 4테마에서 옮긴 것이며 고유 art direction은 아직 아니다"
+        },
+        {
+          "sourceRef": "handoff",
+          "covers": "알려진 부채 5건의 기록",
+          "limits": "산정이 없다. 범위와 비용은 아직 추정치도 없다"
+        }
+      ]
+    }
+  ]
+}

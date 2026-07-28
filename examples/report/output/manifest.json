@@ -1,0 +1,13 @@
+{
+  "generator": "forma@0.1.0",
+  "specVersion": "0.2",
+  "artifact": "report",
+  "purpose": "explain",
+  "variant": "technical",
+  "interaction": "static",
+  "title": "Forma는 왜 spec 우선인가",
+  "language": "ko",
+  "sectionCount": 13,
+  "bytes": 228953,
+  "externalNetworkRequests": 0
+}

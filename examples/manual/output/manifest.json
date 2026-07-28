@@ -1,0 +1,13 @@
+{
+  "generator": "forma@0.1.0",
+  "specVersion": "0.2",
+  "artifact": "manual",
+  "purpose": "operate",
+  "variant": "procedural",
+  "interaction": "islands",
+  "title": "Agent Skill로 Forma 쓰기",
+  "language": "ko",
+  "sectionCount": 17,
+  "bytes": 225560,
+  "externalNetworkRequests": 0
+}

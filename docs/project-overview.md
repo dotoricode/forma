@@ -65,19 +65,24 @@ output/
 
 ### `index.html` 안의 실제 구성
 
-`examples/forma-theme-simple/output/index.html` 실측 (169,914 bytes,
-gzip 105,297 bytes):
+`fixtures/dashboard/release-gate/output/index.html` 실측 (205,311 bytes,
+gzip 107,075 bytes):
 
 | 구성 요소 | 바이트 | 비중 | 정체 |
 |---|---:|---:|---|
-| WOFF2 폰트 (base64) | 121,443 | 71.5% | `<style>` 안 `@font-face`의 data URI |
-| CSS 규칙 | 33,511 | 19.7% | 인라인 `<style>`, 외부 파일 없음 |
-| HTML 마크업 | 12,048 | 7.1% | 시맨틱 HTML + 인라인 SVG |
-| JavaScript | 2,912 | 1.7% | 인라인 `<script type="module">` |
+| WOFF2 폰트 (base64) | 111,252 | 54.2% | `<style>` 안 `@font-face` 5개의 data URI |
+| CSS 규칙 | 73,436 | 35.8% | 인라인 `<style>`, 외부 파일 없음 |
+| HTML 마크업 | 13,454 | 6.6% | 시맨틱 HTML + 인라인 SVG |
+| JavaScript | 7,169 | 3.5% | 인라인 `<script type="module">` |
 
-**용량의 7할이 폰트다.** 그래서 문서마다 실제 쓰인 글자만 골라 subset한다
-(`src/design/fonts.ts`). 한글이 한 글자도 없으면 IBM Plex Sans KR은 아예
-넣지 않는다.
+**폰트가 절반이고 CSS가 그다음이다.** 폰트는 문서마다 실제 쓰인 글자만 골라
+subset한다(`src/design/fonts.ts`). 한글이 한 글자도 없으면 IBM Plex Sans KR은
+아예 넣지 않는다.
+
+CSS 비중이 0.1 시절 실측(19.7%)에서 두 배 가까이 올랐다. 스타일시트가 블록
+59종과 artifact 4종을 모두 덮게 됐고, **문서가 실제로 쓰는 블록과 무관하게
+전체 규칙이 통째로 실린다.** 쓰는 블록만 싣는 방식이 필요한지는 아직
+판단하지 않았다.
 
 ### 언어 구성
 

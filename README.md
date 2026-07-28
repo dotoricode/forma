@@ -51,9 +51,10 @@ Four working examples ship in `fixtures/`: `explain`, `review`, `test`,
 `report` — each with its source input, its `forma.spec.json`, and its
 rendered `output/` (HTML + QA screenshots).
 
-The `examples/forma-theme-{simple,workspace,guide,magazine}/` directories
-render the same `manual` content through every current theme for direct
-comparison.
+The `examples/{dashboard,report,manual,advanced}/` directories are one
+document per artifact, and all four are about Forma itself: its current
+state, why it compiles a spec instead of letting an agent write HTML, how to
+drive it from an agent skill, and an open decision it has not made yet.
 
 ## CLI
 
