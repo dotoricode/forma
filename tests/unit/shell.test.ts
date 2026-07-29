@@ -3,6 +3,7 @@ import { renderSpecToHtml } from "../../src/renderer/shell.js";
 import { loadSpecFile } from "../../src/renderer/render.js";
 
 const FIXTURE = "fixtures/manual/quickstart/forma.spec.json";
+const DASHBOARD_FIXTURE = "examples/dashboard/forma.spec.json";
 
 /**
  * The document bar replaced a bare theme button floating in the page corner.
@@ -37,5 +38,29 @@ describe("document bar", () => {
     // The nav already carries aria-label, so the visible heading is
     // aria-hidden. Without that a screen reader announces the rail twice.
     expect(html).toMatch(/<p class="toc__label" aria-hidden="true">/);
+  });
+
+  it("gives manuals separate guide navigation and page navigation", async () => {
+    const spec = await loadSpecFile(FIXTURE);
+    const { html } = await renderSpecToHtml(spec);
+
+    expect(html).toContain('class="guide-nav');
+    expect(html).toContain('class="guide-nav__group"');
+    expect(html).toContain('class="side-toc');
+  });
+
+  it("puts dashboard status and metrics before explanatory narrative", async () => {
+    const spec = await loadSpecFile(DASHBOARD_FIXTURE);
+    const { html } = await renderSpecToHtml(spec);
+
+    const body = html.slice(html.indexOf("<body>"));
+    const status = body.indexOf('class="section blk-status-header');
+    const metrics = body.indexOf('class="section blk-metric-group');
+    const chart = body.indexOf('class="section blk-chart');
+    const narrative = body.indexOf('class="section blk-narrative');
+    expect(status).toBeGreaterThan(-1);
+    expect(metrics).toBeGreaterThan(status);
+    expect(chart).toBeGreaterThan(metrics);
+    expect(narrative).toBeGreaterThan(chart);
   });
 });

@@ -35,17 +35,17 @@ export function buildInteractiveScript(): string {
   }
 
   function initTocActiveState() {
-    const links = document.querySelectorAll(".toc a[href^='#']");
+    const links = document.querySelectorAll(".toc a[href^='#'], .guide-nav a[href^='#']");
     if (links.length === 0 || !("IntersectionObserver" in window)) return;
     const targets = new Map();
     for (const link of links) {
       const id = link.getAttribute("href").slice(1);
       const el = document.getElementById(id);
-      if (el) targets.set(el, link);
+      if (el) targets.set(el, [...(targets.get(el) || []), link]);
     }
-    const setActive = (link) => {
+    const setActive = (activeLinks) => {
       for (const l of links) l.removeAttribute("aria-current");
-      if (link) link.setAttribute("aria-current", "true");
+      for (const link of activeLinks || []) link.setAttribute("aria-current", "true");
     };
     const observer = new IntersectionObserver(
       (entries) => {

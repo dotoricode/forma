@@ -187,23 +187,52 @@ export function renderChartSvg(block: ChartBlock): string {
   const plotRight = width - 16;
   const allValues = block.series.flatMap((s) => s.values);
   const max = Math.max(...allValues, 1);
+  const min = Math.min(...allValues, 0);
+  const range = Math.max(max - min, 1);
+  const yFor = (value: number) => plotTop + ((max - value) / range) * (plotBottom - plotTop);
 
   const catCount = block.categories.length;
   const bandWidth = (plotRight - plotLeft) / catCount;
   const seriesCount = block.series.length;
+  const zeroY = yFor(0);
 
-  const axis = `<line x1="${plotLeft}" y1="${plotBottom}" x2="${plotRight}" y2="${plotBottom}" class="chart-axis" />`;
+  const grid = Array.from({ length: 5 }, (_, i) => {
+    const y = plotTop + ((plotBottom - plotTop) * i) / 4;
+    return `<line x1="${plotLeft}" y1="${y.toFixed(1)}" x2="${plotRight}" y2="${y.toFixed(1)}" class="chart-grid" />`;
+  }).join("\n");
+  const axis = `<line x1="${plotLeft}" y1="${zeroY.toFixed(1)}" x2="${plotRight}" y2="${zeroY.toFixed(1)}" class="chart-axis" />`;
 
   const bars = block.series
     .flatMap((series, si) =>
-      series.values.map((value, ci) => {
+      series.values.slice(0, catCount).map((value, ci) => {
         const barWidth = (bandWidth - 12) / seriesCount;
         const x = plotLeft + ci * bandWidth + 6 + si * barWidth;
-        const barHeight = ((plotBottom - plotTop) * value) / max;
-        const y = plotBottom - barHeight;
-        return `<rect x="${x.toFixed(1)}" y="${y.toFixed(1)}" width="${barWidth.toFixed(1)}" height="${barHeight.toFixed(1)}" class="chart-bar" rx="2" />`;
+        const valueY = yFor(value);
+        const y = Math.min(valueY, zeroY);
+        const barHeight = Math.max(Math.abs(zeroY - valueY), 1);
+        return `<rect x="${x.toFixed(1)}" y="${y.toFixed(1)}" width="${barWidth.toFixed(1)}" height="${barHeight.toFixed(1)}" class="chart-bar" data-series="${si}" rx="2" />`;
       }),
     )
+    .join("\n");
+
+  const lines = block.series
+    .map((series, si) => {
+      const points = series.values
+        .slice(0, catCount)
+        .map((value, ci) => {
+          const x = plotLeft + ci * bandWidth + bandWidth / 2;
+          return `${x.toFixed(1)},${yFor(value).toFixed(1)}`;
+        })
+        .join(" ");
+      const dots = series.values
+        .slice(0, catCount)
+        .map((value, ci) => {
+          const x = plotLeft + ci * bandWidth + bandWidth / 2;
+          return `<circle cx="${x.toFixed(1)}" cy="${yFor(value).toFixed(1)}" r="3" class="chart-point" data-series="${si}" />`;
+        })
+        .join("\n");
+      return `<polyline points="${points}" class="chart-line" data-series="${si}" />\n${dots}`;
+    })
     .join("\n");
 
   const labels = block.categories
@@ -213,7 +242,8 @@ export function renderChartSvg(block: ChartBlock): string {
     })
     .join("\n");
 
-  return svgWrapper(width, height, `${axis}\n${bars}\n${labels}`);
+  const marks = block.kind === "line" ? lines : bars;
+  return svgWrapper(width, height, `${grid}\n${axis}\n${marks}\n${labels}`);
 }
 
 function svgWrapper(width: number, height: number, inner: string): string {

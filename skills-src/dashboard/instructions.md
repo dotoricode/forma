@@ -17,6 +17,21 @@ build error, not a style note.
 | `driver` | `breakdown` — what made it move |
 | `freshness` | `data-freshness` — as of when, covering what |
 
+## Writing voice
+
+Write like an operations console, not an essay.
+
+- Lead with the state, then the number, then the comparison basis.
+- Prefer short declarative fragments: "Android crash rate crossed the gate",
+  not "It is worth noting that there appears to have been an increase".
+- Put interpretation in `reading`, `detail`, or `suspected`; keep it to the
+  one sentence that changes the decision.
+- Use a `chart` for a time trend and a `breakdown` for contribution. The
+  default opening sequence is `status-header`, `metric-group`, then one of
+  those visuals.
+- Keep the first screen more visual than verbal. Three to five KPIs, one
+  trend, one comparison, and one action beat a paragraph followed by tiles.
+
 ## Workflow
 
 1. **Read the material.** Logs, CI output, telemetry, CSVs. If a number you
@@ -33,6 +48,7 @@ build error, not a style note.
 6. **Explain the movement, do not just show it.** A `breakdown` whose
    `reading` says "78% of the rise came from one OS" is worth more than the
    same four numbers with no sentence.
+   Use a line `chart` when the x-axis is time; use bars for categories.
 7. **State the data's limits.** `data-freshness.knownGaps` is where you admit
    what the numbers do not cover. A dashboard that hides its blind spots is
    the failure mode this artifact has.

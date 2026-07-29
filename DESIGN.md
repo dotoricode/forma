@@ -22,11 +22,13 @@ Defined in `src/design/tokens.ts` (primitives) and emitted in
 `block-css.ts` and per-artifact overrides in `artifact-css.ts`. Semantic names only — component CSS
 never references a primitive or raw hex/OKLCH value directly.
 
-- **Color**: `--color-canvas/surface/surface-raised/text/text-muted/
+- **Color**: VS Code's built-in Light+ and Dark+ workbench and syntax
+  palettes are mapped to `--color-canvas/surface/surface-raised/text/text-muted/
   border/border-strong/accent/accent-strong/on-accent/success/warning/
-  danger/info`. All OKLCH. One accent hue (restrained ink-blue). At most 3
-  surface levels in either theme. The light canvas is pure white; subtle
-  neutrals are reserved for raised surfaces, separators, and controls.
+  danger/info/chart-1…chart-6`. Components never consume a named hue
+  directly. At most 3 surface levels exist in either mode; additional hues
+  carry status or data-series meaning rather than decoration. Exact sources
+  and mappings live in `docs/vscode-palette.md`.
 - **Typography**: `--font-sans` (Geist → IBM Plex Sans KR → system-ui),
   `--font-mono` (Geist Mono → system mono). `--measure-prose` (42rem),
   `--measure-wide` (`min(100%, 72rem)`). These are rem, not ch: `ch` is the
@@ -91,6 +93,12 @@ the two most important structural rules:
 | `report` | Editorial Brief | Conclusion up front, editorial rules, print-aware |
 | `manual` | Guided Path | Orientation rail, narrow measure, steps with results |
 | `advanced` | Decision Room | Evidence graph, simulation, recorded decision |
+
+The artifacts also have distinct writing voices. Signal Grid is terse and
+operational; Editorial Brief makes complete claims; Guided Path uses direct
+imperatives and observable outcomes; Decision Room separates claim,
+counterclaim, assumption, and recorded dissent. The canonical instructions
+live in `skills-src/{dashboard,report,manual,advanced}/instructions.md`.
 
 The stylesheet hooks are `data-artifact` and `data-variant` on `<html>`,
 kept separate so a rule can address every report without repeating itself

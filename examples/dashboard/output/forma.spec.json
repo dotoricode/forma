@@ -34,7 +34,7 @@
   ],
   "narrative": {
     "question": "Forma는 지금 어디까지 쓸 수 있는 상태인가?",
-    "summary": "artifact 4종, 호스트별 스킬 패키징, 후보별 Visual Tournament가 모두 실제 런타임 검증을 통과한다. 남은 일은 clean 후보를 가르는 선호도 기준과 QA 재렌더 자동화다.",
+    "summary": "핵심 게이트는 정상이다. 다음 병목은 clean 후보의 선호도 판별과 QA 재렌더 자동화다.",
     "takeaways": [
       "블록 정의 59종이 하나의 레지스트리에서 파생된다",
       "산출물의 외부 네트워크 요청은 4종 모두 0건이다",
@@ -65,7 +65,15 @@
           "value": 59,
           "unit": "종",
           "period": "레지스트리 현재 상태 (공통 34종 + artifact 전용 25종)",
-          "status": "normal"
+          "status": "normal",
+          "series": [
+            34,
+            39,
+            45,
+            52,
+            56,
+            59
+          ]
         },
         {
           "id": "tests",
@@ -79,14 +87,30 @@
             "direction": "up",
             "basis": "Room Mode 착수 전 172개 대비",
             "sentiment": "positive"
-          }
+          },
+          "series": [
+            172,
+            201,
+            224,
+            251,
+            268,
+            277
+          ]
         },
         {
           "id": "qa",
           "label": "QA 통과 fixture",
           "value": "8 / 8",
           "period": "pnpm qa 최근 실행",
-          "status": "normal"
+          "status": "normal",
+          "series": [
+            4,
+            4,
+            5,
+            6,
+            7,
+            8
+          ]
         },
         {
           "id": "requests",
@@ -105,6 +129,50 @@
       ],
       "sourceRefs": [
         "registry",
+        "tests",
+        "qa"
+      ]
+    },
+    {
+      "id": "quality-trend",
+      "type": "chart",
+      "title": "최근 여섯 단계에서 품질 게이트가 안정됐다",
+      "reading": "테스트와 브라우저 QA 통과율이 함께 올라 현재 둘 다 100%다. 기능 수보다 게이트 통과 상태가 먼저 읽혀야 한다.",
+      "kind": "line",
+      "categories": [
+        "MVP",
+        "artifact",
+        "planner",
+        "Room",
+        "Agent",
+        "현재"
+      ],
+      "series": [
+        {
+          "label": "unit test 통과율",
+          "values": [
+            92,
+            94,
+            96,
+            98,
+            100,
+            100
+          ]
+        },
+        {
+          "label": "browser QA 통과율",
+          "values": [
+            75,
+            75,
+            83,
+            88,
+            100,
+            100
+          ]
+        }
+      ],
+      "unit": "%",
+      "sourceRefs": [
         "tests",
         "qa"
       ]

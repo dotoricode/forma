@@ -1,6 +1,43 @@
 import { artifactCss } from "./artifact-css.js";
 import { blockCss } from "./block-css.js";
-import { primitiveColor, spacing, radius, breakpoint, motion, measure } from "./tokens.js";
+import {
+  vscodeDark,
+  vscodeLight,
+  spacing,
+  radius,
+  breakpoint,
+  motion,
+  measure,
+  type FormaColorPalette,
+} from "./tokens.js";
+
+function colorTokens(palette: FormaColorPalette): string {
+  return `
+    --color-canvas: ${palette.canvas};
+    --color-surface: ${palette.surface};
+    --color-surface-raised: ${palette.surfaceRaised};
+    --color-text: ${palette.text};
+    --color-text-muted: ${palette.textMuted};
+    --color-border: ${palette.border};
+    --color-border-strong: ${palette.borderStrong};
+    --color-accent: ${palette.accent};
+    --color-accent-strong: ${palette.accentStrong};
+    --color-on-accent: ${palette.onAccent};
+    --color-success: ${palette.success};
+    --color-warning: ${palette.warning};
+    --color-danger: ${palette.danger};
+    --color-info: ${palette.info};
+    --color-success-text: ${palette.successText};
+    --color-warning-text: ${palette.warningText};
+    --color-danger-text: ${palette.dangerText};
+    --color-info-text: ${palette.infoText};
+    --color-chart-1: ${palette.chartBlue};
+    --color-chart-2: ${palette.chartCyan};
+    --color-chart-3: ${palette.chartYellow};
+    --color-chart-4: ${palette.chartPurple};
+    --color-chart-5: ${palette.chartOrange};
+    --color-chart-6: ${palette.chartGreen};`;
+}
 
 /**
  * Builds the complete Forma stylesheet. `fontFaceCss` is injected from the
@@ -24,24 +61,7 @@ ${fontFaceCss}
 
 @layer tokens {
   :root {
-    --color-canvas: ${primitiveColor.neutral0};
-    --color-surface: ${primitiveColor.neutral0};
-    --color-surface-raised: ${primitiveColor.neutral50};
-    --color-text: ${primitiveColor.neutral900};
-    --color-text-muted: ${primitiveColor.neutral600};
-    --color-border: ${primitiveColor.neutral200};
-    --color-border-strong: ${primitiveColor.neutral300};
-    --color-accent: ${primitiveColor.accent500};
-    --color-accent-strong: ${primitiveColor.accent600};
-    --color-on-accent: ${primitiveColor.neutral0};
-    --color-success: ${primitiveColor.success500};
-    --color-warning: ${primitiveColor.warning500};
-    --color-danger: ${primitiveColor.danger500};
-    --color-info: ${primitiveColor.info500};
-    --color-success-text: ${primitiveColor.success700};
-    --color-warning-text: ${primitiveColor.warning700};
-    --color-danger-text: ${primitiveColor.danger700};
-    --color-info-text: ${primitiveColor.info700};
+${colorTokens(vscodeLight)}
 
     --font-sans: "Geist", "IBM Plex Sans KR", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
     --font-mono: "Geist Mono", ui-monospace, "SFMono-Regular", Consolas, "Liberation Mono", monospace;
@@ -64,35 +84,13 @@ ${fontFaceCss}
   }
 
   [data-theme="dark"] {
-    --color-canvas: ${primitiveColor.neutral950};
-    --color-surface: ${primitiveColor.neutral900};
-    --color-surface-raised: ${primitiveColor.neutral800};
-    --color-text: ${primitiveColor.neutral100};
-    --color-text-muted: ${primitiveColor.neutral400};
-    --color-border: ${primitiveColor.neutral700};
-    --color-border-strong: ${primitiveColor.neutral600};
-    --color-accent: ${primitiveColor.accent400};
-    --color-accent-strong: ${primitiveColor.accent500};
-    --color-on-accent: ${primitiveColor.neutral950};
-    --color-success-text: ${primitiveColor.success300};
-    --color-warning-text: ${primitiveColor.warning300};
-    --color-danger-text: ${primitiveColor.danger300};
-    --color-info-text: ${primitiveColor.info300};
+${colorTokens(vscodeDark)}
     color-scheme: dark;
   }
 
   @media (prefers-color-scheme: dark) {
     :root:not([data-theme="light"]) {
-      --color-canvas: ${primitiveColor.neutral950};
-      --color-surface: ${primitiveColor.neutral900};
-      --color-surface-raised: ${primitiveColor.neutral800};
-      --color-text: ${primitiveColor.neutral100};
-      --color-text-muted: ${primitiveColor.neutral400};
-      --color-border: ${primitiveColor.neutral700};
-      --color-border-strong: ${primitiveColor.neutral600};
-      --color-accent: ${primitiveColor.accent400};
-      --color-accent-strong: ${primitiveColor.accent500};
-      --color-on-accent: ${primitiveColor.neutral950};
+${colorTokens(vscodeDark)}
       color-scheme: dark;
     }
   }
@@ -220,12 +218,26 @@ ${fontFaceCss}
     inline-size: 0.9rem;
     block-size: 0.9rem;
     border-radius: 3px;
-    background: var(--color-text);
+    background: var(--color-accent);
     flex: none;
+  }
+  .doc-bar__brand {
+    font-size: 0.875rem;
+    font-weight: 700;
+    letter-spacing: -0.015em;
+  }
+  .doc-bar__direction {
+    font-family: var(--font-mono);
+    font-size: 0.6875rem;
+    color: var(--color-accent-strong);
+    border-inline-start: 1px solid var(--color-border);
+    padding-inline-start: var(--space-2);
+    white-space: nowrap;
   }
   .doc-bar__title {
     font-size: 0.875rem;
-    font-weight: 600;
+    font-weight: 450;
+    color: var(--color-text-muted);
     letter-spacing: -0.01em;
     /* One line. A long title must not push the bar into two rows and move
        the document under it. */
@@ -252,7 +264,7 @@ ${fontFaceCss}
   }
   @media (max-width: ${breakpoint.mobile}) {
     .doc-bar__inner { padding-inline: var(--space-4); }
-    .doc-bar__tag { display: none; }
+    .doc-bar__tag, .doc-bar__direction, .doc-bar__title { display: none; }
   }
 
   main { display: block; }

@@ -81,24 +81,31 @@
 
 @layer tokens {
   :root {
-    --color-canvas: oklch(100% 0 0);
-    --color-surface: oklch(100% 0 0);
-    --color-surface-raised: oklch(98.5% 0.002 90);
-    --color-text: oklch(13% 0.004 90);
-    --color-text-muted: oklch(42% 0.006 90);
-    --color-border: oklch(92% 0.004 90);
-    --color-border-strong: oklch(85% 0.005 90);
-    --color-accent: oklch(54% 0.13 250);
-    --color-accent-strong: oklch(46% 0.13 250);
-    --color-on-accent: oklch(100% 0 0);
-    --color-success: oklch(58% 0.13 152);
-    --color-warning: oklch(72% 0.15 80);
-    --color-danger: oklch(58% 0.18 25);
-    --color-info: oklch(60% 0.10 235);
-    --color-success-text: oklch(43% 0.12 152);
-    --color-warning-text: oklch(48% 0.12 80);
-    --color-danger-text: oklch(45% 0.17 25);
-    --color-info-text: oklch(45% 0.11 235);
+
+    --color-canvas: #FFFFFF;
+    --color-surface: #F3F3F3;
+    --color-surface-raised: #F0F0F0;
+    --color-text: #333333;
+    --color-text-muted: #616161;
+    --color-border: #D4D4D4;
+    --color-border-strong: #C4C4C4;
+    --color-accent: #007ACC;
+    --color-accent-strong: #006AB1;
+    --color-on-accent: #FFFFFF;
+    --color-success: #388A34;
+    --color-warning: #BF8803;
+    --color-danger: #E51400;
+    --color-info: #0063D3;
+    --color-success-text: #277A2E;
+    --color-warning-text: #855F00;
+    --color-danger-text: #A1260D;
+    --color-info-text: #0063D3;
+    --color-chart-1: #0070C1;
+    --color-chart-2: #267F99;
+    --color-chart-3: #795E26;
+    --color-chart-4: #AF00DB;
+    --color-chart-5: #A31515;
+    --color-chart-6: #388A34;
 
     --font-sans: "Geist", "IBM Plex Sans KR", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
     --font-mono: "Geist Mono", ui-monospace, "SFMono-Regular", Consolas, "Liberation Mono", monospace;
@@ -121,35 +128,61 @@
   }
 
   [data-theme="dark"] {
-    --color-canvas: oklch(9% 0.003 90);
-    --color-surface: oklch(13% 0.004 90);
-    --color-surface-raised: oklch(20% 0.005 90);
-    --color-text: oklch(96.5% 0.003 90);
-    --color-text-muted: oklch(70% 0.006 90);
-    --color-border: oklch(30% 0.006 90);
-    --color-border-strong: oklch(42% 0.006 90);
-    --color-accent: oklch(62% 0.11 250);
-    --color-accent-strong: oklch(54% 0.13 250);
-    --color-on-accent: oklch(9% 0.003 90);
-    --color-success-text: oklch(80% 0.13 152);
-    --color-warning-text: oklch(84% 0.13 80);
-    --color-danger-text: oklch(78% 0.14 25);
-    --color-info-text: oklch(80% 0.10 235);
+
+    --color-canvas: #1E1E1E;
+    --color-surface: #252526;
+    --color-surface-raised: #2A2D2E;
+    --color-text: #CCCCCC;
+    --color-text-muted: #969696;
+    --color-border: #3C3C3C;
+    --color-border-strong: #5A5D5E;
+    --color-accent: #3794FF;
+    --color-accent-strong: #4FC1FF;
+    --color-on-accent: #1E1E1E;
+    --color-success: #89D185;
+    --color-warning: #CCA700;
+    --color-danger: #F14C4C;
+    --color-info: #59A4F9;
+    --color-success-text: #89D185;
+    --color-warning-text: #DCDCAA;
+    --color-danger-text: #F48771;
+    --color-info-text: #75BEFF;
+    --color-chart-1: #4FC1FF;
+    --color-chart-2: #4EC9B0;
+    --color-chart-3: #DCDCAA;
+    --color-chart-4: #C586C0;
+    --color-chart-5: #CE9178;
+    --color-chart-6: #89D185;
     color-scheme: dark;
   }
 
   @media (prefers-color-scheme: dark) {
     :root:not([data-theme="light"]) {
-      --color-canvas: oklch(9% 0.003 90);
-      --color-surface: oklch(13% 0.004 90);
-      --color-surface-raised: oklch(20% 0.005 90);
-      --color-text: oklch(96.5% 0.003 90);
-      --color-text-muted: oklch(70% 0.006 90);
-      --color-border: oklch(30% 0.006 90);
-      --color-border-strong: oklch(42% 0.006 90);
-      --color-accent: oklch(62% 0.11 250);
-      --color-accent-strong: oklch(54% 0.13 250);
-      --color-on-accent: oklch(9% 0.003 90);
+
+    --color-canvas: #1E1E1E;
+    --color-surface: #252526;
+    --color-surface-raised: #2A2D2E;
+    --color-text: #CCCCCC;
+    --color-text-muted: #969696;
+    --color-border: #3C3C3C;
+    --color-border-strong: #5A5D5E;
+    --color-accent: #3794FF;
+    --color-accent-strong: #4FC1FF;
+    --color-on-accent: #1E1E1E;
+    --color-success: #89D185;
+    --color-warning: #CCA700;
+    --color-danger: #F14C4C;
+    --color-info: #59A4F9;
+    --color-success-text: #89D185;
+    --color-warning-text: #DCDCAA;
+    --color-danger-text: #F48771;
+    --color-info-text: #75BEFF;
+    --color-chart-1: #4FC1FF;
+    --color-chart-2: #4EC9B0;
+    --color-chart-3: #DCDCAA;
+    --color-chart-4: #C586C0;
+    --color-chart-5: #CE9178;
+    --color-chart-6: #89D185;
       color-scheme: dark;
     }
   }
@@ -277,12 +310,26 @@
     inline-size: 0.9rem;
     block-size: 0.9rem;
     border-radius: 3px;
-    background: var(--color-text);
+    background: var(--color-accent);
     flex: none;
+  }
+  .doc-bar__brand {
+    font-size: 0.875rem;
+    font-weight: 700;
+    letter-spacing: -0.015em;
+  }
+  .doc-bar__direction {
+    font-family: var(--font-mono);
+    font-size: 0.6875rem;
+    color: var(--color-accent-strong);
+    border-inline-start: 1px solid var(--color-border);
+    padding-inline-start: var(--space-2);
+    white-space: nowrap;
   }
   .doc-bar__title {
     font-size: 0.875rem;
-    font-weight: 600;
+    font-weight: 450;
+    color: var(--color-text-muted);
     letter-spacing: -0.01em;
     /* One line. A long title must not push the bar into two rows and move
        the document under it. */
@@ -309,7 +356,7 @@
   }
   @media (max-width: 390px) {
     .doc-bar__inner { padding-inline: var(--space-4); }
-    .doc-bar__tag { display: none; }
+    .doc-bar__tag, .doc-bar__direction, .doc-bar__title { display: none; }
   }
 
   main { display: block; }
@@ -661,10 +708,56 @@
 
   /* chart */
   .blk-chart { max-width: 100%; }
-  .blk-chart__title { font-size: 1rem; margin-block-end: var(--space-4); color: var(--color-text-muted); }
+  .blk-chart__title { font-size: 1rem; margin-block-end: var(--space-2); }
+  .blk-chart__reading {
+    max-width: 48rem;
+    margin-block-end: var(--space-4);
+    color: var(--color-text-muted);
+  }
   .blk-chart svg text { font-family: var(--font-sans); fill: var(--color-text-muted); font-size: 0.75rem; }
-  .blk-chart .chart-bar { fill: var(--color-accent); }
-  .blk-chart .chart-axis { stroke: var(--color-border); }
+  .blk-chart .chart-axis { stroke: var(--color-border-strong); }
+  .blk-chart .chart-grid { stroke: var(--color-border); stroke-width: 1; }
+  .blk-chart .chart-line {
+    fill: none;
+    stroke-width: 2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+  .blk-chart :is(.chart-line, .chart-point)[data-series="0"] { stroke: var(--color-chart-1); }
+  .blk-chart :is(.chart-line, .chart-point)[data-series="1"] { stroke: var(--color-chart-2); }
+  .blk-chart :is(.chart-line, .chart-point)[data-series="2"] { stroke: var(--color-chart-3); }
+  .blk-chart :is(.chart-line, .chart-point)[data-series="3"] { stroke: var(--color-chart-4); }
+  .blk-chart :is(.chart-line, .chart-point)[data-series="4"] { stroke: var(--color-chart-5); }
+  .blk-chart :is(.chart-line, .chart-point)[data-series="5"] { stroke: var(--color-chart-6); }
+  .blk-chart .chart-point[data-series="0"] { fill: var(--color-chart-1); }
+  .blk-chart .chart-point[data-series="1"] { fill: var(--color-chart-2); }
+  .blk-chart .chart-point[data-series="2"] { fill: var(--color-chart-3); }
+  .blk-chart .chart-point[data-series="3"] { fill: var(--color-chart-4); }
+  .blk-chart .chart-point[data-series="4"] { fill: var(--color-chart-5); }
+  .blk-chart .chart-point[data-series="5"] { fill: var(--color-chart-6); }
+  .blk-chart .chart-bar[data-series="0"] { fill: var(--color-chart-1); }
+  .blk-chart .chart-bar[data-series="1"] { fill: var(--color-chart-2); }
+  .blk-chart .chart-bar[data-series="2"] { fill: var(--color-chart-3); }
+  .blk-chart .chart-bar[data-series="3"] { fill: var(--color-chart-4); }
+  .blk-chart .chart-bar[data-series="4"] { fill: var(--color-chart-5); }
+  .blk-chart .chart-bar[data-series="5"] { fill: var(--color-chart-6); }
+  .blk-chart__legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2) var(--space-5);
+    list-style: none;
+    margin-block-start: var(--space-3);
+    font-size: 0.8125rem;
+    color: var(--color-text-muted);
+  }
+  .blk-chart__legend li { display: inline-flex; align-items: center; gap: var(--space-2); }
+  .blk-chart__swatch { inline-size: 0.75rem; block-size: 0.25rem; border-radius: 999px; }
+  .blk-chart__swatch[data-series="0"] { background: var(--color-chart-1); }
+  .blk-chart__swatch[data-series="1"] { background: var(--color-chart-2); }
+  .blk-chart__swatch[data-series="2"] { background: var(--color-chart-3); }
+  .blk-chart__swatch[data-series="3"] { background: var(--color-chart-4); }
+  .blk-chart__swatch[data-series="4"] { background: var(--color-chart-5); }
+  .blk-chart__swatch[data-series="5"] { background: var(--color-chart-6); }
 
   /* finding / risk / decision */
   .blk-finding__badge, .blk-risk__badge {
@@ -1702,23 +1795,72 @@
     margin-block-end: var(--space-4);
   }
 
-  /* Guided Path — a persistent orientation rail and a controlled reading
-     measure keep long procedures scannable without narrowing the workspace. */
+  /* Guided Path — DocPilot-informed navigation separates the guide's broad
+     path on the left from the current page outline on the right. The centre
+     remains a controlled procedure measure rather than becoming a portal. */
   :root[data-artifact="manual"] .layout {
     grid-template-columns: 232px minmax(0, 1fr);
     max-width: none;
-    gap: var(--space-7);
+    gap: var(--space-6);
   }
-  :root[data-artifact="manual"] .layout > .side-toc {
+  :root[data-artifact="manual"] .layout > .guide-sidebar {
     order: -1;
     position: sticky;
     inset-block-start: var(--space-5);
     align-self: start;
     max-height: calc(100vh - var(--space-8));
     overflow-y: auto;
-    border-inline-end: 1px solid var(--color-border);
-    border-block-end: none;
     padding-inline-end: var(--space-4);
+    min-block-size: 100%;
+    box-shadow: 1px 0 0 var(--color-border);
+  }
+  :root[data-artifact="manual"] .layout > .side-toc {
+    order: 1;
+    display: none;
+    position: sticky;
+    inset-block-start: var(--space-5);
+    align-self: start;
+    max-height: calc(100vh - var(--space-8));
+    overflow-y: auto;
+    border-block-end: none;
+    padding-inline-start: var(--space-3);
+  }
+  :root[data-artifact="manual"] .guide-nav__label,
+  :root[data-artifact="manual"] .guide-nav__group-label {
+    margin: 0;
+    color: var(--color-text-muted);
+    font-size: 0.6875rem;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+  :root[data-artifact="manual"] .guide-nav__label {
+    color: var(--color-text);
+    margin-block-end: var(--space-5);
+  }
+  :root[data-artifact="manual"] .guide-nav__group + .guide-nav__group {
+    margin-block-start: var(--space-5);
+  }
+  :root[data-artifact="manual"] .guide-nav__group-label {
+    margin-block-end: var(--space-2);
+    padding-inline: 0.65em;
+  }
+  :root[data-artifact="manual"] .guide-nav a {
+    display: block;
+    padding: 0.4em 0.65em;
+    color: var(--color-text-muted);
+    text-decoration: none;
+    border-radius: var(--radius-sm);
+    font-size: 0.875rem;
+    line-height: 1.45;
+  }
+  :root[data-artifact="manual"] .guide-nav a:hover {
+    color: var(--color-text);
+  }
+  :root[data-artifact="manual"] .guide-nav a[aria-current="true"] {
+    background: var(--color-surface-raised);
+    color: var(--color-text);
+    font-weight: 600;
   }
   :root[data-artifact="manual"] .side-toc .toc {
     flex-direction: column;
@@ -1834,17 +1976,13 @@
      a wide viewport left empty on the right, which read as an unfinished
      page rather than a deliberate column. */
   :root[data-artifact="manual"] .layout {
-    max-width: calc(232px + var(--space-7) + 66rem);
+    max-width: calc(232px + var(--space-6) + 66rem);
     margin-inline: auto;
   }
   /* The rail's divider stopped where its list ended, leaving a vertical line
      hanging in the middle of the page. A full-height divider on the grid
      column reads as structure; a partial one reads as a stray border. */
-  :root[data-artifact="manual"] .layout > .side-toc {
-    border-inline-end: none;
-    min-block-size: 100%;
-    box-shadow: 1px 0 0 var(--color-border);
-  }
+  :root[data-artifact="manual"] .layout > .side-toc { border-inline-end: none; }
 
   /* The deck sat *below* the body size, so the document opened with its
      hierarchy inverted: the sentence explaining the title was quieter than
@@ -1978,6 +2116,23 @@
     :root[data-artifact="dashboard"] .doc > .section { grid-column: 1 / -1; }
     :root[data-artifact="dashboard"] .doc > .blk-anomaly { grid-column: 1 / span 7; }
     :root[data-artifact="dashboard"] .doc > .blk-action-plan { grid-column: 8 / -1; }
+    :root[data-artifact="advanced"] .doc {
+      display: grid;
+      grid-template-columns: repeat(12, minmax(0, 1fr));
+      column-gap: var(--space-5);
+      align-content: start;
+    }
+    :root[data-artifact="advanced"] .doc > .section { grid-column: 1 / -1; }
+    :root[data-artifact="advanced"] .doc > .blk-challenge { grid-column: 1 / span 7; }
+    :root[data-artifact="advanced"] .doc > .blk-simulation { grid-column: 8 / -1; }
+  }
+
+  @media (min-width: 1280px) {
+    :root[data-artifact="manual"] .layout {
+      grid-template-columns: 232px minmax(0, 1fr) 200px;
+      max-width: calc(232px + 200px + 66rem + var(--space-8));
+    }
+    :root[data-artifact="manual"] .layout > .side-toc { display: block; }
   }
 
   /* Decision Room needs enough horizontal room for evidence graphs,
@@ -1987,6 +2142,37 @@
     max-width: min(100%, 96rem);
   }
   :root[data-artifact="advanced"] .breakout { max-width: 100%; }
+  :root[data-artifact="advanced"] .blk-brief {
+    border-block-start: 4px solid var(--color-accent);
+    padding-block-start: var(--space-7);
+  }
+  :root[data-artifact="advanced"] .blk-evidence-graph {
+    background: var(--color-surface);
+    border-block: 1px solid var(--color-border-strong);
+    padding-inline: var(--space-5);
+  }
+  :root[data-artifact="advanced"] .claim {
+    display: grid;
+    grid-template-columns: minmax(8rem, 0.3fr) minmax(0, 1fr);
+    gap: var(--space-2) var(--space-5);
+    border-block-end: 1px solid var(--color-border);
+  }
+  :root[data-artifact="advanced"] .claim__meta { grid-row: 1 / span 3; }
+  :root[data-artifact="advanced"] .claim__statement,
+  :root[data-artifact="advanced"] .claim__support,
+  :root[data-artifact="advanced"] .claim__contradiction { grid-column: 2; }
+  :root[data-artifact="advanced"] .blk-challenge {
+    background: color-mix(in oklab, var(--color-danger) 7%, var(--color-canvas));
+    padding-inline: var(--space-5);
+  }
+  :root[data-artifact="advanced"] .blk-simulation {
+    background: color-mix(in oklab, var(--color-info) 7%, var(--color-canvas));
+    padding-inline: var(--space-5);
+  }
+  :root[data-artifact="advanced"] .blk-decision-record {
+    border-block: 2px solid var(--color-text);
+    padding-inline: var(--space-5);
+  }
 
   @media (max-width: 900px) {
     :root[data-artifact="dashboard"] .layout,
@@ -1996,7 +2182,8 @@
       padding-inline: var(--space-4);
     }
     :root[data-artifact="dashboard"] .layout > .side-toc,
-    :root[data-artifact="manual"] .layout > .side-toc {
+    :root[data-artifact="manual"] .layout > .side-toc,
+    :root[data-artifact="manual"] .layout > .guide-sidebar {
       order: -1;
       position: static;
       max-height: none;
@@ -2006,6 +2193,33 @@
       margin-inline-start: 0;
       padding: 0 0 var(--space-4);
     }
+    :root[data-artifact="manual"] .layout > .side-toc { display: none; }
+    :root[data-artifact="manual"] .guide-nav {
+      display: flex;
+      gap: var(--space-2);
+      overflow-x: auto;
+      padding-block-end: var(--space-1);
+    }
+    :root[data-artifact="manual"] :is(.guide-nav__label, .guide-nav__group-label) {
+      display: none;
+    }
+    :root[data-artifact="manual"] .guide-nav__group {
+      display: contents;
+    }
+    :root[data-artifact="manual"] .guide-nav a {
+      flex: none;
+      white-space: nowrap;
+      background: var(--color-surface);
+    }
+    :root[data-artifact="advanced"] .claim {
+      grid-template-columns: minmax(0, 1fr);
+    }
+    :root[data-artifact="advanced"] .claim__meta { grid-row: auto; }
+    :root[data-artifact="advanced"] :is(
+      .claim__statement,
+      .claim__support,
+      .claim__contradiction
+    ) { grid-column: 1; }
     :root[data-artifact="dashboard"] .side-toc .toc,
     :root[data-artifact="manual"] .side-toc .toc {
       position: static;
@@ -2034,6 +2248,8 @@
   <div class="doc-bar__inner">
     <p class="doc-bar__identity">
       <span class="doc-bar__mark" aria-hidden="true"></span>
+      <span class="doc-bar__brand">Forma</span>
+      <span class="doc-bar__direction">Decision Room</span>
       <span class="doc-bar__title">Visual Tournament 선호도 기준 판단</span>
     </p>
     <div class="doc-bar__actions">
@@ -2046,7 +2262,7 @@
   <main class="doc" id="main" data-density="comfortable">
 <section class="section blk-narrative" id="narrative"><div class="measure"><h1 class="blk-narrative__title">Visual Tournament 선호도 기준 판단</h1><p class="blk-narrative__question">결함이 없는 후보가 동률일 때 Forma가 선호도를 정해야 하는가?</p><div class="blk-narrative__summary"><p>축 4개는 실제 렌더러에 연결됐고 후보 8개가 각자 브라우저 검사를 받는다. 첫 실행에서는 8개가 모두 100점이었다. 결함이 없으면 authored 구성을 유지할지, 읽기 폭과 밀도에 별도 선호 점수를 둘지 정해야 한다.</p></div><ul class="blk-takeaways"><li>density·measure·figurePlacement·typeScale가 실제 DOM과 CSS를 바꾼다</li><li>후보마다 2048·1920·1440·1024·390px 브라우저 증거를 따로 수집한다</li><li>현재 soft score는 결함 감점만 있어서 clean 후보 8개가 모두 100점이었다</li></ul></div></section><section class="section blk-brief" id="brief"><div class="measure"><h1 class="blk-brief__question">clean 후보 사이의 선호를 점수화할 것인가, authored-first를 유지할 것인가?</h1><div class="blk-brief__summary"><p><code>density</code> / <code>measure</code> / <code>figurePlacement</code> / <code>typeScale</code> 네 축은 실제로 서로 다른 HTML을 만든다. 후보별 hard gate도 분리됐다. 남은 질문은 오류가 없는 구성 사이에서 Forma가 보편적인 취향을 주장해야 하느냐다.</p></div><h2 class="blk-brief__heading">오늘 결정할 것</h2><ol class="blk-brief__list"><li>clean 후보에 별도 선호도 점수를 추가할 것인가</li><li>artifact별로 다른 선호 기준을 둘 것인가</li><li>동률이면 authored 후보를 유지한다는 현재 규칙을 계약으로 남길 것인가</li></ol><h2 class="blk-brief__heading">아직 모르는 것</h2><ul class="blk-brief__list" data-tone="unknown"><li>읽기 폭과 밀도 선호를 하나의 점수로 합쳐도 되는지 근거가 없다</li><li>artifact마다 선호 기준이 얼마나 달라야 하는지 사용자 검증이 없다</li><li>CI에서 advanced quality를 기본값으로 쓸지는 아직 정하지 않았다</li></ul><div class="blk-source-note" aria-label="출처"><ul><li><span class="blk-source-note__label">후보 생성과 채점</span><code class="blk-source-note__locator">src/qa/candidates.ts</code></li><li><span class="blk-source-note__label">핸드오프 문서의 완료 기록</span><code class="blk-source-note__locator">docs/handoff-artifact-architecture.md</code></li></ul></div></div></section><section class="section blk-evidence-graph breakout" id="evidence"><h2 class="blk-evidence-graph__title">지금 확실한 것과 그렇지 않은 것</h2><p class="blk-evidence-graph__legend">노출도 순입니다. 영향이 크고 근거가 약한 것이 위로 옵니다.</p><ol class="blk-evidence-graph__claims"><li class="claim" data-confidence="verified" data-impact="high" id="claim-axes-live"><p class="claim__meta">확인됨 · 영향 큼</p><p class="claim__statement">축 4개가 실제 DOM·CSS·섹션 순서를 바꾸고 후보별 브라우저 증거를 만든다.</p><p class="claim__support"><span>근거</span> 후보 생성과 채점</p></li><li class="claim" data-confidence="verified" data-impact="high" id="claim-css-current"><p class="claim__meta">확인됨 · 영향 큼</p><p class="claim__statement">Dashboard는 12열 Signal Grid를, Advanced는 96rem 검토 캔버스를 쓴다.</p><p class="claim__support"><span>근거</span> artifact별 CSS, 핸드오프 문서의 완료 기록</p></li><li class="claim" data-confidence="verified" data-impact="high" id="claim-clean-tie"><p class="claim__meta">확인됨 · 영향 큼</p><p class="claim__statement">advanced fixture의 첫 전체 실행에서 후보 8개가 모두 hard gate를 통과하고 100점으로 동률이었다.</p><p class="claim__support"><span>근거</span> 후보 생성과 채점</p></li><li class="claim" data-confidence="unknown" data-impact="medium" id="claim-preference-valid"><p class="claim__meta">미확인 · 영향 중간</p><p class="claim__statement">읽기 폭과 밀도를 수치화하면 authored-first보다 더 나은 결과를 고를 수 있다.</p><p class="claim__support" data-empty="true">뒷받침하는 출처가 없습니다.</p></li><li class="claim" data-confidence="verified" data-impact="medium" id="claim-selection-works"><p class="claim__meta">확인됨 · 영향 중간</p><p class="claim__statement">후보 생성, 채점, 승자 선택은 실제로 동작하고 테스트로 고정돼 있다.</p><p class="claim__support"><span>근거</span> 후보 생성과 채점</p></li></ol></section><section class="section blk-challenge" id="challenge"><div class="measure"><h2 class="blk-challenge__title">가장 강한 반론</h2><blockquote class="blk-challenge__counter">선호도 점수는 결함 검출과 다르다. 좁은 measure가 항상 좋다거나 compact가 항상 낫다는 규칙은 문서와 독자에 따라 틀릴 수 있다. 근거 없이 점수를 넣으면 결정론적이지만 잘못된 취향을 자동화하게 된다.</blockquote><h3 class="blk-challenge__heading">검증되지 않은 가정</h3><ul class="blk-challenge__list"><li>브라우저 기하 정보만으로 읽기 품질을 대변할 수 있다</li><li>artifact마다 선호 기준을 다르게 두어도 설명 가능성이 유지된다</li><li>authored-first가 실제로 안전한 기본값이다</li></ul><h3 class="blk-challenge__heading">무엇이 이걸 틀리게 만드나</h3><ul class="blk-challenge__list"><li>선호도 점수가 사람이 고른 결과와 반복해서 어긋난다</li><li>같은 내용이 artifact에 따라 설명하기 어려운 점수 차를 낸다</li><li>점수 추가가 seed 재현성이나 authored 보존 규칙을 깨뜨린다</li></ul><h3 class="blk-challenge__heading">결정을 뒤집을 조건</h3><ul class="blk-challenge__list"><li>실제 검수에서 authored가 아닌 후보를 반복해서 선택해야 하면 선호도 기준을 다시 연다</li><li>hard gate만으로 후보 탈락이 전혀 일어나지 않는 실행이 누적되면 후보 수부터 줄인다</li></ul><div class="blk-source-note" aria-label="출처"><ul><li><span class="blk-source-note__label">후보 생성과 채점</span><code class="blk-source-note__locator">src/qa/candidates.ts</code></li></ul></div></div></section><section class="section blk-simulation" id="sim"><div class="measure"><h2 class="blk-simulation__title">후보 수와 build 시간</h2><p class="blk-simulation__description">후보마다 5개 뷰포트와 axe를 따로 검사하므로 build 시간은 후보 수에 비례한다. 첫 전체 실행의 후보당 평균을 기준으로 후보 수와 CI 여유를 본다. 계산은 아래 입력만 쓰고 외부로 나가는 요청은 없다.</p><div class="blk-simulation__panel" data-forma-simulation="true"><div class="blk-simulation__inputs"><label class="sim-input"><span class="sim-input__label">렌더 1회<span class="sim-input__unit">ms</span></span><input type="range" min="500" max="8000" step="100" data-sim-input="renderMs" name="renderMs" value="3450"/><output class="sim-input__value" data-sim-echo="renderMs">3450</output></label><label class="sim-input"><span class="sim-input__label">후보 수<span class="sim-input__unit">개</span></span><input type="range" min="1" max="16" step="1" data-sim-input="candidates" name="candidates" value="8"/><output class="sim-input__value" data-sim-echo="candidates">8</output></label><label class="sim-input"><span class="sim-input__label">build에 허용할 시간<span class="sim-input__unit">초</span></span><input type="range" min="10" max="300" step="5" data-sim-input="budgetSec" name="budgetSec" value="60"/><output class="sim-input__value" data-sim-echo="budgetSec">60</output></label></div><dl class="blk-simulation__outputs"><dt>후보 전체 렌더 시간</dt><dd data-sim-output="{&quot;type&quot;:&quot;operation&quot;,&quot;operator&quot;:&quot;divide&quot;,&quot;left&quot;:{&quot;type&quot;:&quot;operation&quot;,&quot;operator&quot;:&quot;multiply&quot;,&quot;left&quot;:{&quot;type&quot;:&quot;variable&quot;,&quot;name&quot;:&quot;renderMs&quot;},&quot;right&quot;:{&quot;type&quot;:&quot;variable&quot;,&quot;name&quot;:&quot;candidates&quot;}},&quot;right&quot;:{&quot;type&quot;:&quot;literal&quot;,&quot;value&quot;:1000}}" data-sim-precision="1" data-sim-unit="초">27.6초</dd><dt>남는 여유</dt><dd data-sim-output="{&quot;type&quot;:&quot;operation&quot;,&quot;operator&quot;:&quot;subtract&quot;,&quot;left&quot;:{&quot;type&quot;:&quot;variable&quot;,&quot;name&quot;:&quot;budgetSec&quot;},&quot;right&quot;:{&quot;type&quot;:&quot;operation&quot;,&quot;operator&quot;:&quot;divide&quot;,&quot;left&quot;:{&quot;type&quot;:&quot;operation&quot;,&quot;operator&quot;:&quot;multiply&quot;,&quot;left&quot;:{&quot;type&quot;:&quot;variable&quot;,&quot;name&quot;:&quot;renderMs&quot;},&quot;right&quot;:{&quot;type&quot;:&quot;variable&quot;,&quot;name&quot;:&quot;candidates&quot;}},&quot;right&quot;:{&quot;type&quot;:&quot;literal&quot;,&quot;value&quot;:1000}}}" data-sim-precision="1" data-sim-unit="초">32.4초</dd></dl><p class="blk-simulation__fallback">지금 값은 현재 가정입니다. 조절하면 결과가 따라 바뀝니다.</p></div><div class="blk-source-note" aria-label="출처"><ul><li><span class="blk-source-note__label">후보 생성과 채점</span><code class="blk-source-note__locator">src/qa/candidates.ts</code></li></ul></div></div></section><section class="section blk-option-comparison breakout" id="options"><h3 class="blk-option-comparison__title">선택지</h3><div class="blk-option-comparison__scroll"><table class="blk-option-comparison__table"><thead><tr><th scope="col"><span class="visually-hidden">선택지</span></th><th scope="col" data-recommended="false">A. 선호도 점수를 지금 추가</th><th scope="col" data-recommended="false">B. authored-first 유지</th><th scope="col" data-recommended="false">C. artifact별 점수 분리</th></tr></thead><tbody><tr><th scope="row">먼저 얻는 것</th><td data-recommended="false">clean 후보 사이에도 순위가 생긴다</td><td data-recommended="false">결함 없는 경우 저자의 선택을 보존한다</td><td data-recommended="false">Signal Grid와 Editorial Brief의 목표를 따로 반영한다</td></tr><tr><th scope="row">위험</th><td data-recommended="false">근거 없는 보편 취향을 코드로 고정한다</td><td data-recommended="false">tournament가 주로 안전성 필터로만 동작한다</td><td data-recommended="false">설명과 유지 비용이 네 배로 늘어난다</td></tr><tr><th scope="row">되돌리기</th><td data-recommended="false">점수 항목을 제거하면 된다</td><td data-recommended="false">선호 근거가 생기면 점수를 추가한다</td><td data-recommended="false">공통 hard gate만 남기면 된다</td></tr><tr><th scope="row">순서 의존</th><td data-recommended="false">사용자 검증이 먼저 필요하다</td><td data-recommended="false">없음</td><td data-recommended="false">artifact별 검수 데이터가 필요하다</td></tr></tbody></table></div></section><section class="section blk-risk-register breakout" id="risks"><h3 class="blk-risk-register__title">위험</h3><div class="blk-risk-register__scroll"><table class="blk-risk-register__table"><thead><tr><th scope="col">위험</th><th scope="col">가능성</th><th scope="col">영향</th><th scope="col">대응</th><th scope="col">담당</th></tr></thead><tbody><tr data-likelihood="medium" data-impact="high"><th scope="row">선호도 점수가 실제 검수자의 선택과 어긋난다</th><td>중간</td><td>높음</td><td>선호 근거가 쌓일 때까지 authored-first를 유지한다</td><td>미정</td></tr><tr data-likelihood="medium" data-impact="medium"><th scope="row">후보별 브라우저 검사 시간이 CI 예산을 잠식한다</th><td>중간</td><td>중간</td><td>위 시뮬레이션으로 상한을 먼저 정하고, 넘으면 후보 수를 줄인다</td><td>미정</td></tr><tr data-likelihood="high" data-impact="medium"><th scope="row">100점 동률이 후보가 실제로 같다는 뜻으로 오해된다</th><td>높음</td><td>중간</td><td>tournament.json에 후보 축과 개별 점수를 남기고 동률 규칙을 문서화한다</td><td>미정</td></tr></tbody></table></div></section><section class="section blk-decision-record" id="decision"><div class="measure"><div class="decision-record" data-status="proposed"><p class="decision-record__status">제안</p><h2 class="decision-record__decision">선택지 B를 유지한다. hard gate로 깨진 후보를 제거하고, clean 후보가 동률이면 authored 구성을 보존한다.</h2><div class="decision-record__rationale"><p>overflow·clipped text·axe·외부 요청은 객관적으로 탈락시킬 수 있지만, narrow와 wide 중 무엇이 더 좋은지는 독자와 artifact에 따라 달라진다. 근거 없는 취향 점수보다 저자의 명시 선택을 보존하는 편이 설명 가능하다.</p></div><dl class="decision-record__meta"><div><dt>책임</dt><dd>미정</dd></div></dl><h3 class="decision-record__heading">기록된 반대 의견</h3><dl class="decision-record__dissent"><dt>반론 기록</dt><dd>모든 clean 후보가 동률이면 후보를 여덟 개 만드는 비용을 정당화하기 어렵다.</dd></dl><h3 class="decision-record__heading">다시 볼 조건</h3><ul class="decision-record__revisit"><li>실제 검수에서 authored가 아닌 구성을 반복해서 선택하면 선호도 기준을 다시 설계한다</li><li>advanced build 시간이 60초를 넘으면 후보 수를 줄인다</li></ul></div><div class="blk-source-note" aria-label="출처"><ul><li><span class="blk-source-note__label">후보 생성과 채점</span><code class="blk-source-note__locator">src/qa/candidates.ts</code></li><li><span class="blk-source-note__label">핸드오프 문서의 완료 기록</span><code class="blk-source-note__locator">docs/handoff-artifact-architecture.md</code></li></ul></div></div></section><section class="section blk-source-ledger breakout" id="ledger"><h3 class="blk-source-ledger__title">출처</h3><div class="blk-source-ledger__scroll"><table class="blk-source-ledger__table"><thead><tr><th scope="col">출처</th><th scope="col">다루는 범위</th><th scope="col">다루지 않는 것</th></tr></thead><tbody><tr><th scope="row">후보 생성과 채점</th><td>후보 생성, 채점, 승자 선택의 현재 동작</td><td>soft score는 현재 결함 감점만 다룬다</td></tr><tr><th scope="row">artifact별 CSS</th><td>artifact별 CSS의 현재 규칙</td><td>사용자 선호를 입증하는 데이터는 포함하지 않는다</td></tr><tr><th scope="row">핸드오프 문서의 완료 기록</th><td>축 연결·호스트 검증·CSS 정리 완료 기록</td><td>장기 사용자 검증 결과는 아직 없다</td></tr></tbody></table></div></section>
   </main>
-  <aside class="side-toc no-print"><nav class="toc" aria-label="섹션 이동"><p class="toc__label" aria-hidden="true">이 문서의 목차</p><a href="#brief">브리핑</a><a href="#evidence">지금 확실한 것과 그렇지 않은 것</a><a href="#challenge">가장 강한 반론</a><a href="#sim">후보 수와 build 시간</a><a href="#options">선택지</a><a href="#risks">위험</a><a href="#decision">결정</a><a href="#ledger">출처</a></nav></aside>
+  <aside class="side-toc no-print" aria-label="현재 페이지 목차"><nav class="toc" aria-label="섹션 이동"><p class="toc__label" aria-hidden="true">이 문서의 목차</p><a href="#brief">브리핑</a><a href="#evidence">지금 확실한 것과 그렇지 않은 것</a><a href="#challenge">가장 강한 반론</a><a href="#sim">후보 수와 build 시간</a><a href="#options">선택지</a><a href="#risks">위험</a><a href="#decision">결정</a><a href="#ledger">출처</a></nav></aside>
 </div>
 <footer class="doc no-print">
   <p class="blk-source-note">Forma 0.1.0 · public</p>
@@ -2080,17 +2296,17 @@
   }
 
   function initTocActiveState() {
-    const links = document.querySelectorAll(".toc a[href^='#']");
+    const links = document.querySelectorAll(".toc a[href^='#'], .guide-nav a[href^='#']");
     if (links.length === 0 || !("IntersectionObserver" in window)) return;
     const targets = new Map();
     for (const link of links) {
       const id = link.getAttribute("href").slice(1);
       const el = document.getElementById(id);
-      if (el) targets.set(el, link);
+      if (el) targets.set(el, [...(targets.get(el) || []), link]);
     }
-    const setActive = (link) => {
+    const setActive = (activeLinks) => {
       for (const l of links) l.removeAttribute("aria-current");
-      if (link) link.setAttribute("aria-current", "true");
+      for (const link of activeLinks || []) link.setAttribute("aria-current", "true");
     };
     const observer = new IntersectionObserver(
       (entries) => {

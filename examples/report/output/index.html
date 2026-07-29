@@ -81,24 +81,31 @@
 
 @layer tokens {
   :root {
-    --color-canvas: oklch(100% 0 0);
-    --color-surface: oklch(100% 0 0);
-    --color-surface-raised: oklch(98.5% 0.002 90);
-    --color-text: oklch(13% 0.004 90);
-    --color-text-muted: oklch(42% 0.006 90);
-    --color-border: oklch(92% 0.004 90);
-    --color-border-strong: oklch(85% 0.005 90);
-    --color-accent: oklch(54% 0.13 250);
-    --color-accent-strong: oklch(46% 0.13 250);
-    --color-on-accent: oklch(100% 0 0);
-    --color-success: oklch(58% 0.13 152);
-    --color-warning: oklch(72% 0.15 80);
-    --color-danger: oklch(58% 0.18 25);
-    --color-info: oklch(60% 0.10 235);
-    --color-success-text: oklch(43% 0.12 152);
-    --color-warning-text: oklch(48% 0.12 80);
-    --color-danger-text: oklch(45% 0.17 25);
-    --color-info-text: oklch(45% 0.11 235);
+
+    --color-canvas: #FFFFFF;
+    --color-surface: #F3F3F3;
+    --color-surface-raised: #F0F0F0;
+    --color-text: #333333;
+    --color-text-muted: #616161;
+    --color-border: #D4D4D4;
+    --color-border-strong: #C4C4C4;
+    --color-accent: #007ACC;
+    --color-accent-strong: #006AB1;
+    --color-on-accent: #FFFFFF;
+    --color-success: #388A34;
+    --color-warning: #BF8803;
+    --color-danger: #E51400;
+    --color-info: #0063D3;
+    --color-success-text: #277A2E;
+    --color-warning-text: #855F00;
+    --color-danger-text: #A1260D;
+    --color-info-text: #0063D3;
+    --color-chart-1: #0070C1;
+    --color-chart-2: #267F99;
+    --color-chart-3: #795E26;
+    --color-chart-4: #AF00DB;
+    --color-chart-5: #A31515;
+    --color-chart-6: #388A34;
 
     --font-sans: "Geist", "IBM Plex Sans KR", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
     --font-mono: "Geist Mono", ui-monospace, "SFMono-Regular", Consolas, "Liberation Mono", monospace;
@@ -121,35 +128,61 @@
   }
 
   [data-theme="dark"] {
-    --color-canvas: oklch(9% 0.003 90);
-    --color-surface: oklch(13% 0.004 90);
-    --color-surface-raised: oklch(20% 0.005 90);
-    --color-text: oklch(96.5% 0.003 90);
-    --color-text-muted: oklch(70% 0.006 90);
-    --color-border: oklch(30% 0.006 90);
-    --color-border-strong: oklch(42% 0.006 90);
-    --color-accent: oklch(62% 0.11 250);
-    --color-accent-strong: oklch(54% 0.13 250);
-    --color-on-accent: oklch(9% 0.003 90);
-    --color-success-text: oklch(80% 0.13 152);
-    --color-warning-text: oklch(84% 0.13 80);
-    --color-danger-text: oklch(78% 0.14 25);
-    --color-info-text: oklch(80% 0.10 235);
+
+    --color-canvas: #1E1E1E;
+    --color-surface: #252526;
+    --color-surface-raised: #2A2D2E;
+    --color-text: #CCCCCC;
+    --color-text-muted: #969696;
+    --color-border: #3C3C3C;
+    --color-border-strong: #5A5D5E;
+    --color-accent: #3794FF;
+    --color-accent-strong: #4FC1FF;
+    --color-on-accent: #1E1E1E;
+    --color-success: #89D185;
+    --color-warning: #CCA700;
+    --color-danger: #F14C4C;
+    --color-info: #59A4F9;
+    --color-success-text: #89D185;
+    --color-warning-text: #DCDCAA;
+    --color-danger-text: #F48771;
+    --color-info-text: #75BEFF;
+    --color-chart-1: #4FC1FF;
+    --color-chart-2: #4EC9B0;
+    --color-chart-3: #DCDCAA;
+    --color-chart-4: #C586C0;
+    --color-chart-5: #CE9178;
+    --color-chart-6: #89D185;
     color-scheme: dark;
   }
 
   @media (prefers-color-scheme: dark) {
     :root:not([data-theme="light"]) {
-      --color-canvas: oklch(9% 0.003 90);
-      --color-surface: oklch(13% 0.004 90);
-      --color-surface-raised: oklch(20% 0.005 90);
-      --color-text: oklch(96.5% 0.003 90);
-      --color-text-muted: oklch(70% 0.006 90);
-      --color-border: oklch(30% 0.006 90);
-      --color-border-strong: oklch(42% 0.006 90);
-      --color-accent: oklch(62% 0.11 250);
-      --color-accent-strong: oklch(54% 0.13 250);
-      --color-on-accent: oklch(9% 0.003 90);
+
+    --color-canvas: #1E1E1E;
+    --color-surface: #252526;
+    --color-surface-raised: #2A2D2E;
+    --color-text: #CCCCCC;
+    --color-text-muted: #969696;
+    --color-border: #3C3C3C;
+    --color-border-strong: #5A5D5E;
+    --color-accent: #3794FF;
+    --color-accent-strong: #4FC1FF;
+    --color-on-accent: #1E1E1E;
+    --color-success: #89D185;
+    --color-warning: #CCA700;
+    --color-danger: #F14C4C;
+    --color-info: #59A4F9;
+    --color-success-text: #89D185;
+    --color-warning-text: #DCDCAA;
+    --color-danger-text: #F48771;
+    --color-info-text: #75BEFF;
+    --color-chart-1: #4FC1FF;
+    --color-chart-2: #4EC9B0;
+    --color-chart-3: #DCDCAA;
+    --color-chart-4: #C586C0;
+    --color-chart-5: #CE9178;
+    --color-chart-6: #89D185;
       color-scheme: dark;
     }
   }
@@ -277,12 +310,26 @@
     inline-size: 0.9rem;
     block-size: 0.9rem;
     border-radius: 3px;
-    background: var(--color-text);
+    background: var(--color-accent);
     flex: none;
+  }
+  .doc-bar__brand {
+    font-size: 0.875rem;
+    font-weight: 700;
+    letter-spacing: -0.015em;
+  }
+  .doc-bar__direction {
+    font-family: var(--font-mono);
+    font-size: 0.6875rem;
+    color: var(--color-accent-strong);
+    border-inline-start: 1px solid var(--color-border);
+    padding-inline-start: var(--space-2);
+    white-space: nowrap;
   }
   .doc-bar__title {
     font-size: 0.875rem;
-    font-weight: 600;
+    font-weight: 450;
+    color: var(--color-text-muted);
     letter-spacing: -0.01em;
     /* One line. A long title must not push the bar into two rows and move
        the document under it. */
@@ -309,7 +356,7 @@
   }
   @media (max-width: 390px) {
     .doc-bar__inner { padding-inline: var(--space-4); }
-    .doc-bar__tag { display: none; }
+    .doc-bar__tag, .doc-bar__direction, .doc-bar__title { display: none; }
   }
 
   main { display: block; }
@@ -661,10 +708,56 @@
 
   /* chart */
   .blk-chart { max-width: 100%; }
-  .blk-chart__title { font-size: 1rem; margin-block-end: var(--space-4); color: var(--color-text-muted); }
+  .blk-chart__title { font-size: 1rem; margin-block-end: var(--space-2); }
+  .blk-chart__reading {
+    max-width: 48rem;
+    margin-block-end: var(--space-4);
+    color: var(--color-text-muted);
+  }
   .blk-chart svg text { font-family: var(--font-sans); fill: var(--color-text-muted); font-size: 0.75rem; }
-  .blk-chart .chart-bar { fill: var(--color-accent); }
-  .blk-chart .chart-axis { stroke: var(--color-border); }
+  .blk-chart .chart-axis { stroke: var(--color-border-strong); }
+  .blk-chart .chart-grid { stroke: var(--color-border); stroke-width: 1; }
+  .blk-chart .chart-line {
+    fill: none;
+    stroke-width: 2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+  .blk-chart :is(.chart-line, .chart-point)[data-series="0"] { stroke: var(--color-chart-1); }
+  .blk-chart :is(.chart-line, .chart-point)[data-series="1"] { stroke: var(--color-chart-2); }
+  .blk-chart :is(.chart-line, .chart-point)[data-series="2"] { stroke: var(--color-chart-3); }
+  .blk-chart :is(.chart-line, .chart-point)[data-series="3"] { stroke: var(--color-chart-4); }
+  .blk-chart :is(.chart-line, .chart-point)[data-series="4"] { stroke: var(--color-chart-5); }
+  .blk-chart :is(.chart-line, .chart-point)[data-series="5"] { stroke: var(--color-chart-6); }
+  .blk-chart .chart-point[data-series="0"] { fill: var(--color-chart-1); }
+  .blk-chart .chart-point[data-series="1"] { fill: var(--color-chart-2); }
+  .blk-chart .chart-point[data-series="2"] { fill: var(--color-chart-3); }
+  .blk-chart .chart-point[data-series="3"] { fill: var(--color-chart-4); }
+  .blk-chart .chart-point[data-series="4"] { fill: var(--color-chart-5); }
+  .blk-chart .chart-point[data-series="5"] { fill: var(--color-chart-6); }
+  .blk-chart .chart-bar[data-series="0"] { fill: var(--color-chart-1); }
+  .blk-chart .chart-bar[data-series="1"] { fill: var(--color-chart-2); }
+  .blk-chart .chart-bar[data-series="2"] { fill: var(--color-chart-3); }
+  .blk-chart .chart-bar[data-series="3"] { fill: var(--color-chart-4); }
+  .blk-chart .chart-bar[data-series="4"] { fill: var(--color-chart-5); }
+  .blk-chart .chart-bar[data-series="5"] { fill: var(--color-chart-6); }
+  .blk-chart__legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2) var(--space-5);
+    list-style: none;
+    margin-block-start: var(--space-3);
+    font-size: 0.8125rem;
+    color: var(--color-text-muted);
+  }
+  .blk-chart__legend li { display: inline-flex; align-items: center; gap: var(--space-2); }
+  .blk-chart__swatch { inline-size: 0.75rem; block-size: 0.25rem; border-radius: 999px; }
+  .blk-chart__swatch[data-series="0"] { background: var(--color-chart-1); }
+  .blk-chart__swatch[data-series="1"] { background: var(--color-chart-2); }
+  .blk-chart__swatch[data-series="2"] { background: var(--color-chart-3); }
+  .blk-chart__swatch[data-series="3"] { background: var(--color-chart-4); }
+  .blk-chart__swatch[data-series="4"] { background: var(--color-chart-5); }
+  .blk-chart__swatch[data-series="5"] { background: var(--color-chart-6); }
 
   /* finding / risk / decision */
   .blk-finding__badge, .blk-risk__badge {
@@ -1702,23 +1795,72 @@
     margin-block-end: var(--space-4);
   }
 
-  /* Guided Path — a persistent orientation rail and a controlled reading
-     measure keep long procedures scannable without narrowing the workspace. */
+  /* Guided Path — DocPilot-informed navigation separates the guide's broad
+     path on the left from the current page outline on the right. The centre
+     remains a controlled procedure measure rather than becoming a portal. */
   :root[data-artifact="manual"] .layout {
     grid-template-columns: 232px minmax(0, 1fr);
     max-width: none;
-    gap: var(--space-7);
+    gap: var(--space-6);
   }
-  :root[data-artifact="manual"] .layout > .side-toc {
+  :root[data-artifact="manual"] .layout > .guide-sidebar {
     order: -1;
     position: sticky;
     inset-block-start: var(--space-5);
     align-self: start;
     max-height: calc(100vh - var(--space-8));
     overflow-y: auto;
-    border-inline-end: 1px solid var(--color-border);
-    border-block-end: none;
     padding-inline-end: var(--space-4);
+    min-block-size: 100%;
+    box-shadow: 1px 0 0 var(--color-border);
+  }
+  :root[data-artifact="manual"] .layout > .side-toc {
+    order: 1;
+    display: none;
+    position: sticky;
+    inset-block-start: var(--space-5);
+    align-self: start;
+    max-height: calc(100vh - var(--space-8));
+    overflow-y: auto;
+    border-block-end: none;
+    padding-inline-start: var(--space-3);
+  }
+  :root[data-artifact="manual"] .guide-nav__label,
+  :root[data-artifact="manual"] .guide-nav__group-label {
+    margin: 0;
+    color: var(--color-text-muted);
+    font-size: 0.6875rem;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+  :root[data-artifact="manual"] .guide-nav__label {
+    color: var(--color-text);
+    margin-block-end: var(--space-5);
+  }
+  :root[data-artifact="manual"] .guide-nav__group + .guide-nav__group {
+    margin-block-start: var(--space-5);
+  }
+  :root[data-artifact="manual"] .guide-nav__group-label {
+    margin-block-end: var(--space-2);
+    padding-inline: 0.65em;
+  }
+  :root[data-artifact="manual"] .guide-nav a {
+    display: block;
+    padding: 0.4em 0.65em;
+    color: var(--color-text-muted);
+    text-decoration: none;
+    border-radius: var(--radius-sm);
+    font-size: 0.875rem;
+    line-height: 1.45;
+  }
+  :root[data-artifact="manual"] .guide-nav a:hover {
+    color: var(--color-text);
+  }
+  :root[data-artifact="manual"] .guide-nav a[aria-current="true"] {
+    background: var(--color-surface-raised);
+    color: var(--color-text);
+    font-weight: 600;
   }
   :root[data-artifact="manual"] .side-toc .toc {
     flex-direction: column;
@@ -1834,17 +1976,13 @@
      a wide viewport left empty on the right, which read as an unfinished
      page rather than a deliberate column. */
   :root[data-artifact="manual"] .layout {
-    max-width: calc(232px + var(--space-7) + 66rem);
+    max-width: calc(232px + var(--space-6) + 66rem);
     margin-inline: auto;
   }
   /* The rail's divider stopped where its list ended, leaving a vertical line
      hanging in the middle of the page. A full-height divider on the grid
      column reads as structure; a partial one reads as a stray border. */
-  :root[data-artifact="manual"] .layout > .side-toc {
-    border-inline-end: none;
-    min-block-size: 100%;
-    box-shadow: 1px 0 0 var(--color-border);
-  }
+  :root[data-artifact="manual"] .layout > .side-toc { border-inline-end: none; }
 
   /* The deck sat *below* the body size, so the document opened with its
      hierarchy inverted: the sentence explaining the title was quieter than
@@ -1978,6 +2116,23 @@
     :root[data-artifact="dashboard"] .doc > .section { grid-column: 1 / -1; }
     :root[data-artifact="dashboard"] .doc > .blk-anomaly { grid-column: 1 / span 7; }
     :root[data-artifact="dashboard"] .doc > .blk-action-plan { grid-column: 8 / -1; }
+    :root[data-artifact="advanced"] .doc {
+      display: grid;
+      grid-template-columns: repeat(12, minmax(0, 1fr));
+      column-gap: var(--space-5);
+      align-content: start;
+    }
+    :root[data-artifact="advanced"] .doc > .section { grid-column: 1 / -1; }
+    :root[data-artifact="advanced"] .doc > .blk-challenge { grid-column: 1 / span 7; }
+    :root[data-artifact="advanced"] .doc > .blk-simulation { grid-column: 8 / -1; }
+  }
+
+  @media (min-width: 1280px) {
+    :root[data-artifact="manual"] .layout {
+      grid-template-columns: 232px minmax(0, 1fr) 200px;
+      max-width: calc(232px + 200px + 66rem + var(--space-8));
+    }
+    :root[data-artifact="manual"] .layout > .side-toc { display: block; }
   }
 
   /* Decision Room needs enough horizontal room for evidence graphs,
@@ -1987,6 +2142,37 @@
     max-width: min(100%, 96rem);
   }
   :root[data-artifact="advanced"] .breakout { max-width: 100%; }
+  :root[data-artifact="advanced"] .blk-brief {
+    border-block-start: 4px solid var(--color-accent);
+    padding-block-start: var(--space-7);
+  }
+  :root[data-artifact="advanced"] .blk-evidence-graph {
+    background: var(--color-surface);
+    border-block: 1px solid var(--color-border-strong);
+    padding-inline: var(--space-5);
+  }
+  :root[data-artifact="advanced"] .claim {
+    display: grid;
+    grid-template-columns: minmax(8rem, 0.3fr) minmax(0, 1fr);
+    gap: var(--space-2) var(--space-5);
+    border-block-end: 1px solid var(--color-border);
+  }
+  :root[data-artifact="advanced"] .claim__meta { grid-row: 1 / span 3; }
+  :root[data-artifact="advanced"] .claim__statement,
+  :root[data-artifact="advanced"] .claim__support,
+  :root[data-artifact="advanced"] .claim__contradiction { grid-column: 2; }
+  :root[data-artifact="advanced"] .blk-challenge {
+    background: color-mix(in oklab, var(--color-danger) 7%, var(--color-canvas));
+    padding-inline: var(--space-5);
+  }
+  :root[data-artifact="advanced"] .blk-simulation {
+    background: color-mix(in oklab, var(--color-info) 7%, var(--color-canvas));
+    padding-inline: var(--space-5);
+  }
+  :root[data-artifact="advanced"] .blk-decision-record {
+    border-block: 2px solid var(--color-text);
+    padding-inline: var(--space-5);
+  }
 
   @media (max-width: 900px) {
     :root[data-artifact="dashboard"] .layout,
@@ -1996,7 +2182,8 @@
       padding-inline: var(--space-4);
     }
     :root[data-artifact="dashboard"] .layout > .side-toc,
-    :root[data-artifact="manual"] .layout > .side-toc {
+    :root[data-artifact="manual"] .layout > .side-toc,
+    :root[data-artifact="manual"] .layout > .guide-sidebar {
       order: -1;
       position: static;
       max-height: none;
@@ -2006,6 +2193,33 @@
       margin-inline-start: 0;
       padding: 0 0 var(--space-4);
     }
+    :root[data-artifact="manual"] .layout > .side-toc { display: none; }
+    :root[data-artifact="manual"] .guide-nav {
+      display: flex;
+      gap: var(--space-2);
+      overflow-x: auto;
+      padding-block-end: var(--space-1);
+    }
+    :root[data-artifact="manual"] :is(.guide-nav__label, .guide-nav__group-label) {
+      display: none;
+    }
+    :root[data-artifact="manual"] .guide-nav__group {
+      display: contents;
+    }
+    :root[data-artifact="manual"] .guide-nav a {
+      flex: none;
+      white-space: nowrap;
+      background: var(--color-surface);
+    }
+    :root[data-artifact="advanced"] .claim {
+      grid-template-columns: minmax(0, 1fr);
+    }
+    :root[data-artifact="advanced"] .claim__meta { grid-row: auto; }
+    :root[data-artifact="advanced"] :is(
+      .claim__statement,
+      .claim__support,
+      .claim__contradiction
+    ) { grid-column: 1; }
     :root[data-artifact="dashboard"] .side-toc .toc,
     :root[data-artifact="manual"] .side-toc .toc {
       position: static;
@@ -2034,6 +2248,8 @@
   <div class="doc-bar__inner">
     <p class="doc-bar__identity">
       <span class="doc-bar__mark" aria-hidden="true"></span>
+      <span class="doc-bar__brand">Forma</span>
+      <span class="doc-bar__direction">Editorial Brief</span>
       <span class="doc-bar__title">Forma는 왜 spec 우선인가</span>
     </p>
     <div class="doc-bar__actions">
@@ -2046,7 +2262,7 @@
   <main class="doc" id="main" data-density="comfortable">
 <section class="section blk-cover" id="cover"><p class="blk-cover__eyebrow">설계 기록</p><h1 class="blk-cover__title">Forma는 왜 spec 우선인가</h1><p class="blk-cover__subtitle">에이전트에게 HTML을 쓰게 하지 않는 이유</p><ul class="blk-cover__meta"><li>2026-07-28 기준</li><li>spec 0.2</li><li>공개</li></ul></section><section class="section blk-narrative" id="narrative"><div class="measure"><p class="blk-narrative__question">왜 에이전트가 HTML을 직접 쓰지 않고 spec만 쓰는가?</p><div class="blk-narrative__summary"><p>에이전트가 마크업을 쓰면 품질이 프롬프트 운에 좌우되고 같은 입력이 같은 결과를 내지 않는다. spec만 쓰게 하고 렌더를 결정론적 컴파일러에 맡기면 품질을 코드로 고정할 수 있다.</p></div><ul class="blk-takeaways"><li>품질 규칙을 프롬프트가 아니라 검증기와 lint에 넣으면 회귀를 테스트로 막을 수 있다</li><li>블록 정의 하나를 추가하면 타입·JSON Schema·허용 목록·dispatch가 전부 파생된다</li><li>대가는 표현의 자유다. 블록 어휘에 없는 것은 만들 수 없다</li></ul></div></section><section class="section blk-thesis" id="thesis"><div class="measure"><p class="blk-thesis__statement">에이전트가 HTML을 쓰면 품질은 프롬프트 운에 달리고, 같은 입력이 같은 결과를 내지 않는다.<span class="confidence-tag" data-confidence="inferred">추정</span></p><p class="blk-thesis__qualifier">spec만 쓰게 하고 렌더를 결정론적 컴파일러에 맡기면 품질 규칙을 코드로 고정하고 테스트로 지킬 수 있다.</p><div class="blk-source-note" aria-label="출처"><ul><li><span class="blk-source-note__label">Forma Spec 스키마와 검증기</span><code class="blk-source-note__locator">src/spec/validate.ts</code></li><li><span class="blk-source-note__label">블록 레지스트리</span><code class="blk-source-note__locator">src/blocks/registry.ts</code></li></ul></div></div></section><section class="section blk-exec-summary" id="exec"><div class="measure"><h2 class="blk-exec-summary__title">핵심 요약</h2><div class="blk-exec-summary__body"><p>Forma의 입력은 <code>forma.spec.json</code> 하나다. 에이전트는 무엇을 말할지, 어떤 블록에 담을지, 무엇이 그것을 뒷받침하는지를 쓴다. 색·간격·타이포·레이아웃은 쓰지 않는다. 그건 렌더러가 결정한다.</p><p>이 경계가 있으면 "verified라고 표시했는데 근거가 없다" 같은 문제를 프롬프트로 부탁하는 대신 검증 오류로 만들 수 있다. 실제로 그렇게 하고 있다.</p></div><dl class="blk-exec-summary__figures"><div class="blk-exec-summary__figure"><dt>블록 정의</dt><dd>59종</dd></div><div class="blk-exec-summary__figure"><dt>통과 테스트</dt><dd>277개</dd></div><div class="blk-exec-summary__figure"><dt>산출물 외부 요청</dt><dd>0건</dd></div></dl><div class="blk-source-note" aria-label="출처"><ul><li><span class="blk-source-note__label">블록 레지스트리</span><code class="blk-source-note__locator">src/blocks/registry.ts</code></li><li><span class="blk-source-note__label">브라우저 QA 결과</span><code class="blk-source-note__locator">fixtures/*/output/qa</code></li></ul></div></div></section><section class="section blk-headline-finding" id="finding-determinism"><div class="measure"><div data-severity="info"><h3 class="blk-headline-finding__claim">같은 spec은 같은 HTML을 낸다. 그래서 렌더 결과를 테스트로 고정할 수 있다.</h3><p class="blk-headline-finding__meta"><span class="confidence-tag" data-confidence="verified">확인됨</span></p><div class="blk-headline-finding__detail"><p>렌더 경로에 모델 호출이 없다. 문법 강조는 Shiki가 토큰화하고, 다이어그램은 spec의 노드 목록에서 SVG를 만들고, 시뮬레이터는 닫힌 산술 AST를 평가한다. 어느 단계도 생성 모델을 부르지 않으므로 출력이 흔들릴 여지가 없다.</p></div></div><div class="blk-source-note" aria-label="출처"><ul><li><span class="blk-source-note__label">Forma Spec 스키마와 검증기</span><code class="blk-source-note__locator">src/spec/validate.ts</code></li><li><span class="blk-source-note__label">블록 레지스트리</span><code class="blk-source-note__locator">src/blocks/registry.ts</code></li></ul></div></div></section><section class="section blk-evidence-stack" id="evidence"><div class="measure"><h3 class="blk-evidence-stack__title">무엇이 이 판단을 뒷받침하나</h3><ol class="blk-evidence-stack__list"><li class="blk-evidence-stack__item" data-confidence="verified"><p class="blk-evidence-stack__summary">품질 규칙이 검증기에 들어가 있다</p><p class="blk-evidence-stack__detail">verified로 표시한 주장이 근거를 인용하지 않으면 렌더 전에 막힌다. dashboard가 지표를 실으면서 데이터 기준 블록이 없으면 막힌다. 이건 요청이 아니라 오류다.</p><p class="blk-evidence-stack__source">Forma Spec 스키마와 검증기</p></li><li class="blk-evidence-stack__item" data-confidence="verified"><p class="blk-evidence-stack__summary">블록을 추가하면 파생물이 전부 따라온다</p><p class="blk-evidence-stack__detail">정의 하나를 레지스트리 배열에 넣으면 union 타입, JSON Schema, artifact 허용 목록, 렌더 dispatch가 함께 생긴다. 최소 fixture를 테스트에 넣지 않으면 테스트가 실패한다. 의도한 가드다.</p><p class="blk-evidence-stack__source">블록 레지스트리</p></li><li class="blk-evidence-stack__item" data-confidence="verified"><p class="blk-evidence-stack__summary">산출물이 네트워크에 나가지 않는 것을 브라우저에서 측정한다</p><p class="blk-evidence-stack__detail">fixture 8종을 5뷰포트로 열어 document 이외의 요청을 세고, 하나라도 있으면 실패한다. 주장이 아니라 게이트다.</p><p class="blk-evidence-stack__source">브라우저 QA 결과</p></li></ol></div></section><section class="section blk-headline-finding" id="finding-cost"><div class="measure"><div data-severity="medium"><h3 class="blk-headline-finding__claim">대가는 표현의 자유다. 블록 어휘에 없는 것은 만들 수 없다.</h3><p class="blk-headline-finding__meta"><span class="confidence-tag" data-confidence="verified">확인됨</span></p><div class="blk-headline-finding__detail"><p>에이전트가 "여기에 이런 도표가 있으면 좋겠다"고 판단해도 해당 블록이 없으면 넣을 방법이 없다. 근사치로 흉내내는 것도 금지돼 있다. 잘못된 모양이 검증을 통과하는 것이 명확한 실패보다 나쁘기 때문이다. 그래서 블록 어휘를 넓히는 일이 이 프로젝트의 주된 작업이 된다.</p></div></div><div class="blk-source-note" aria-label="출처"><ul><li><span class="blk-source-note__label">블록 레지스트리</span><code class="blk-source-note__locator">src/blocks/registry.ts</code></li></ul></div></div></section><section class="section blk-option-comparison breakout" id="options"><h3 class="blk-option-comparison__title">선택지</h3><div class="blk-option-comparison__scroll"><table class="blk-option-comparison__table"><thead><tr><th scope="col"><span class="visually-hidden">선택지</span></th><th scope="col" data-recommended="false">A. 에이전트가 HTML/CSS 직접 생성</th><th scope="col" data-recommended="false">B. 템플릿 채우기</th><th scope="col" data-recommended="false">C. spec 우선 컴파일 (현재)</th></tr></thead><tbody><tr><th scope="row">결과 재현성</th><td data-recommended="false">낮음 — 같은 입력이 다른 결과</td><td data-recommended="false">높음</td><td data-recommended="false">높음 — 모델 호출 0</td></tr><tr><th scope="row">품질 관리 지점</th><td data-recommended="false">프롬프트뿐</td><td data-recommended="false">템플릿</td><td data-recommended="false">검증기·lint·테스트</td></tr><tr><th scope="row">표현 자유도</th><td data-recommended="false">매우 높음</td><td data-recommended="false">매우 낮음 — 템플릿 수만큼</td><td data-recommended="false">블록 어휘 범위</td></tr><tr><th scope="row">새 표현 추가 비용</th><td data-recommended="false">없음</td><td data-recommended="false">템플릿 신규 작성</td><td data-recommended="false">블록 정의 1개 + 최소 fixture</td></tr></tbody></table></div></section><section class="section blk-decision-matrix breakout" id="matrix"><h3 class="blk-decision-matrix__title">가중치 적용</h3><div class="blk-decision-matrix__scroll"><table class="blk-decision-matrix__table"><thead><tr><th scope="col">기준</th><th scope="col">가중치</th><th scope="col" data-chosen="false">A. 직접 생성</th><th scope="col" data-chosen="false">B. 템플릿</th><th scope="col" data-chosen="false">C. spec 우선</th></tr></thead><tbody><tr><th scope="row">결과 재현성</th><td class="blk-decision-matrix__weight">3</td><td class="blk-decision-matrix__score">1</td><td class="blk-decision-matrix__score">5</td><td class="blk-decision-matrix__score">5</td></tr><tr><th scope="row">품질을 코드로 고정할 수 있는가</th><td class="blk-decision-matrix__weight">3</td><td class="blk-decision-matrix__score">1</td><td class="blk-decision-matrix__score">3</td><td class="blk-decision-matrix__score">5</td></tr><tr><th scope="row">표현 자유도</th><td class="blk-decision-matrix__weight">1</td><td class="blk-decision-matrix__score">5</td><td class="blk-decision-matrix__score">1</td><td class="blk-decision-matrix__score">3</td></tr></tbody><tfoot><tr><th scope="row">가중 합계</th><td></td><td class="blk-decision-matrix__total" data-best="false">11.0</td><td class="blk-decision-matrix__total" data-best="false">25.0</td><td class="blk-decision-matrix__total" data-best="true">33.0</td></tr></tfoot></table></div></section><section class="section blk-recommendation" id="recommendation"><div class="measure"><p class="blk-recommendation__label">권고</p><h3 class="blk-recommendation__statement">spec 우선을 유지하고, 표현이 부족할 때는 프롬프트를 고치지 말고 블록을 추가한다.</h3><div class="blk-recommendation__rationale"><p>블록 추가 비용이 정의 하나와 최소 fixture 하나로 낮게 유지되고 있다. 이 비용이 낮은 동안에는 자유도 손실을 어휘 확장으로 갚는 것이 재현성을 포기하는 것보다 싸다.</p></div><p class="blk-recommendation__conditions-label">이 판단이 바뀌는 조건</p><ul class="blk-recommendation__conditions"><li>블록 추가 비용이 올라가면 다시 판단한다. 정의 하나가 여러 파일을 건드리게 되는 순간이 신호다</li><li>마케팅 페이지처럼 표현이 목적인 산출물에는 이 판단을 적용하지 않는다</li></ul><div class="blk-source-note" aria-label="출처"><ul><li><span class="blk-source-note__label">블록 레지스트리</span><code class="blk-source-note__locator">src/blocks/registry.ts</code></li></ul></div></div></section><section class="section blk-implication" id="implication"><div class="measure"><h3 class="blk-implication__title">무엇이 달라지나</h3><dl class="blk-implication__list"><dt>에이전트를 쓰는 사람</dt><dd>결과물이 마음에 안 들 때 고칠 곳은 프롬프트가 아니라 spec이거나 블록이다.</dd><dt>블록을 추가하는 사람</dt><dd>최소 fixture를 테스트에 넣지 않으면 테스트가 실패한다. 우회하지 말고 fixture를 쓰면 된다.</dd><dt>문서를 받는 사람</dt><dd>manifest에 spec 해시와 외부 요청 수가 적혀 있어 받은 파일을 직접 검증할 수 있다.</dd></dl></div></section><section class="section blk-risk-register breakout" id="risks"><h3 class="blk-risk-register__title">위험</h3><div class="blk-risk-register__scroll"><table class="blk-risk-register__table"><thead><tr><th scope="col">위험</th><th scope="col">가능성</th><th scope="col">영향</th><th scope="col">대응</th><th scope="col">담당</th></tr></thead><tbody><tr data-likelihood="high" data-impact="medium"><th scope="row">블록 어휘가 커지면서 스타일시트 전체가 모든 문서에 실린다</th><td>높음</td><td>중간</td><td>실측 중이다. 현재 dashboard 산출물에서 CSS가 34.7%를 차지한다. 쓰는 블록만 싣는 방식이 필요한지 판단할 근거를 모으고 있다</td><td>미정</td></tr><tr data-likelihood="medium" data-impact="high"><th scope="row">블록이 없어서 표현하지 못한 것을 에이전트가 근사치로 흉내낸다</th><td>중간</td><td>높음</td><td>스킬 문서에 금지로 명시하고, 지원하지 않는 artifact를 report로 fallback시키는 것도 막았다</td><td>미정</td></tr></tbody></table></div></section><section class="section blk-action-plan" id="actions"><div class="measure"><h3 class="blk-action-plan__title">다음 행동</h3><ol class="blk-action-plan__list"><li class="blk-action-plan__item" data-blocking="false"><span class="blk-action-plan__label">스타일시트를 문서가 쓰는 블록만 싣도록 만들 수 있는지 확인</span><span class="blk-action-plan__owner">미정</span></li><li class="blk-action-plan__item" data-blocking="false"><span class="blk-action-plan__label">clean 후보 사이의 선호도 기준이 실제 의사결정에 필요한지 측정하기</span><span class="blk-action-plan__owner">미정</span></li></ol></div></section><section class="section blk-source-ledger breakout" id="ledger"><h3 class="blk-source-ledger__title">출처</h3><div class="blk-source-ledger__scroll"><table class="blk-source-ledger__table"><thead><tr><th scope="col">출처</th><th scope="col">다루는 범위</th><th scope="col">다루지 않는 것</th></tr></thead><tbody><tr><th scope="row">Forma Spec 스키마와 검증기</th><td>검증 규칙과 계약 검사</td><td>규칙이 잡는 것만 잡는다. 내용의 진위는 검사하지 않는다</td></tr><tr><th scope="row">블록 레지스트리</th><td>블록 59종의 정의와 artifact별 허용 목록</td><td>현재 상태 기준이며 계속 늘어난다</td></tr><tr><th scope="row">브라우저 QA 결과</th><td>fixture 8종의 브라우저·접근성·오프라인 측정</td><td>커밋된 산출물을 검사한다. 재렌더하지 않으므로 렌더러 변경 후에는 직접 재렌더해야 한다</td></tr><tr><th scope="row">보안 문서</th><td>네트워크 자세와 Room Mode의 예외</td><td>설계 의도의 기록이며 감사 보고서가 아니다</td></tr></tbody></table></div></section>
   </main>
-  <aside class="side-toc no-print"><nav class="toc" aria-label="섹션 이동"><p class="toc__label" aria-hidden="true">이 문서의 목차</p><a href="#cover">Forma는 왜 spec 우선인가</a><a href="#thesis">에이전트가 HTML을 쓰면 품질은 프롬프트 운에 달리고, 같은 입력이 같은 결과를 내지 않는다.</a><a href="#exec">핵심 요약</a><a href="#finding-determinism">같은 spec은 같은 HTML을 낸다. 그래서 렌더 결과를 테스트로 고정할 수 있다.</a><a href="#evidence">무엇이 이 판단을 뒷받침하나</a><a href="#finding-cost">대가는 표현의 자유다. 블록 어휘에 없는 것은 만들 수 없다.</a><a href="#options">선택지</a><a href="#matrix">가중치 적용</a><a href="#recommendation">spec 우선을 유지하고, 표현이 부족할 때는 프롬프트를 고치지 말고 블록을 추가한다.</a><a href="#implication">무엇이 달라지나</a><a href="#risks">위험</a><a href="#actions">다음 행동</a><a href="#ledger">출처</a></nav></aside>
+  <aside class="side-toc no-print" aria-label="현재 페이지 목차"><nav class="toc" aria-label="섹션 이동"><p class="toc__label" aria-hidden="true">이 문서의 목차</p><a href="#cover">Forma는 왜 spec 우선인가</a><a href="#thesis">에이전트가 HTML을 쓰면 품질은 프롬프트 운에 달리고, 같은 입력이 같은 결과를 내지 않는다.</a><a href="#exec">핵심 요약</a><a href="#finding-determinism">같은 spec은 같은 HTML을 낸다. 그래서 렌더 결과를 테스트로 고정할 수 있다.</a><a href="#evidence">무엇이 이 판단을 뒷받침하나</a><a href="#finding-cost">대가는 표현의 자유다. 블록 어휘에 없는 것은 만들 수 없다.</a><a href="#options">선택지</a><a href="#matrix">가중치 적용</a><a href="#recommendation">spec 우선을 유지하고, 표현이 부족할 때는 프롬프트를 고치지 말고 블록을 추가한다.</a><a href="#implication">무엇이 달라지나</a><a href="#risks">위험</a><a href="#actions">다음 행동</a><a href="#ledger">출처</a></nav></aside>
 </div>
 <footer class="doc no-print">
   <p class="blk-source-note">Forma 0.1.0 · public</p>
@@ -2080,17 +2296,17 @@
   }
 
   function initTocActiveState() {
-    const links = document.querySelectorAll(".toc a[href^='#']");
+    const links = document.querySelectorAll(".toc a[href^='#'], .guide-nav a[href^='#']");
     if (links.length === 0 || !("IntersectionObserver" in window)) return;
     const targets = new Map();
     for (const link of links) {
       const id = link.getAttribute("href").slice(1);
       const el = document.getElementById(id);
-      if (el) targets.set(el, link);
+      if (el) targets.set(el, [...(targets.get(el) || []), link]);
     }
-    const setActive = (link) => {
+    const setActive = (activeLinks) => {
       for (const l of links) l.removeAttribute("aria-current");
-      if (link) link.setAttribute("aria-current", "true");
+      for (const link of activeLinks || []) link.setAttribute("aria-current", "true");
     };
     const observer = new IntersectionObserver(
       (entries) => {

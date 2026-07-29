@@ -105,23 +105,72 @@ export function artifactCss(): string {
     margin-block-end: var(--space-4);
   }
 
-  /* Guided Path — a persistent orientation rail and a controlled reading
-     measure keep long procedures scannable without narrowing the workspace. */
+  /* Guided Path — DocPilot-informed navigation separates the guide's broad
+     path on the left from the current page outline on the right. The centre
+     remains a controlled procedure measure rather than becoming a portal. */
   :root[data-artifact="manual"] .layout {
     grid-template-columns: 232px minmax(0, 1fr);
     max-width: none;
-    gap: var(--space-7);
+    gap: var(--space-6);
   }
-  :root[data-artifact="manual"] .layout > .side-toc {
+  :root[data-artifact="manual"] .layout > .guide-sidebar {
     order: -1;
     position: sticky;
     inset-block-start: var(--space-5);
     align-self: start;
     max-height: calc(100vh - var(--space-8));
     overflow-y: auto;
-    border-inline-end: 1px solid var(--color-border);
-    border-block-end: none;
     padding-inline-end: var(--space-4);
+    min-block-size: 100%;
+    box-shadow: 1px 0 0 var(--color-border);
+  }
+  :root[data-artifact="manual"] .layout > .side-toc {
+    order: 1;
+    display: none;
+    position: sticky;
+    inset-block-start: var(--space-5);
+    align-self: start;
+    max-height: calc(100vh - var(--space-8));
+    overflow-y: auto;
+    border-block-end: none;
+    padding-inline-start: var(--space-3);
+  }
+  :root[data-artifact="manual"] .guide-nav__label,
+  :root[data-artifact="manual"] .guide-nav__group-label {
+    margin: 0;
+    color: var(--color-text-muted);
+    font-size: 0.6875rem;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+  :root[data-artifact="manual"] .guide-nav__label {
+    color: var(--color-text);
+    margin-block-end: var(--space-5);
+  }
+  :root[data-artifact="manual"] .guide-nav__group + .guide-nav__group {
+    margin-block-start: var(--space-5);
+  }
+  :root[data-artifact="manual"] .guide-nav__group-label {
+    margin-block-end: var(--space-2);
+    padding-inline: 0.65em;
+  }
+  :root[data-artifact="manual"] .guide-nav a {
+    display: block;
+    padding: 0.4em 0.65em;
+    color: var(--color-text-muted);
+    text-decoration: none;
+    border-radius: var(--radius-sm);
+    font-size: 0.875rem;
+    line-height: 1.45;
+  }
+  :root[data-artifact="manual"] .guide-nav a:hover {
+    color: var(--color-text);
+  }
+  :root[data-artifact="manual"] .guide-nav a[aria-current="true"] {
+    background: var(--color-surface-raised);
+    color: var(--color-text);
+    font-weight: 600;
   }
   :root[data-artifact="manual"] .side-toc .toc {
     flex-direction: column;
@@ -237,17 +286,13 @@ export function artifactCss(): string {
      a wide viewport left empty on the right, which read as an unfinished
      page rather than a deliberate column. */
   :root[data-artifact="manual"] .layout {
-    max-width: calc(232px + var(--space-7) + 66rem);
+    max-width: calc(232px + var(--space-6) + 66rem);
     margin-inline: auto;
   }
   /* The rail's divider stopped where its list ended, leaving a vertical line
      hanging in the middle of the page. A full-height divider on the grid
      column reads as structure; a partial one reads as a stray border. */
-  :root[data-artifact="manual"] .layout > .side-toc {
-    border-inline-end: none;
-    min-block-size: 100%;
-    box-shadow: 1px 0 0 var(--color-border);
-  }
+  :root[data-artifact="manual"] .layout > .side-toc { border-inline-end: none; }
 
   /* The deck sat *below* the body size, so the document opened with its
      hierarchy inverted: the sentence explaining the title was quieter than
@@ -381,6 +426,23 @@ export function artifactCss(): string {
     :root[data-artifact="dashboard"] .doc > .section { grid-column: 1 / -1; }
     :root[data-artifact="dashboard"] .doc > .blk-anomaly { grid-column: 1 / span 7; }
     :root[data-artifact="dashboard"] .doc > .blk-action-plan { grid-column: 8 / -1; }
+    :root[data-artifact="advanced"] .doc {
+      display: grid;
+      grid-template-columns: repeat(12, minmax(0, 1fr));
+      column-gap: var(--space-5);
+      align-content: start;
+    }
+    :root[data-artifact="advanced"] .doc > .section { grid-column: 1 / -1; }
+    :root[data-artifact="advanced"] .doc > .blk-challenge { grid-column: 1 / span 7; }
+    :root[data-artifact="advanced"] .doc > .blk-simulation { grid-column: 8 / -1; }
+  }
+
+  @media (min-width: 1280px) {
+    :root[data-artifact="manual"] .layout {
+      grid-template-columns: 232px minmax(0, 1fr) 200px;
+      max-width: calc(232px + 200px + 66rem + var(--space-8));
+    }
+    :root[data-artifact="manual"] .layout > .side-toc { display: block; }
   }
 
   /* Decision Room needs enough horizontal room for evidence graphs,
@@ -390,6 +452,37 @@ export function artifactCss(): string {
     max-width: min(100%, 96rem);
   }
   :root[data-artifact="advanced"] .breakout { max-width: 100%; }
+  :root[data-artifact="advanced"] .blk-brief {
+    border-block-start: 4px solid var(--color-accent);
+    padding-block-start: var(--space-7);
+  }
+  :root[data-artifact="advanced"] .blk-evidence-graph {
+    background: var(--color-surface);
+    border-block: 1px solid var(--color-border-strong);
+    padding-inline: var(--space-5);
+  }
+  :root[data-artifact="advanced"] .claim {
+    display: grid;
+    grid-template-columns: minmax(8rem, 0.3fr) minmax(0, 1fr);
+    gap: var(--space-2) var(--space-5);
+    border-block-end: 1px solid var(--color-border);
+  }
+  :root[data-artifact="advanced"] .claim__meta { grid-row: 1 / span 3; }
+  :root[data-artifact="advanced"] .claim__statement,
+  :root[data-artifact="advanced"] .claim__support,
+  :root[data-artifact="advanced"] .claim__contradiction { grid-column: 2; }
+  :root[data-artifact="advanced"] .blk-challenge {
+    background: color-mix(in oklab, var(--color-danger) 7%, var(--color-canvas));
+    padding-inline: var(--space-5);
+  }
+  :root[data-artifact="advanced"] .blk-simulation {
+    background: color-mix(in oklab, var(--color-info) 7%, var(--color-canvas));
+    padding-inline: var(--space-5);
+  }
+  :root[data-artifact="advanced"] .blk-decision-record {
+    border-block: 2px solid var(--color-text);
+    padding-inline: var(--space-5);
+  }
 
   @media (max-width: 900px) {
     :root[data-artifact="dashboard"] .layout,
@@ -399,7 +492,8 @@ export function artifactCss(): string {
       padding-inline: var(--space-4);
     }
     :root[data-artifact="dashboard"] .layout > .side-toc,
-    :root[data-artifact="manual"] .layout > .side-toc {
+    :root[data-artifact="manual"] .layout > .side-toc,
+    :root[data-artifact="manual"] .layout > .guide-sidebar {
       order: -1;
       position: static;
       max-height: none;
@@ -409,6 +503,33 @@ export function artifactCss(): string {
       margin-inline-start: 0;
       padding: 0 0 var(--space-4);
     }
+    :root[data-artifact="manual"] .layout > .side-toc { display: none; }
+    :root[data-artifact="manual"] .guide-nav {
+      display: flex;
+      gap: var(--space-2);
+      overflow-x: auto;
+      padding-block-end: var(--space-1);
+    }
+    :root[data-artifact="manual"] :is(.guide-nav__label, .guide-nav__group-label) {
+      display: none;
+    }
+    :root[data-artifact="manual"] .guide-nav__group {
+      display: contents;
+    }
+    :root[data-artifact="manual"] .guide-nav a {
+      flex: none;
+      white-space: nowrap;
+      background: var(--color-surface);
+    }
+    :root[data-artifact="advanced"] .claim {
+      grid-template-columns: minmax(0, 1fr);
+    }
+    :root[data-artifact="advanced"] .claim__meta { grid-row: auto; }
+    :root[data-artifact="advanced"] :is(
+      .claim__statement,
+      .claim__support,
+      .claim__contradiction
+    ) { grid-column: 1; }
     :root[data-artifact="dashboard"] .side-toc .toc,
     :root[data-artifact="manual"] .side-toc .toc {
       position: static;

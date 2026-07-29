@@ -14,6 +14,13 @@ export interface DesignLintFinding {
   message: string;
 }
 
+export const DEFAULT_DESIGN_LINT_TARGETS = [
+  "examples/dashboard/output/index.html",
+  "examples/report/output/index.html",
+  "examples/manual/output/index.html",
+  "examples/advanced/output/index.html",
+] as const;
+
 const BANNED_CONTENT_VALUES = ['content: "["', "content: '['", 'content: "{"', "content: '{'", 'content: "</>"', "content: '</>'"];
 
 /** Detects `::before`/`::after` rules that combine border-left with a top/bottom
@@ -267,19 +274,18 @@ export async function lintHtmlFile(htmlPath: string): Promise<DesignLintFinding[
 }
 
 async function main() {
-  const target = process.argv[2];
-  if (!target) {
-    console.error("usage: design-lint.ts <path-to-index.html>");
-    process.exit(1);
+  const targets =
+    process.argv.length > 2 ? process.argv.slice(2) : [...DEFAULT_DESIGN_LINT_TARGETS];
+  for (const target of targets) {
+    const findings = await lintHtmlFile(target);
+    if (findings.length === 0) {
+      console.log(`forma design-lint: ${target} — no violations found`);
+      continue;
+    }
+    console.log(`forma design-lint: ${target} — ${findings.length} finding(s)`);
+    for (const f of findings) console.log(`  - [${f.rule}] ${f.message}`);
+    process.exitCode = 1;
   }
-  const findings = await lintHtmlFile(target);
-  if (findings.length === 0) {
-    console.log(`forma design-lint: ${target} — no violations found`);
-    return;
-  }
-  console.log(`forma design-lint: ${target} — ${findings.length} finding(s)`);
-  for (const f of findings) console.log(`  - [${f.rule}] ${f.message}`);
-  process.exitCode = 1;
 }
 
 if (import.meta.url === `file://${process.argv[1]}`) {

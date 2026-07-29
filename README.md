@@ -16,11 +16,17 @@ checks the result.
 The output is one offline HTML file: no account, no server, no tracking, and no
 external network requests.
 
-**[Open the visual introduction](./docs/forma-introduction/output/index.html)**
-· [See a dashboard](./examples/dashboard/output/index.html)
-· [See a report](./examples/report/output/index.html)
-· [See a manual](./examples/manual/output/index.html)
-· [See a Decision Room](./examples/advanced/output/index.html)
+**[Open the live HTML gallery](https://dotoricode.github.io/forma/)**
+· [Visual introduction](./docs/forma-introduction/output/index.html)
+· [Dashboard](https://dotoricode.github.io/forma/dashboard/)
+· [Report](https://dotoricode.github.io/forma/report/)
+· [Manual](https://dotoricode.github.io/forma/manual/)
+· [Decision Room](https://dotoricode.github.io/forma/advanced/)
+
+The gallery is rebuilt from the current example specs and deployed from
+`main` with GitHub Pages. Every preview links to the actual self-contained
+HTML, so it can be inspected in a browser instead of only as repository
+source.
 
 ## Designed differently from prompt-to-HTML generators
 
@@ -46,17 +52,53 @@ that decision repeatable, inspectable, and testable.
 
 These are sometimes called themes, but they are more than skins. Each one
 changes information hierarchy, page rhythm, navigation, density, and the
-semantic blocks available to the Agent.
+semantic blocks available to the Agent. Their writing voices differ too:
+operational and terse, edited and argumentative, calm and procedural, or
+deliberative and explicit about uncertainty.
 
-| Signal Grid · dashboard | Editorial Brief · report |
-|---|---|
-| [![Signal Grid dashboard design](./docs/images/artifacts/dashboard.png)](./examples/dashboard/output/index.html) | [![Editorial Brief report design](./docs/images/artifacts/report.png)](./examples/report/output/index.html) |
-| Dense operational hierarchy, persistent context, hard dividers, and quantitative emphasis. | Asymmetric editorial grid, thesis-first typography, marginal navigation, and evidence-led pacing. |
+The light and dark modes use semantic colors mapped from VS Code's built-in
+Light+ and Dark+ palettes. Blue carries interaction and primary series;
+green, orange, red, purple, and cyan distinguish state and data without
+turning the document into decoration. See the
+[palette mapping](./docs/vscode-palette.md).
 
-| Guided Path · manual | Decision Room · advanced |
+### Signal Grid · dashboard
+
+A terse operations surface. Status, KPIs, sparklines, and comparative charts
+lead the first screen; prose explains only what the visual evidence cannot.
+
+| Light+ | Dark+ |
 |---|---|
-| [![Guided Path manual design](./docs/images/artifacts/manual.png)](./examples/manual/output/index.html) | [![Decision Room advanced design](./docs/images/artifacts/advanced.png)](./examples/advanced/output/index.html) |
-| Stable wayfinding, numbered procedure rhythm, visible checkpoints, and restrained code treatment. | Debate-first hierarchy, claim/evidence contrast, risk emphasis, simulation controls, and a durable decision record. |
+| [![Signal Grid dashboard in light mode](./docs/images/artifacts/dashboard.png)](https://dotoricode.github.io/forma/dashboard/) | [![Signal Grid dashboard in dark mode](./docs/images/artifacts/dashboard-dark.png)](https://dotoricode.github.io/forma/dashboard/) |
+
+### Editorial Brief · report
+
+An edited brief. It states the judgment first, then paces claims, evidence,
+alternatives, and recommendations through an asymmetric editorial grid.
+
+| Light+ | Dark+ |
+|---|---|
+| [![Editorial Brief report in light mode](./docs/images/artifacts/report.png)](https://dotoricode.github.io/forma/report/) | [![Editorial Brief report in dark mode](./docs/images/artifacts/report-dark.png)](https://dotoricode.github.io/forma/report/) |
+
+### Guided Path · manual
+
+A calm, imperative guide inspired by mature documentation products: grouped
+navigation on the left, a wide procedure in the center, and an on-page
+outline on the right. Steps name both the action and the observable result.
+
+| Light+ | Dark+ |
+|---|---|
+| [![Guided Path manual in light mode](./docs/images/artifacts/manual.png)](https://dotoricode.github.io/forma/manual/) | [![Guided Path manual in dark mode](./docs/images/artifacts/manual-dark.png)](https://dotoricode.github.io/forma/manual/) |
+
+### Decision Room · advanced
+
+A facilitated decision record. Claims and counterclaims stay visibly
+separate, simulations remain conditional, and dissent survives the final
+recommendation.
+
+| Light+ | Dark+ |
+|---|---|
+| [![Decision Room in light mode](./docs/images/artifacts/advanced.png)](https://dotoricode.github.io/forma/advanced/) | [![Decision Room in dark mode](./docs/images/artifacts/advanced-dark.png)](https://dotoricode.github.io/forma/advanced/) |
 
 ## Install in your Agent
 

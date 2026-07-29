@@ -216,10 +216,56 @@ export function blockCss(): string {
 
   /* chart */
   .blk-chart { max-width: 100%; }
-  .blk-chart__title { font-size: 1rem; margin-block-end: var(--space-4); color: var(--color-text-muted); }
+  .blk-chart__title { font-size: 1rem; margin-block-end: var(--space-2); }
+  .blk-chart__reading {
+    max-width: 48rem;
+    margin-block-end: var(--space-4);
+    color: var(--color-text-muted);
+  }
   .blk-chart svg text { font-family: var(--font-sans); fill: var(--color-text-muted); font-size: 0.75rem; }
-  .blk-chart .chart-bar { fill: var(--color-accent); }
-  .blk-chart .chart-axis { stroke: var(--color-border); }
+  .blk-chart .chart-axis { stroke: var(--color-border-strong); }
+  .blk-chart .chart-grid { stroke: var(--color-border); stroke-width: 1; }
+  .blk-chart .chart-line {
+    fill: none;
+    stroke-width: 2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+  .blk-chart :is(.chart-line, .chart-point)[data-series="0"] { stroke: var(--color-chart-1); }
+  .blk-chart :is(.chart-line, .chart-point)[data-series="1"] { stroke: var(--color-chart-2); }
+  .blk-chart :is(.chart-line, .chart-point)[data-series="2"] { stroke: var(--color-chart-3); }
+  .blk-chart :is(.chart-line, .chart-point)[data-series="3"] { stroke: var(--color-chart-4); }
+  .blk-chart :is(.chart-line, .chart-point)[data-series="4"] { stroke: var(--color-chart-5); }
+  .blk-chart :is(.chart-line, .chart-point)[data-series="5"] { stroke: var(--color-chart-6); }
+  .blk-chart .chart-point[data-series="0"] { fill: var(--color-chart-1); }
+  .blk-chart .chart-point[data-series="1"] { fill: var(--color-chart-2); }
+  .blk-chart .chart-point[data-series="2"] { fill: var(--color-chart-3); }
+  .blk-chart .chart-point[data-series="3"] { fill: var(--color-chart-4); }
+  .blk-chart .chart-point[data-series="4"] { fill: var(--color-chart-5); }
+  .blk-chart .chart-point[data-series="5"] { fill: var(--color-chart-6); }
+  .blk-chart .chart-bar[data-series="0"] { fill: var(--color-chart-1); }
+  .blk-chart .chart-bar[data-series="1"] { fill: var(--color-chart-2); }
+  .blk-chart .chart-bar[data-series="2"] { fill: var(--color-chart-3); }
+  .blk-chart .chart-bar[data-series="3"] { fill: var(--color-chart-4); }
+  .blk-chart .chart-bar[data-series="4"] { fill: var(--color-chart-5); }
+  .blk-chart .chart-bar[data-series="5"] { fill: var(--color-chart-6); }
+  .blk-chart__legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2) var(--space-5);
+    list-style: none;
+    margin-block-start: var(--space-3);
+    font-size: 0.8125rem;
+    color: var(--color-text-muted);
+  }
+  .blk-chart__legend li { display: inline-flex; align-items: center; gap: var(--space-2); }
+  .blk-chart__swatch { inline-size: 0.75rem; block-size: 0.25rem; border-radius: 999px; }
+  .blk-chart__swatch[data-series="0"] { background: var(--color-chart-1); }
+  .blk-chart__swatch[data-series="1"] { background: var(--color-chart-2); }
+  .blk-chart__swatch[data-series="2"] { background: var(--color-chart-3); }
+  .blk-chart__swatch[data-series="3"] { background: var(--color-chart-4); }
+  .blk-chart__swatch[data-series="4"] { background: var(--color-chart-5); }
+  .blk-chart__swatch[data-series="5"] { background: var(--color-chart-6); }
 
   /* finding / risk / decision */
   .blk-finding__badge, .blk-risk__badge {

@@ -4,7 +4,7 @@ import { buildStylesheet } from "../design/foundations-css.js";
 import { buildFontFaceCss } from "../design/fonts.js";
 import { buildInteractiveScript } from "./interactive.js";
 import { composeDocument } from "./compose.js";
-import { DEFAULT_VARIANT } from "../spec/artifact.js";
+import { ART_DIRECTION, DEFAULT_VARIANT } from "../spec/artifact.js";
 import { applyComposition, type CompositionAxes } from "./composition.js";
 
 /* The button is icon-only, so its accessible name has to cover both
@@ -14,6 +14,14 @@ const THEME_ICONS = `<svg class="theme-toggle__icon theme-toggle__icon--moon" vi
 const SKIP_LABEL: Record<"ko" | "en", string> = {
   en: "Skip to main content",
   ko: "본문으로 건너뛰기",
+};
+const GUIDE_ASIDE_LABEL: Record<"ko" | "en", string> = {
+  en: "Guide index",
+  ko: "가이드 목록",
+};
+const PAGE_ASIDE_LABEL: Record<"ko" | "en", string> = {
+  en: "Page outline",
+  ko: "현재 페이지 목차",
 };
 const GENERATOR = "Forma 0.1.0";
 
@@ -46,6 +54,12 @@ export async function renderSpecToHtml(
   const compositionAttr = composition
     ? ` data-measure="${composition.measure}" data-figure-placement="${composition.figurePlacement}" data-type-scale="${composition.typeScale}"`
     : "";
+  const guideAside = composed.guideNavHtml
+    ? `<aside class="guide-sidebar no-print" aria-label="${escapeHtml(GUIDE_ASIDE_LABEL[htmlLangAttr])}">${composed.guideNavHtml}</aside>\n`
+    : "";
+  const pageAside = composed.tocHtml
+    ? `\n  <aside class="side-toc no-print" aria-label="${escapeHtml(PAGE_ASIDE_LABEL[htmlLangAttr])}">${composed.tocHtml}</aside>`
+    : "";
 
   const html = `<!doctype html>
 <html lang="${htmlLangAttr}"${themeAttr}${designAttr}>
@@ -66,6 +80,8 @@ export async function renderSpecToHtml(
   <div class="doc-bar__inner">
     <p class="doc-bar__identity">
       <span class="doc-bar__mark" aria-hidden="true"></span>
+      <span class="doc-bar__brand">Forma</span>
+      <span class="doc-bar__direction">${escapeHtml(ART_DIRECTION[spec.meta.artifact])}</span>
       <span class="doc-bar__title">${escapeHtml(spec.meta.title)}</span>
     </p>
     <div class="doc-bar__actions">
@@ -75,10 +91,9 @@ export async function renderSpecToHtml(
   </div>
 </header>
 <div class="layout">
-  <main class="doc" id="main" data-density="${spec.meta.density}"${compositionAttr}>
+  ${guideAside}<main class="doc" id="main" data-density="${spec.meta.density}"${compositionAttr}>
 ${composed.bodyHtml}
-  </main>
-  ${composed.tocHtml ? `<aside class="side-toc no-print">${composed.tocHtml}</aside>` : ""}
+  </main>${pageAside}
 </div>
 <footer class="doc no-print">
   <p class="blk-source-note">${escapeHtml(GENERATOR)} · ${escapeHtml(spec.meta.confidentiality)}</p>

@@ -172,6 +172,8 @@ const chart = defineBlock({
   schema: BlockBase.extend({
     type: z.literal("chart"),
     title: z.string().optional(),
+    /** The conclusion the reader should take from the visual. */
+    reading: z.string().optional(),
     kind: z.enum(["bar", "line"]).default("bar"),
     categories: z.array(z.string().min(1)).min(1),
     series: z.array(z.object({ label: z.string().min(1), values: z.array(z.number()).min(1) })).min(1),
@@ -181,11 +183,20 @@ const chart = defineBlock({
     return (
       <Section id={block.id} className="blk-chart breakout">
         {block.title ? <h2 className="blk-chart__title">{block.title}</h2> : null}
+        {block.reading ? <p className="blk-chart__reading">{block.reading}</p> : null}
         {/* The SVG gains a wrapper element that the string renderer did
             not have: `dangerouslySetInnerHTML` needs a host node. It is a
             plain block-level div, so layout is unchanged, and naming it
             matches the diagram blocks' `__canvas`. */}
         <InlineSvg className="blk-chart__canvas" svg={sanitizeSvg(renderChartSvg(block))} />
+        <ul className="blk-chart__legend" aria-label={block.title}>
+          {block.series.map((series, i) => (
+            <li key={series.label}>
+              <span className="blk-chart__swatch" data-series={i} aria-hidden="true"></span>
+              {series.label}
+            </li>
+          ))}
+        </ul>
         <SourceNotes block={block} ctx={ctx} />
       </Section>
     );

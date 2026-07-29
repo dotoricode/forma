@@ -19,6 +19,20 @@ might want this, build a `report` and say the Decision Room exists.
 | `simulation` | `simulation` — let the room move the numbers |
 | `decision` | `decision-record` — the outcome, its owner, and its dissent |
 
+## Writing voice
+
+Write like a facilitated decision record, not a persuasive report.
+
+- Frame the opening as a question the room can close today.
+- State claims, counterclaims, and assumptions as separate sentences. Do not
+  smooth disagreement into neutral summary prose.
+- Write the strongest counter-argument in its strongest form. Avoid
+  straw-man qualifiers such as "some may feel".
+- Phrase simulation outputs conditionally: "At 12% adoption, payback moves
+  to Q4", not "The model proves the option is safe".
+- Record the final decision in past tense with owner, dissent, and explicit
+  revisit conditions so a future reader can reconstruct the room.
+
 ## Workflow
 
 1. **Write the question so it can be answered today.** `brief.decideToday` is

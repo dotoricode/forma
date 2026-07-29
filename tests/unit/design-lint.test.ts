@@ -1,8 +1,17 @@
 import { describe, expect, it } from "vitest";
-import { lintCss } from "../../src/qa/design-lint.js";
+import { DEFAULT_DESIGN_LINT_TARGETS, lintCss } from "../../src/qa/design-lint.js";
 import { buildStylesheet } from "../../src/design/foundations-css.js";
 
 describe("lintCss", () => {
+  it("covers all four example artifacts by default", () => {
+    expect(DEFAULT_DESIGN_LINT_TARGETS).toEqual([
+      "examples/dashboard/output/index.html",
+      "examples/report/output/index.html",
+      "examples/manual/output/index.html",
+      "examples/advanced/output/index.html",
+    ]);
+  });
+
   it("limits key-point counters to direct items so source locators do not collapse", () => {
     const css = buildStylesheet("");
     expect(css).toContain(".blk-key-points > ol > li {");
@@ -82,7 +91,7 @@ describe("lintCss", () => {
   it("keeps wide-screen artifact frames proportionate to the viewport", () => {
     const css = buildStylesheet("");
     expect(css).toContain('--measure-wide: min(100%, 72rem);');
-    expect(css).toContain('calc(232px + var(--space-7) + 66rem)');
+    expect(css).toContain('calc(232px + var(--space-6) + 66rem)');
     expect(css).toContain(':root[data-artifact="manual"] .measure { max-width: 48rem; }');
   });
 
@@ -95,7 +104,7 @@ describe("lintCss", () => {
 
   it("uses a white light canvas, including the dashboard workspace", () => {
     const css = buildStylesheet("");
-    expect(css).toContain("--color-canvas: oklch(100% 0 0);");
+    expect(css).toContain("--color-canvas: #FFFFFF;");
     const dashboardTokens =
       css.match(/:root\[data-artifact="dashboard"\]\s*\{([^}]*)\}/)?.[1] ?? "";
     expect(dashboardTokens).not.toContain("--color-canvas:");

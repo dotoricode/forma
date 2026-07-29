@@ -19,6 +19,7 @@ jobs:
           cache: pnpm
       - run: pnpm install --frozen-lockfile
       - run: pnpm build
+      - run: pnpm pages:build
       - run: node scripts/check-naming.mjs
       - run: pnpm forma verify-skills
 
@@ -40,5 +41,5 @@ jobs:
           for mode in explain review test report; do
             pnpm forma render "fixtures/$mode/forma.spec.json" --out "fixtures/$mode/output"
           done
-      - run: pnpm lint:design fixtures/explain/output/index.html
+      - run: pnpm lint:design
       - run: pnpm qa
