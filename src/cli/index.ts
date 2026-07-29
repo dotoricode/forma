@@ -3,6 +3,7 @@ import { Command } from "commander";
 import path from "node:path";
 import { readFile } from "node:fs/promises";
 import { createServer } from "node:http";
+import { networkInterfaces } from "node:os";
 import { loadSpecFile, renderSpecFileToDir, FormaSpecError } from "../renderer/render.js";
 import { buildFormaJsonSchema } from "../spec/json-schema.js";
 import { installSkills, verifySkills } from "./skills.js";
@@ -106,38 +107,131 @@ program
 
 program
   .command("advanced <spec>")
-  .description("Build a Decision Room. --portable travels as a file with no network at all.")
+  .description("Build a Decision Room. --portable travels as a file; --room opens a live session.")
   .option("--out <dir>", "output directory", "forma-room")
   .option("--portable", "single self-contained build, no server", false)
-  .action(async (specPath: string, opts: { out: string; portable: boolean }) => {
-    try {
-      const spec = await loadSpecFile(specPath);
-      if (spec.meta.artifact !== "advanced") {
-        throw new FormaSpecError(
-          `forma: 'advanced' needs an artifact of 'advanced'; this spec is '${spec.meta.artifact}'.`,
-        );
+  .option("--room", "open a live Decision Room on this machine", false)
+  .option("--lan", "let other machines on the local network join (off by default)", false)
+  .option("-p, --port <port>", "port for Room Mode", "4180")
+  .action(
+    async (
+      specPath: string,
+      opts: { out: string; portable: boolean; room: boolean; lan: boolean; port: string },
+    ) => {
+      try {
+        const spec = await loadSpecFile(specPath);
+        if (spec.meta.artifact !== "advanced") {
+          throw new FormaSpecError(
+            `forma: 'advanced' needs an artifact of 'advanced'; this spec is '${spec.meta.artifact}'.`,
+          );
+        }
+        if (opts.portable && opts.room) {
+          throw new FormaSpecError(
+            "forma: --portable and --room are different products. Pick one.",
+          );
+        }
+        if (!opts.portable && !opts.room) {
+          throw new FormaSpecError(
+            "forma: pass --portable for a file that makes no requests, or --room to open a live session.",
+          );
+        }
+        if (opts.lan && !opts.room) {
+          throw new FormaSpecError("forma: --lan only means something with --room.");
+        }
+
+        if (opts.portable) {
+          if (spec.meta.interaction === "live") {
+            throw new FormaSpecError(
+              "forma: interaction 'live' needs Room Mode. A portable build cannot sync participants.",
+            );
+          }
+          const outcome = await renderSpecFileToDir(specPath, opts.out, { portable: true });
+          console.log(`forma: Decision Room (portable) ${outcome.htmlPath} (${outcome.bytes} bytes)`);
+          console.log("forma: no external network requests, no telemetry, no CDN.");
+          console.log(`forma: verify it with \`forma qa ${opts.out}\`.`);
+          return;
+        }
+
+        await openRoom(specPath, opts);
+      } catch (error) {
+        exitWithError(error);
       }
-      if (!opts.portable) {
-        // Room Mode binds a local server and syncs participants over the
-        // LAN. That is a different security posture from a file that makes
-        // no requests at all, so it is not the default and not implied.
-        throw new FormaSpecError(
-          "forma: only --portable is implemented. Room Mode (a localhost server with LAN opt-in) is not built yet.",
-        );
-      }
-      if (spec.meta.interaction === "live") {
-        throw new FormaSpecError(
-          "forma: interaction 'live' needs Room Mode. A portable build cannot sync participants.",
-        );
-      }
-      const outcome = await renderSpecFileToDir(specPath, opts.out, { portable: true });
-      console.log(`forma: Decision Room (portable) ${outcome.htmlPath} (${outcome.bytes} bytes)`);
-      console.log("forma: no external network requests, no telemetry, no CDN.");
-      console.log(`forma: verify it with \`forma qa ${opts.out}\`.`);
-    } catch (error) {
-      exitWithError(error);
-    }
+    },
+  );
+
+/**
+ * Room Mode. Kept out of the action body because it has a lifecycle the
+ * other commands do not: it renders, binds a port, prints a credential, and
+ * then waits for people.
+ */
+async function openRoom(
+  specPath: string,
+  opts: { out: string; lan: boolean; port: string },
+): Promise<void> {
+  const { startRoomServer } = await import("../room/server.js");
+  const { createSessionToken } = await import("../room/token.js");
+  const { hashText, writeFreeze } = await import("../room/persist.js");
+  const { loadSpecFileWithSource } = await import("../renderer/render.js");
+  const { renderSpecToHtml } = await import("../renderer/shell.js");
+  const { redactSecrets, stripHomeDirectory } = await import("../security/sanitize.js");
+
+  const { spec, raw } = await loadSpecFileWithSource(specPath);
+  const rendered = await renderSpecToHtml(spec);
+  // The same guards the file path applies. A room document is the portable
+  // document plus a panel, so it must not be less redacted than the file.
+  const html = stripHomeDirectory(redactSecrets(rendered.html).text);
+
+  const bind = opts.lan ? ("lan" as const) : ("loopback" as const);
+  const token = createSessionToken();
+
+  const handle = await startRoomServer({
+    spec,
+    html,
+    specHash: hashText(raw),
+    sourceHash: hashText(html),
+    token,
+    bind,
+    port: Number(opts.port),
+    onFreeze: (state) => writeFreeze(state, { outDir: opts.out, spec, html, bind }),
   });
+
+  const shown = bind === "lan" ? localAddresses() : ["127.0.0.1"];
+  console.log(`forma: Decision Room open — ${spec.meta.title}`);
+  for (const address of shown) {
+    console.log(`  http://${address}:${handle.port}/?t=${token}`);
+  }
+  console.log("");
+  if (bind === "lan") {
+    console.log("forma: --lan is on. Anyone on this network who has the link can join.");
+    console.log("forma: external network requests: 0. Local network traffic: yes, that is --lan.");
+  } else {
+    console.log("forma: bound to 127.0.0.1. Nothing outside this machine can reach it.");
+    console.log("forma: external network requests: 0. Pass --lan to let other desks join.");
+  }
+  console.log("forma: the session token is not stored anywhere. Closing the room voids it.");
+  console.log("forma: nothing is written to disk until someone freezes the decision.");
+  console.log("forma: Ctrl+C to close and discard the session.");
+
+  const shutdown = () => {
+    void handle.close().then(() => {
+      console.log("\nforma: room closed. In-memory session discarded.");
+      process.exit(0);
+    });
+  };
+  process.on("SIGINT", shutdown);
+  process.on("SIGTERM", shutdown);
+}
+
+/** Non-internal IPv4 addresses, so the printed link is one people can use. */
+function localAddresses(): string[] {
+  const found: string[] = [];
+  for (const entries of Object.values(networkInterfaces())) {
+    for (const entry of entries ?? []) {
+      if (entry.family === "IPv4" && !entry.internal) found.push(entry.address);
+    }
+  }
+  return found.length > 0 ? found : ["127.0.0.1"];
+}
 
 program
   .command("preview <htmlOrDir>")

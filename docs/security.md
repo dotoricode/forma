@@ -61,6 +61,40 @@ before transmission. A URL Source may render as a user-activated external
 link, but loading the Rendered Output never follows that link automatically;
 the link uses `noopener`, `noreferrer`, and a no-referrer policy.
 
+### Room Mode is the one networked surface
+
+`forma advanced --room` binds a local HTTP server. It is the only part of
+Forma that listens on a socket, and the distinction it forces is worth
+stating in the words the manifest uses:
+
+- **External network requests: 0.** Unchanged, and now enforced rather than
+  asserted — every room response carries
+  `Content-Security-Policy: default-src 'none'; … connect-src 'self'`, so the
+  browser itself refuses an outbound fetch to anywhere else.
+- **Local network traffic: yes, and only if you asked.** The default bind is
+  `127.0.0.1`; `--lan` is what binds `0.0.0.0`. Verified by connecting to the
+  host's own LAN address without `--lan` and getting a refused connection.
+
+Do not write "Room Mode makes no network requests". It makes no *external*
+ones. `manifest.json` keeps `session` and `snapshot` as separate objects so
+neither claim can be read as the other.
+
+Controls on the listening surface:
+
+- A 192-bit session token, generated per run, compared with
+  `timingSafeEqual`, never written to disk, void when the process exits.
+  Every request needs it, including the SSE stream.
+- Requests with a foreign `Origin` are refused even with a valid token.
+- Every client message is parsed against a bounded Zod schema before it
+  reaches the state (`src/room/protocol.ts`). Request bodies are capped.
+- Participant ids are never echoed to other participants, so one participant
+  cannot vote as another.
+- Room state is in memory only. **Nothing is written to disk until a Decision
+  Freeze**, and the freeze reply carries file basenames rather than host
+  paths, which with `--lan` would otherwise cross to another machine.
+- `snapshot.html` contains no room panel and no client script. It makes zero
+  requests of any kind, external or local.
+
 ## Code execution
 
 Forma never executes analyzed source code. Code/diff content is only ever
