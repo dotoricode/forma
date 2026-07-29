@@ -6,7 +6,7 @@ on:
   pull_request:
 
 jobs:
-  build-test:
+  build-and-verify:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -19,7 +19,6 @@ jobs:
           cache: pnpm
       - run: pnpm install --frozen-lockfile
       - run: pnpm build
-      - run: pnpm test
       - run: node scripts/check-naming.mjs
       - run: pnpm forma verify-skills
 
@@ -36,6 +35,7 @@ jobs:
           cache: pnpm
       - run: pnpm install --frozen-lockfile
       - run: npx playwright install --with-deps chromium
+      - run: pnpm test
       - run: |
           for mode in explain review test report; do
             pnpm forma render "fixtures/$mode/forma.spec.json" --out "fixtures/$mode/output"
