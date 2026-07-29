@@ -1,11 +1,17 @@
 # Forma
 
-**Turn complex work into clear form.**
+**Forma means form: the shape that makes complex work understandable,
+reviewable, and actionable.**
+
+The name describes the product. Forma does not decorate raw content after the
+fact; it gives evidence, narrative, and action a deliberate structure before
+they reach the page. **Turn complex work into clear form.**
 
 Forma gives Codex and Claude Code four Agent Skills for turning documents,
 code, test results, metrics, and decision material into polished,
-self-contained HTML. You ask the Agent for the artifact; the Agent reads the
-source, writes a structured spec, renders it, and checks the result.
+self-contained HTML. You ask the Agent for the outcome; the Agent reads the
+source, chooses the right artifact, writes a structured spec, renders it, and
+checks the result.
 
 The output is one offline HTML file: no account, no server, no tracking, and no
 external network requests.
@@ -15,6 +21,42 @@ external network requests.
 · [See a report](./examples/report/output/index.html)
 · [See a manual](./examples/manual/output/index.html)
 · [See a Decision Room](./examples/advanced/output/index.html)
+
+## Designed differently from prompt-to-HTML generators
+
+A typical prompt-to-HTML workflow asks one model to understand the material
+and invent the page at the same time. That can produce a striking first
+render, but layout, hierarchy, density, and interaction are prompt-dependent.
+Forma moves those visual decisions into a deterministic design system.
+
+| Typical prompt-to-HTML workflow | Forma |
+|---|---|
+| Starts from an open canvas | Starts from a reader contract |
+| Generates layout and CSS per request | Compiles semantic blocks through a versioned design grammar |
+| Often converges on one reusable card-grid aesthetic | Uses a different composition model for metrics, arguments, procedures, and decisions |
+| Visual hierarchy changes when the prompt changes | Hierarchy is owned by the artifact and remains consistent across runs |
+| Judges quality mainly from the final screenshot | Checks structure, overflow, clipped text, accessibility, and offline behavior |
+| The model owns both meaning and presentation | The Agent owns meaning; the renderer owns presentation |
+
+Forma is not trying to make the most visually novel page on every run. It is
+trying to make the visual form appropriate to the reader's job—and to make
+that decision repeatable, inspectable, and testable.
+
+## Four design grammars
+
+These are sometimes called themes, but they are more than skins. Each one
+changes information hierarchy, page rhythm, navigation, density, and the
+semantic blocks available to the Agent.
+
+| Signal Grid · dashboard | Editorial Brief · report |
+|---|---|
+| [![Signal Grid dashboard design](./docs/images/artifacts/dashboard.png)](./examples/dashboard/output/index.html) | [![Editorial Brief report design](./docs/images/artifacts/report.png)](./examples/report/output/index.html) |
+| Dense operational hierarchy, persistent context, hard dividers, and quantitative emphasis. | Asymmetric editorial grid, thesis-first typography, marginal navigation, and evidence-led pacing. |
+
+| Guided Path · manual | Decision Room · advanced |
+|---|---|
+| [![Guided Path manual design](./docs/images/artifacts/manual.png)](./examples/manual/output/index.html) | [![Decision Room advanced design](./docs/images/artifacts/advanced.png)](./examples/advanced/output/index.html) |
+| Stable wayfinding, numbered procedure rhythm, visible checkpoints, and restrained code treatment. | Debate-first hierarchy, claim/evidence contrast, risk emphasis, simulation controls, and a durable decision record. |
 
 ## Install in your Agent
 
@@ -82,9 +124,9 @@ selection. Forma's deterministic renderer owns layout, typography,
 accessibility, sanitization, and visual consistency. The Agent never writes
 the final HTML or CSS by hand.
 
-## Four artifacts
+## Choosing an artifact
 
-Each skill represents a reader contract, not a visual theme:
+Each skill represents a reader contract:
 
 | Skill | Artifact | Use it when the reader needs |
 |---|---|---|
