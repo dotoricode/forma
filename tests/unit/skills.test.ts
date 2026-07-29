@@ -1,158 +1,239 @@
-import { lstat, mkdtemp, readFile, rm, stat, writeFile, mkdir } from "node:fs/promises";
+import { mkdtemp, readFile, rm, stat, writeFile, mkdir } from "node:fs/promises";
+import { execFile } from "node:child_process";
 import { tmpdir } from "node:os";
+import { promisify } from "node:util";
 import path from "node:path";
 import { afterEach, describe, expect, it } from "vitest";
-import { installSkills, verifySkills } from "../../src/cli/skills.js";
+import {
+  installAgentSkills,
+  syncConfiguredSkills,
+  verifyInstalledSkills,
+  type CommandRunner,
+} from "../../src/skills/install.js";
 
+const CWD = process.cwd();
 const tempDirs: string[] = [];
+const execFileAsync = promisify(execFile);
+
+async function tempDir(prefix: string): Promise<string> {
+  const dir = await mkdtemp(path.join(tmpdir(), prefix));
+  tempDirs.push(dir);
+  return dir;
+}
 
 afterEach(async () => {
   await Promise.all(tempDirs.splice(0).map((dir) => rm(dir, { recursive: true, force: true })));
 });
 
-describe("installSkills", () => {
-  it("keeps YAML frontmatter at the start of installed SKILL.md files", async () => {
-    const cwd = await mkdtemp(path.join(tmpdir(), "forma-skills-"));
-    tempDirs.push(cwd);
-    const canonicalDir = path.join(cwd, "skills", "forma");
-    await mkdir(canonicalDir, { recursive: true });
+describe("installAgentSkills", () => {
+  it("installs all four standalone skills into every Codex target", async () => {
+    const root = await tempDir("forma-install-");
+    const first = path.join(root, "codex");
+    const second = path.join(root, "shared");
+    const outDir = path.join(root, "build");
+
+    const result = await installAgentSkills(CWD, {
+      host: "codex",
+      targetRoots: [first, second],
+      outDir,
+    });
+
+    expect(result.skills.map((skill) => skill.invocation).sort()).toEqual([
+      "$forma-advanced",
+      "$forma-dashboard",
+      "$forma-manual",
+      "$forma-report",
+    ]);
+    for (const name of ["forma-advanced", "forma-dashboard", "forma-manual", "forma-report"]) {
+      for (const target of [first, second]) {
+        const skillDir = path.join(target, name);
+        const skillMd = await readFile(path.join(skillDir, "SKILL.md"), "utf-8");
+        expect(skillMd).toMatch(new RegExp(`^name: "${name}"$`, "m"));
+        expect(
+          JSON.parse(await readFile(path.join(skillDir, ".forma-runtime.json"), "utf-8")),
+        ).toEqual({ version: 1, repo: CWD });
+        expect((await stat(path.join(skillDir, "SKILL.md"))).isSymbolicLink()).toBe(false);
+      }
+    }
+
+    expect(
+      await verifyInstalledSkills(CWD, {
+        targetRoots: [first, second],
+        outDir,
+      }),
+    ).toEqual([]);
+  }, 60_000);
+
+  it("writes identical package checksums to every configured target", async () => {
+    const root = await tempDir("forma-checksum-");
+    const targets = [path.join(root, "one"), path.join(root, "two")];
+    const outDir = path.join(root, "build");
+    await installAgentSkills(CWD, { host: "codex", targetRoots: targets, outDir });
+
+    for (const name of ["forma-advanced", "forma-dashboard", "forma-manual", "forma-report"]) {
+      const checksums = await Promise.all(
+        targets.map(async (target) =>
+          JSON.parse(
+            await readFile(path.join(target, name, ".forma-skill-checksum.json"), "utf-8"),
+          ).checksum,
+        ),
+      );
+      expect(new Set(checksums).size).toBe(1);
+    }
+  }, 60_000);
+
+  it("removes only a checksum-verified generated compatibility router", async () => {
+    const root = await tempDir("forma-legacy-");
+    const target = path.join(root, "codex");
+    const legacy = path.join(target, "forma");
+    await mkdir(legacy, { recursive: true });
     await writeFile(
-      path.join(canonicalDir, "SKILL.md"),
-      "---\nname: forma\ndescription: Test skill.\n---\n\n# Forma\n",
+      path.join(legacy, ".forma-skill-checksum.json"),
+      JSON.stringify({
+        checksum: "d6bf9b6261df73127f2a8d0d186aaf0c14d5e2fae4ba063fd6c627f79efab68e",
+      }),
       "utf-8",
     );
 
-    await installSkills(cwd);
+    const result = await installAgentSkills(CWD, {
+      host: "codex",
+      targetRoots: [target],
+      outDir: path.join(root, "build"),
+    });
 
-    for (const installedPath of [
-      ".agents/skills/forma/SKILL.md",
-      ".claude/skills/forma/SKILL.md",
-    ]) {
-      const installed = await readFile(path.join(cwd, installedPath), "utf-8");
-      expect(installed).toMatch(/^---\r?\nname: forma\r?\n/);
-      expect(installed).toContain(
-        "<!-- GENERATED COPY — do not edit directly. Source of truth: skills/forma/.",
-      );
-    }
-  });
+    expect(result.removedLegacy).toEqual([legacy]);
+    await expect(stat(legacy)).rejects.toThrow();
+  }, 60_000);
+
+  it("runs from another project using the installed runtime metadata", async () => {
+    const root = await tempDir("forma-runtime-");
+    const target = path.join(root, "codex");
+    const workDir = path.join(root, "project");
+    await mkdir(workDir, { recursive: true });
+    await installAgentSkills(CWD, {
+      host: "codex",
+      targetRoots: [target],
+      outDir: path.join(root, "build"),
+    });
+
+    const wrapper = path.join(target, "forma-report/scripts/validate.mjs");
+    const fixture = path.join(CWD, "fixtures/report/technical/forma.spec.json");
+    const { stdout } = await execFileAsync(process.execPath, [wrapper, fixture], {
+      cwd: workDir,
+    });
+    expect(stdout).toContain("is valid");
+  }, 60_000);
+
+  it("does not overwrite an installed skill that was edited after installation", async () => {
+    const root = await tempDir("forma-conflict-");
+    const target = path.join(root, "codex");
+    const outDir = path.join(root, "build");
+    await installAgentSkills(CWD, { host: "codex", targetRoots: [target], outDir });
+
+    const changed = path.join(target, "forma-report", "SKILL.md");
+    await writeFile(changed, `${await readFile(changed, "utf-8")}\nlocal edit\n`, "utf-8");
+
+    await expect(
+      installAgentSkills(CWD, { host: "codex", targetRoots: [target], outDir }),
+    ).rejects.toThrow(/modified[\s\S]*forma-report/i);
+  }, 60_000);
+
+  it("installs the Claude plugin through its local marketplace Adapter", async () => {
+    const root = await tempDir("forma-claude-");
+    const outDir = path.join(root, "build");
+    const calls: Array<{ command: string; args: string[] }> = [];
+    const runCommand: CommandRunner = async (command, args) => {
+      calls.push({ command, args });
+    };
+
+    const result = await installAgentSkills(CWD, {
+      host: "claude",
+      scope: "user",
+      outDir,
+      runCommand,
+    });
+
+    expect(result.skills.map((skill) => skill.invocation).sort()).toEqual([
+      "/forma:advanced",
+      "/forma:dashboard",
+      "/forma:manual",
+      "/forma:report",
+    ]);
+    expect(calls).toEqual([
+      {
+        command: "claude",
+        args: ["plugin", "validate", path.join(outDir, "claude")],
+      },
+      {
+        command: "claude",
+        args: ["plugin", "marketplace", "add", path.join(outDir, "claude"), "--scope", "user"],
+      },
+      {
+        command: "claude",
+        args: ["plugin", "install", "forma@forma", "--scope", "user"],
+      },
+    ]);
+
+    const marketplace = JSON.parse(
+      await readFile(path.join(outDir, "claude/.claude-plugin/marketplace.json"), "utf-8"),
+    );
+    expect(marketplace.name).toBe("forma");
+    expect(marketplace.plugins[0].source).toBe("./forma");
+    expect(
+      JSON.parse(
+        await readFile(path.join(outDir, "claude/forma/.forma-runtime.json"), "utf-8"),
+      ),
+    ).toEqual({ version: 1, repo: CWD });
+  }, 60_000);
 });
 
-/**
- * `~/.agents/skill-targets.json` is the machine-wide list of directories every
- * agent on the box reads skills from. It is read at runtime rather than
- * hardcoded, because a path added to that file has to start being synced
- * without a code change — a duplicated list is a list that goes stale.
- */
-describe("machine-wide skill targets", () => {
-  async function fixture(targets: unknown | undefined) {
-    const cwd = await mkdtemp(path.join(tmpdir(), "forma-skills-cwd-"));
-    const home = await mkdtemp(path.join(tmpdir(), "forma-skills-home-"));
-    tempDirs.push(cwd, home);
-    const canonicalDir = path.join(cwd, "skills", "forma");
-    await mkdir(canonicalDir, { recursive: true });
+describe("syncConfiguredSkills", () => {
+  it("uses the target list as skill roots and installs all four skills under each one", async () => {
+    const root = await tempDir("forma-configured-");
+    const home = path.join(root, "home");
+    const outDir = path.join(root, "build");
+    await mkdir(path.join(home, ".agents"), { recursive: true });
     await writeFile(
-      path.join(canonicalDir, "SKILL.md"),
-      "---\nname: forma\ndescription: Test skill.\n---\n\n# Forma\n",
+      path.join(home, ".agents", "skill-targets.json"),
+      JSON.stringify({
+        version: 1,
+        targets: ["~/.agents/skills", "~/.claude/skills"],
+      }),
       "utf-8",
     );
-    if (targets !== undefined) {
-      await mkdir(path.join(home, ".agents"), { recursive: true });
-      await writeFile(
-        path.join(home, ".agents", "skill-targets.json"),
-        JSON.stringify({ version: 1, targets }),
-        "utf-8",
-      );
-    }
-    return { cwd, home };
-  }
 
-  it("expands ~ and installs the skill under every listed directory", async () => {
-    const { cwd, home } = await fixture(["~/.claude/skills", "~/.agents/skills"]);
-    const result = await installSkills(cwd, { home, includeGlobalTargets: true });
+    const result = await syncConfiguredSkills(CWD, {
+      home,
+      outDir,
+    });
 
-    expect(result.globalTargets).toEqual([
-      path.join(home, ".claude/skills/forma"),
-      path.join(home, ".agents/skills/forma"),
+    expect(result.targetRoots).toEqual([
+      path.join(home, ".agents/skills"),
+      path.join(home, ".claude/skills"),
     ]);
-    for (const dir of result.globalTargets) {
-      const skillMd = await readFile(path.join(dir, "SKILL.md"), "utf-8");
-      expect(skillMd.startsWith("---")).toBe(true);
-      expect(skillMd).toContain("name: forma");
+    for (const target of result.targetRoots) {
+      await expect(stat(path.join(target, "forma-dashboard/SKILL.md"))).resolves.toBeDefined();
+      await expect(stat(path.join(target, "forma-report/SKILL.md"))).resolves.toBeDefined();
+      await expect(stat(path.join(target, "forma-manual/SKILL.md"))).resolves.toBeDefined();
+      await expect(stat(path.join(target, "forma-advanced/SKILL.md"))).resolves.toBeDefined();
     }
-  });
+  }, 60_000);
 
-  it("writes the identical canonical checksum to every copy, repo and machine-wide", async () => {
-    const { cwd, home } = await fixture(["~/.claude/skills", "~/.claude-work/skills"]);
-    const result = await installSkills(cwd, { home, includeGlobalTargets: true });
-
-    const recorded = await Promise.all(
-      [
-        path.join(cwd, ".agents/skills/forma"),
-        path.join(cwd, ".claude/skills/forma"),
-        ...result.globalTargets,
-      ].map(async (dir) =>
-        JSON.parse(await readFile(path.join(dir, ".forma-skill-checksum.json"), "utf-8")).checksum,
-      ),
-    );
-    expect(new Set(recorded).size).toBe(1);
-    expect(recorded[0]).toBe(result.checksum);
-  });
-
-  it("uses real files rather than symlinks, so every agent resolves them the same way", async () => {
-    const { cwd, home } = await fixture(["~/.claude/skills"]);
-    const result = await installSkills(cwd, { home, includeGlobalTargets: true });
-    const stats = await lstat(path.join(result.globalTargets[0]!, "SKILL.md"));
-    expect(stats.isSymbolicLink()).toBe(false);
-    expect(stats.isFile()).toBe(true);
-  });
-
-  it("syncs only the repo copies when the box has no targets file", async () => {
-    const { cwd, home } = await fixture(undefined);
-    const result = await installSkills(cwd, { home, includeGlobalTargets: true });
-    // CI has no targets file and must still pass.
-    expect(result.globalTargets).toEqual([]);
-    expect(result.targets).toHaveLength(2);
-  });
-
-  it("reports drift in a machine-wide copy without requiring one to exist", async () => {
-    const { cwd, home } = await fixture(["~/.claude/skills"]);
-    await installSkills(cwd, { home, includeGlobalTargets: true });
-    expect((await verifySkills(cwd, { home, includeGlobalTargets: true })).ok).toBe(true);
-
-    // Editing the machine-wide copy is exactly the drift the checksum exists
-    // to catch: one agent would read current instructions, another stale ones.
+  it("rejects an invalid configured target list", async () => {
+    const root = await tempDir("forma-config-invalid-");
+    const home = path.join(root, "home");
+    await mkdir(path.join(home, ".agents"), { recursive: true });
     await writeFile(
-      path.join(home, ".claude/skills/forma/.forma-skill-checksum.json"),
-      JSON.stringify({ checksum: "stale", source: "skills/forma" }),
+      path.join(home, ".agents", "skill-targets.json"),
+      JSON.stringify({ version: 1, targets: { nope: true } }),
       "utf-8",
     );
-    const drifted = await verifySkills(cwd, { home, includeGlobalTargets: true });
-    expect(drifted.ok).toBe(false);
-    expect(drifted.issues.some((issue) => issue.includes(".claude/skills/forma"))).toBe(true);
-  });
 
-  it("rejects a targets file whose targets are not an array of strings", async () => {
-    const { cwd, home } = await fixture({ nope: true });
-    await expect(installSkills(cwd, { home, includeGlobalTargets: true })).rejects.toThrow(/targets/);
-  });
-
-  /**
-   * This is the bug that made the flag necessary. When the machine-wide sync
-   * was on by default, the pre-existing test above — a throwaway skill in a
-   * temp directory calling installSkills(cwd) — wrote its fixture SKILL.md
-   * into all five real directories and replaced the user's installed skill.
-   */
-  it("touches nothing outside the repo unless asked", async () => {
-    const { cwd, home } = await fixture(["~/.claude/skills"]);
-    const result = await installSkills(cwd);
-
-    expect(result.globalTargets).toEqual([]);
-    await expect(stat(path.join(home, ".claude/skills/forma"))).rejects.toThrow();
-  });
-
-  it("rejects a targets file that is not valid JSON", async () => {
-    const { cwd, home } = await fixture(["~/.claude/skills"]);
-    await writeFile(path.join(home, ".agents", "skill-targets.json"), "{ not json", "utf-8");
-    await expect(installSkills(cwd, { home, includeGlobalTargets: true })).rejects.toThrow(/could not parse/);
+    await expect(
+      syncConfiguredSkills(CWD, {
+        home,
+        outDir: path.join(root, "build"),
+      }),
+    ).rejects.toThrow(/targets/);
   });
 });

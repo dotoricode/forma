@@ -22,6 +22,41 @@ const RAIL_LABEL: Record<"ko" | "en", string> = {
   ko: "이 문서의 목차",
 };
 
+const GUIDE_NAV_LABEL: Record<"ko" | "en", string> = {
+  en: "Guide navigation",
+  ko: "가이드 탐색",
+};
+
+const MANUAL_GROUPS = {
+  ko: [
+    { id: "start", label: "시작하기" },
+    { id: "work", label: "작업 순서" },
+    { id: "reference", label: "확인과 참고" },
+  ],
+  en: [
+    { id: "start", label: "Get started" },
+    { id: "work", label: "Procedure" },
+    { id: "reference", label: "Checks and reference" },
+  ],
+} as const;
+
+const MANUAL_GROUP_BY_TYPE: Record<string, "start" | "work" | "reference"> = {
+  "task-map": "start",
+  "audience-scope": "start",
+  prerequisite: "start",
+  "environment-selector": "start",
+  "quick-path": "work",
+  step: "work",
+  checkpoint: "work",
+  "decision-tree": "reference",
+  troubleshooting: "reference",
+  "compatibility-matrix": "reference",
+  "version-note": "reference",
+  "completion-check": "reference",
+  "next-task": "reference",
+  "source-note": "reference",
+};
+
 export function Narrative(props: { spec: FormaSpec; showTitle: boolean }) {
   const { narrative, meta } = props.spec;
   return (
@@ -64,12 +99,64 @@ export function DocumentBody(props: {
   // right after it instead of floating above the title.
   const leadsWithCover = spec.sections[0]?.type === "cover";
   const hasCover = spec.sections.some((block) => block.type === "cover");
+  const dashboardLead =
+    spec.meta.artifact === "dashboard" &&
+    spec.sections[0]?.type === "status-header" &&
+    (spec.sections[1]?.type === "metric-group" || spec.sections[1]?.type === "metric");
+
+  if (dashboardLead) {
+    const evidenceCount = spec.sections[2]?.type === "chart" ? 3 : 2;
+    return (
+      <>
+        {blocks.slice(0, evidenceCount)}
+        <Narrative spec={spec} showTitle={false} />
+        {blocks.slice(evidenceCount)}
+      </>
+    );
+  }
+
   return (
     <>
       {leadsWithCover ? blocks[0] : null}
       <Narrative spec={spec} showTitle={!hasCover} />
       {leadsWithCover ? blocks.slice(1) : blocks}
     </>
+  );
+}
+
+export function ManualGuideNavigation(props: { spec: FormaSpec }): ReactElement | null {
+  if (props.spec.meta.artifact !== "manual") return null;
+  const language = props.spec.meta.language;
+  const entries = props.spec.sections
+    .map((block) => ({
+      id: block.id,
+      type: block.type,
+      title: navTitleOf(block, language),
+      group: MANUAL_GROUP_BY_TYPE[block.type] ?? "reference",
+    }))
+    .filter((entry): entry is typeof entry & { title: string } => Boolean(entry.title));
+  if (entries.length === 0) return null;
+
+  return (
+    <nav className="guide-nav" aria-label={GUIDE_NAV_LABEL[language]}>
+      <p className="guide-nav__label" aria-hidden="true">
+        {GUIDE_NAV_LABEL[language]}
+      </p>
+      {MANUAL_GROUPS[language].map((group) => {
+        const links = entries.filter((entry) => entry.group === group.id);
+        if (links.length === 0) return null;
+        return (
+          <div className="guide-nav__group" key={group.id}>
+            <p className="guide-nav__group-label">{group.label}</p>
+            {links.map((entry) => (
+              <a key={entry.id} href={`#${entry.id}`}>
+                {entry.title}
+              </a>
+            ))}
+          </div>
+        );
+      })}
+    </nav>
   );
 }
 

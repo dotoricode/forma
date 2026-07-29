@@ -151,11 +151,36 @@ export function emitClaudePluginManifest(sources: SkillSource[]): EmittedFile {
     description:
       "Turn complex work into clear form: spec-first, self-contained HTML artifacts that make no network requests.",
     version: "0.1.0",
-    skills: sources.map((source) => source.meta.id),
+    author: { name: "Forma contributors" },
+    // Claude treats these entries as paths relative to the plugin root, not
+    // as skill names. Keeping the `./skills/` prefix is therefore part of the
+    // runtime contract, not presentation.
+    skills: sources.map((source) => `./skills/${source.meta.id}`),
   };
   return {
     path: ".claude-plugin/plugin.json",
     contents: `${JSON.stringify(manifest, null, 2)}\n`,
+  };
+}
+
+/** The repository-local marketplace used by the Agent-driven installer. */
+export function emitClaudeMarketplaceManifest(): EmittedFile {
+  const marketplace = {
+    name: SKILL_NAMESPACE,
+    description: "Forma Agent Skills for clear, self-contained visual artifacts.",
+    owner: { name: "Forma contributors" },
+    plugins: [
+      {
+        name: SKILL_NAMESPACE,
+        source: `./${SKILL_NAMESPACE}`,
+        description:
+          "Four Agent Skills for turning complex work into polished, self-contained HTML artifacts.",
+      },
+    ],
+  };
+  return {
+    path: ".claude-plugin/marketplace.json",
+    contents: `${JSON.stringify(marketplace, null, 2)}\n`,
   };
 }
 

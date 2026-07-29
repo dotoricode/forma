@@ -1,0 +1,13 @@
+{
+  "generator": "forma@0.1.0",
+  "specVersion": "0.2",
+  "artifact": "report",
+  "purpose": "explain",
+  "variant": "editorial",
+  "interaction": "static",
+  "title": "Forma",
+  "language": "en",
+  "sectionCount": 13,
+  "bytes": 144949,
+  "externalNetworkRequests": 0
+}

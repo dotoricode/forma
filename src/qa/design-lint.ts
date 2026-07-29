@@ -14,6 +14,13 @@ export interface DesignLintFinding {
   message: string;
 }
 
+export const DEFAULT_DESIGN_LINT_TARGETS = [
+  "examples/dashboard/output/index.html",
+  "examples/report/output/index.html",
+  "examples/manual/output/index.html",
+  "examples/advanced/output/index.html",
+] as const;
+
 const BANNED_CONTENT_VALUES = ['content: "["', "content: '['", 'content: "{"', "content: '{'", 'content: "</>"', "content: '</>'"];
 
 /** Detects `::before`/`::after` rules that combine border-left with a top/bottom
@@ -30,6 +37,56 @@ function findBracketBorders(css: string): DesignLintFinding[] {
       findings.push({
         rule: "bracket-border",
         message: "::before/::after rule combines a left border with a top/bottom border — looks like a decorative bracket frame, which is banned.",
+      });
+    }
+  }
+  return findings;
+}
+
+/**
+ * A non-uniform edge on a rounded panel reads as a large bracket once the
+ * other hairline edges disappear against the surface. Plain, unrounded
+ * one-pixel evidence rails remain valid.
+ */
+function findRoundedEdgeBorders(css: string): DesignLintFinding[] {
+  const findings: DesignLintFinding[] = [];
+  const source = css.replace(/\/\*[\s\S]*?\*\//g, "");
+  const ruleRegex = /([^{}]+)\{([^}]*)\}/g;
+  let match: RegExpExecArray | null;
+  while ((match = ruleRegex.exec(source)) !== null) {
+    const selector = (match[1] ?? "").trim();
+    const body = match[2] ?? "";
+    if (selector.includes("@")) continue;
+    const rounded = /border-radius\s*:\s*(?!0(?:\D|$))/.test(body);
+    const edgeAccent = /border-(?:inline-start|left|block-start|top)(?:-width)?\s*:/.test(body);
+    if (rounded && edgeAccent) {
+      findings.push({
+        rule: "rounded-edge-border",
+        message: `"${selector.slice(0, 60)}" combines rounded corners with an accented edge — the result reads as a decorative bracket frame.`,
+      });
+    }
+  }
+  return findings;
+}
+
+/** Thick reading-edge rails are the unrounded form of the same AI bracket. */
+function findThickSideBorders(css: string): DesignLintFinding[] {
+  const findings: DesignLintFinding[] = [];
+  const source = css.replace(/\/\*[\s\S]*?\*\//g, "");
+  const ruleRegex = /([^{}]+)\{([^}]*)\}/g;
+  let match: RegExpExecArray | null;
+  while ((match = ruleRegex.exec(source)) !== null) {
+    const selector = (match[1] ?? "").trim();
+    const body = match[2] ?? "";
+    if (selector.includes("@")) continue;
+    const declarations = body.matchAll(
+      /border-(?:inline-start|left)(?:-width)?\s*:\s*(\d+(?:\.\d+)?)px\b/g,
+    );
+    for (const declaration of declarations) {
+      if (Number(declaration[1]) < 2) continue;
+      findings.push({
+        rule: "thick-side-border",
+        message: `"${selector.slice(0, 60)}" uses a ${declaration[1]}px reading-edge rail — thick side rules read as decorative brackets.`,
       });
     }
   }
@@ -193,6 +250,8 @@ export function lintCss(css: string): DesignLintFinding[] {
   return [
     ...findHardcodedPaintColors(css),
     ...findBracketBorders(css),
+    ...findRoundedEdgeBorders(css),
+    ...findThickSideBorders(css),
     ...findDecorativeContent(css),
     ...findExcessiveGradients(css),
     ...findCenteringWidthCaps(css),
@@ -215,19 +274,18 @@ export async function lintHtmlFile(htmlPath: string): Promise<DesignLintFinding[
 }
 
 async function main() {
-  const target = process.argv[2];
-  if (!target) {
-    console.error("usage: design-lint.ts <path-to-index.html>");
-    process.exit(1);
+  const targets =
+    process.argv.length > 2 ? process.argv.slice(2) : [...DEFAULT_DESIGN_LINT_TARGETS];
+  for (const target of targets) {
+    const findings = await lintHtmlFile(target);
+    if (findings.length === 0) {
+      console.log(`forma design-lint: ${target} — no violations found`);
+      continue;
+    }
+    console.log(`forma design-lint: ${target} — ${findings.length} finding(s)`);
+    for (const f of findings) console.log(`  - [${f.rule}] ${f.message}`);
+    process.exitCode = 1;
   }
-  const findings = await lintHtmlFile(target);
-  if (findings.length === 0) {
-    console.log(`forma design-lint: ${target} — no violations found`);
-    return;
-  }
-  console.log(`forma design-lint: ${target} — ${findings.length} finding(s)`);
-  for (const f of findings) console.log(`  - [${f.rule}] ${f.message}`);
-  process.exitCode = 1;
 }
 
 if (import.meta.url === `file://${process.argv[1]}`) {

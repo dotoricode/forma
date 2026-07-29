@@ -87,9 +87,9 @@ reversed.
 ## Design direction
 
 - The original Quiet Editorial direction remains the shared foundation.
-  Research and user testing expanded it into four purpose-led themes with
-  plain-language names: `simple`, `workspace`, `guide`, and `magazine`.
-  Modes remain narrative purposes and themes remain visual treatments.
+  The current contract is artifact-led: Signal Grid, Editorial Brief,
+  Guided Path, and Decision Room own both composition and visual rhythm.
+  Legacy theme names are accepted only at the 0.1 migration boundary.
 
 ## Static design lint implementation
 

@@ -13,18 +13,12 @@
  * to protect.
  */
 import type { FormaSpec } from "../spec/schema.js";
+import type { CompositionAxes } from "../renderer/composition.js";
 import type { Density } from "../spec/artifact.js";
 
 /** The axes a candidate may differ along. Nothing else varies. */
-export interface CompositionCandidate {
+export interface CompositionCandidate extends CompositionAxes {
   id: string;
-  density: Density;
-  /** Reading width for prose, as a token override. */
-  measure: "narrow" | "default" | "wide";
-  /** Where a breakout figure sits relative to the text that explains it. */
-  figurePlacement: "after" | "before";
-  /** Type scale multiplier for headings. */
-  typeScale: "compact" | "default" | "generous";
 }
 
 const DENSITIES: Density[] = ["comfortable", "compact"];
@@ -112,6 +106,7 @@ export interface CandidateEvidence {
   /** Browser findings, when a browser pass ran. */
   axeViolations?: number;
   horizontalOverflow?: number;
+  clippedText?: number;
   externalRequests?: number;
   brokenAnchors?: number;
 }
@@ -135,6 +130,7 @@ function hardGate(evidence: CandidateEvidence): string[] {
   const failures: string[] = [];
   if ((evidence.externalRequests ?? 0) > 0) failures.push("made an external network request");
   if ((evidence.horizontalOverflow ?? 0) > 0) failures.push("overflows horizontally");
+  if ((evidence.clippedText ?? 0) > 0) failures.push("clips visible text");
   if ((evidence.axeViolations ?? 0) > 0) failures.push("has accessibility violations");
   if ((evidence.brokenAnchors ?? 0) > 0) failures.push("has broken anchors");
   for (const finding of evidence.lintFindings) {

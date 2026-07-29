@@ -18,6 +18,21 @@ it.
 | `verification` | `checkpoint`, `completion-check` — the gates |
 | `troubleshooting` | `troubleshooting` — symptom, cause, fix |
 
+## Writing voice
+
+Write like a calm operator standing beside the reader.
+
+- Start step titles with one direct verb: "Install the skill", "Open the
+  output", "Confirm the checksum".
+- Use present-tense observable results: "The command prints four package
+  names", not "The installation should probably complete successfully".
+- Keep explanation after the action and before the check. Never hide an
+  instruction inside background prose.
+- Address failures in the reader's language: first the symptom they see,
+  then the cause, then the smallest recovery action.
+- The opening promises an outcome; the final check repeats the same outcome
+  as something the reader can now observe.
+
 ## Workflow
 
 1. **Run the procedure yourself if you can.** A manual written from reading

@@ -1,0 +1,424 @@
+{
+  "version": "0.2",
+  "meta": {
+    "title": "Forma",
+    "subtitle": "Turn complex work into clear form",
+    "artifact": "report",
+    "purpose": "explain",
+    "audience": "external",
+    "language": "en",
+    "variant": "editorial",
+    "colorMode": "light",
+    "density": "comfortable",
+    "interaction": "static",
+    "confidentiality": "public"
+  },
+  "sources": [
+    {
+      "id": "product-brief",
+      "label": "Forma product brief",
+      "path": "docs/product-brief.md",
+      "kind": "file"
+    },
+    {
+      "id": "readme",
+      "label": "Forma README",
+      "path": "README.md",
+      "kind": "file"
+    },
+    {
+      "id": "architecture",
+      "label": "Forma architecture",
+      "path": "docs/architecture.md",
+      "kind": "file"
+    },
+    {
+      "id": "design",
+      "label": "Forma design system",
+      "path": "DESIGN.md",
+      "kind": "file"
+    },
+    {
+      "id": "security",
+      "label": "Forma security model",
+      "path": "docs/security.md",
+      "kind": "file"
+    },
+    {
+      "id": "registry",
+      "label": "Forma block registry",
+      "path": "src/blocks/registry.ts",
+      "kind": "file"
+    }
+  ],
+  "narrative": {
+    "question": "What is Forma, and when should a team use it?",
+    "summary": "Forma is a spec-first compiler for visual technical communication. An Agent turns source material into structured content; a deterministic renderer turns that spec into a polished, self-contained HTML document; browser QA checks that the result is accessible, responsive, and offline.",
+    "takeaways": [
+      "The Agent owns meaning, narrative, source attribution, and block selection",
+      "The renderer owns layout, typography, accessibility, and consistency",
+      "The result is one portable HTML file with zero external requests"
+    ]
+  },
+  "sections": [
+    {
+      "id": "cover",
+      "type": "cover",
+      "eyebrow": "Visual technical communication",
+      "title": "Forma",
+      "subtitle": "Turn complex work into clear form",
+      "meta": [
+        "Spec-first",
+        "Self-contained HTML",
+        "Offline by default"
+      ],
+      "sourceRefs": [
+        "product-brief",
+        "security"
+      ]
+    },
+    {
+      "id": "thesis",
+      "type": "thesis",
+      "statement": "Forma separates understanding the work from presenting it well.",
+      "qualifier": "An Agent decides what the material means. A deterministic compiler decides how that meaning becomes a readable, reliable browser document.",
+      "confidence": "verified",
+      "sourceRefs": [
+        "product-brief",
+        "architecture"
+      ]
+    },
+    {
+      "id": "summary",
+      "type": "executive-summary",
+      "title": "A reliable path from raw material to a document people can use",
+      "body": "Give Forma documents, code, diffs, test results, or working notes. The Agent reads the material and writes `forma.spec.json`: a structured account of the narrative, semantic blocks, sources, and confidence behind each claim. The renderer then compiles that spec into one browser-ready page and checks the result.\n\nThe boundary is deliberate. Agents are good at interpreting context; a maintained renderer is better at producing consistent layout, typography, accessibility, and security every time.",
+      "figures": [
+        {
+          "label": "Artifact contracts",
+          "value": "4"
+        },
+        {
+          "label": "Semantic blocks",
+          "value": "59"
+        },
+        {
+          "label": "External requests",
+          "value": "0"
+        }
+      ],
+      "confidence": "verified",
+      "sourceRefs": [
+        "product-brief",
+        "registry",
+        "security"
+      ]
+    },
+    {
+      "id": "finding-pipeline",
+      "type": "headline-finding",
+      "claim": "The Agent writes structured intent, not one-off HTML and CSS.",
+      "detail": "The spec records the document's purpose, audience, sources, narrative, and semantic blocks. Forma validates that structure before rendering it. This turns important communication rules—such as citing a verified claim or including a data timestamp—into build-time contracts instead of prompt suggestions.",
+      "severity": "info",
+      "confidence": "verified",
+      "sourceRefs": [
+        "architecture",
+        "design"
+      ]
+    },
+    {
+      "id": "pipeline",
+      "type": "architecture",
+      "title": "One source-to-document pipeline owns each responsibility",
+      "nodes": [
+        {
+          "id": "sources",
+          "label": "Documents, code, diffs, tests, notes",
+          "group": "Source"
+        },
+        {
+          "id": "agent",
+          "label": "Agent reads and structures meaning",
+          "group": "Interpret"
+        },
+        {
+          "id": "spec",
+          "label": "forma.spec.json",
+          "group": "Contract"
+        },
+        {
+          "id": "renderer",
+          "label": "Deterministic renderer",
+          "group": "Compile"
+        },
+        {
+          "id": "html",
+          "label": "Self-contained index.html",
+          "group": "Deliver"
+        },
+        {
+          "id": "qa",
+          "label": "Playwright, axe, Lighthouse",
+          "group": "Verify"
+        }
+      ],
+      "edges": [
+        {
+          "from": "sources",
+          "to": "agent",
+          "label": "read"
+        },
+        {
+          "from": "agent",
+          "to": "spec",
+          "label": "author"
+        },
+        {
+          "from": "spec",
+          "to": "renderer",
+          "label": "validate"
+        },
+        {
+          "from": "renderer",
+          "to": "html",
+          "label": "render"
+        },
+        {
+          "from": "html",
+          "to": "qa",
+          "label": "check"
+        }
+      ],
+      "confidence": "verified",
+      "sourceRefs": [
+        "architecture",
+        "readme"
+      ]
+    },
+    {
+      "id": "finding-artifacts",
+      "type": "headline-finding",
+      "claim": "Four artifact contracts make the reader's job part of the document structure.",
+      "detail": "A dashboard must expose current state and freshness. A report must put its conclusion and recommendation up front. A manual must pair steps with verification and recovery. An advanced artifact must connect a decision to evidence and preserve the outcome. These are validation contracts, not visual themes.",
+      "severity": "info",
+      "confidence": "verified",
+      "sourceRefs": [
+        "design",
+        "product-brief"
+      ]
+    },
+    {
+      "id": "artifact-guide",
+      "type": "option-comparison",
+      "title": "Choose the artifact by the answer the reader needs",
+      "criteria": [
+        "Reader's first question",
+        "Best for",
+        "Required shape"
+      ],
+      "options": [
+        {
+          "id": "dashboard",
+          "label": "Dashboard",
+          "cells": {
+            "Reader's first question": "What is the state now?",
+            "Best for": "Metrics, health, release gates",
+            "Required shape": "Status, KPI, change, driver, action, freshness"
+          }
+        },
+        {
+          "id": "report",
+          "label": "Report",
+          "cells": {
+            "Reader's first question": "What did we learn?",
+            "Best for": "Findings, reviews, recommendations",
+            "Required shape": "Opening, thesis, evidence, recommendation, action"
+          },
+          "recommended": true
+        },
+        {
+          "id": "manual",
+          "label": "Manual",
+          "cells": {
+            "Reader's first question": "What do I do next?",
+            "Best for": "Setup, procedures, troubleshooting",
+            "Required shape": "Scope, prerequisites, steps, checks, recovery"
+          }
+        },
+        {
+          "id": "advanced",
+          "label": "Advanced",
+          "cells": {
+            "Reader's first question": "What should we decide?",
+            "Best for": "Architecture and release decisions",
+            "Required shape": "Brief, evidence graph, alternatives, decision record"
+          }
+        }
+      ],
+      "sourceRefs": [
+        "design",
+        "product-brief"
+      ]
+    },
+    {
+      "id": "finding-portability",
+      "type": "headline-finding",
+      "claim": "The deliverable is portable by construction and private by default.",
+      "detail": "Fonts, styles, diagrams, and the small interaction layer are embedded into the output. Opening the rendered file makes zero external network requests. Inputs are escaped and sanitized, while secret and local-path redaction add a final safety layer before the file is written.",
+      "severity": "info",
+      "confidence": "verified",
+      "sourceRefs": [
+        "security",
+        "architecture"
+      ]
+    },
+    {
+      "id": "evidence",
+      "type": "evidence-stack",
+      "title": "The product claims are backed by code-level boundaries",
+      "supports": "finding-portability",
+      "items": [
+        {
+          "summary": "The renderer does not call a model",
+          "detail": "Model-assisted interpretation ends at the structured spec. Rendering is a local TypeScript pipeline.",
+          "confidence": "verified",
+          "sourceRef": "product-brief"
+        },
+        {
+          "summary": "Every rendered string crosses a sanitization boundary",
+          "detail": "Plain text, inline Markdown, SVG, and URLs each have a documented escape or allowlist path.",
+          "confidence": "verified",
+          "sourceRef": "security"
+        },
+        {
+          "summary": "Browser QA measures the promise",
+          "detail": "Forma checks external requests, accessibility, console errors, overflow, responsive viewports, reduced motion, dark mode, and JavaScript-disabled behavior.",
+          "confidence": "verified",
+          "sourceRef": "readme"
+        }
+      ],
+      "sourceRefs": [
+        "product-brief",
+        "security",
+        "readme"
+      ]
+    },
+    {
+      "id": "recommendation",
+      "type": "recommendation",
+      "statement": "Use Forma when complex technical material needs to become a document another person can understand, verify, or act on.",
+      "rationale": "It is strongest where narrative quality, source traceability, repeatable presentation, and offline sharing matter together: engineering reviews, test reports, release gates, operating procedures, and decision records.",
+      "conditions": [
+        "Do not use Forma to build a marketing landing page or a general application UI",
+        "Do not treat renderer validation as proof that a source claim is true",
+        "Use Advanced Room Mode only when local live collaboration is explicitly required"
+      ],
+      "confidence": "inferred",
+      "notes": "This recommendation combines the product brief's intended uses and non-goals.",
+      "sourceRefs": [
+        "product-brief",
+        "security"
+      ]
+    },
+    {
+      "id": "risks",
+      "type": "risk-register",
+      "title": "The boundaries are as important as the features",
+      "risks": [
+        {
+          "id": "wrong-output",
+          "description": "Using Forma where bespoke visual expression is the primary goal",
+          "likelihood": "medium",
+          "impact": "medium",
+          "mitigation": "Use a purpose-built design or application workflow for marketing pages and product UI",
+          "owner": "Document author"
+        },
+        {
+          "id": "false-confidence",
+          "description": "Mistaking a valid spec for verified source truth",
+          "likelihood": "medium",
+          "impact": "high",
+          "mitigation": "Keep source references precise and mark unsupported claims inferred or unknown",
+          "owner": "Document author"
+        },
+        {
+          "id": "room-network",
+          "description": "Describing Advanced Room Mode as fully offline",
+          "likelihood": "low",
+          "impact": "high",
+          "mitigation": "State that external requests remain zero while explicitly requested local network traffic may occur",
+          "owner": "Session host"
+        }
+      ],
+      "sourceRefs": [
+        "product-brief",
+        "security"
+      ]
+    },
+    {
+      "id": "next",
+      "type": "action-plan",
+      "title": "Try Forma on work you already need to explain",
+      "items": [
+        {
+          "id": "install",
+          "label": "Install dependencies and build Forma with `pnpm install && pnpm build`",
+          "owner": "Reader",
+          "blocking": true
+        },
+        {
+          "id": "invoke",
+          "label": "Invoke `$forma` or `/forma` with source material and the reader's goal",
+          "owner": "Reader",
+          "blocking": false
+        },
+        {
+          "id": "review",
+          "label": "Open the rendered HTML and review its sources, confidence labels, and QA result",
+          "owner": "Reader",
+          "blocking": false
+        }
+      ],
+      "sourceRefs": [
+        "readme"
+      ]
+    },
+    {
+      "id": "sources",
+      "type": "source-ledger",
+      "title": "Sources and limits",
+      "entries": [
+        {
+          "sourceRef": "product-brief",
+          "covers": "Product definition, core idea, artifacts, and non-goals",
+          "limits": "Describes intended scope rather than implementation details"
+        },
+        {
+          "sourceRef": "readme",
+          "covers": "User workflow, CLI surface, Agent invocation, and QA commands",
+          "limits": "Tracks the current repository state"
+        },
+        {
+          "sourceRef": "architecture",
+          "covers": "The source-to-spec-to-render pipeline",
+          "limits": "A high-level map rather than a complete code reference"
+        },
+        {
+          "sourceRef": "design",
+          "covers": "Artifact contracts, composition, visual language, and accessibility intent",
+          "limits": "Design source of truth; implementation can still regress"
+        },
+        {
+          "sourceRef": "security",
+          "covers": "Sanitization, redaction, offline behavior, and Room Mode's network boundary",
+          "limits": "Documents controls, not an independent security audit"
+        },
+        {
+          "sourceRef": "registry",
+          "covers": "The current set of 59 semantic block definitions",
+          "limits": "The count can change as the block vocabulary evolves"
+        }
+      ]
+    }
+  ]
+}

@@ -45,7 +45,7 @@ Agent의 그날 컨디션이 아니라 렌더러 코드가 보장한다. 새 시
 - 렌더된 HTML은 네트워크 요청 **0건**. `file://`로 열어도 완전히 동작
 
 폰트는 npm 패키지에서 로컬로 subset해 base64로 문서 안에 박는다.
-자세한 내용은 `docs/security.md`, `skills/forma/references/typography.md`.
+자세한 내용은 `docs/security.md`, `skills-src/_shared/references/typography.md`.
 
 ---
 
@@ -92,7 +92,7 @@ CSS 비중이 0.1 시절 실측(19.7%)에서 두 배 가까이 올랐다. 스타
 CSS는 TS 템플릿 리터럴로 조립한다.
 
 ```
-src/blocks/*.tsx              블록 20종 컴포넌트
+src/blocks/*.tsx              블록 59종 컴포넌트
 src/renderer/document.tsx     문서 본문 트리
 src/renderer/compose.tsx      renderToStaticMarkup 호출부
 src/design/foundations-css.ts 레이어·토큰·레이아웃
@@ -146,7 +146,8 @@ src/
 │   ├── types.ts                BlockDefinition 계약 (prepare + Component)
 │   ├── primitives.tsx          Section / Measure / SourceNotes 등 공용 컴포넌트
 │   ├── strings.ts              지역화 라벨
-│   └── document|code|diagram|data|decision.tsx  블록 20종
+│   ├── document|code|diagram|data|decision.tsx  기반 블록 20종
+│   └── report|manual|dashboard|advanced.tsx      확장 블록 39종
 │
 ├── planner/      artifact가 지키기로 한 약속을 강제한다
 │   ├── plan.ts                 블록 → 역할 해석 후 계약 검사
@@ -175,7 +176,7 @@ src/
 │   └── sanitize.ts       96줄  이스케이프·sanitize·시크릿 마스킹의 유일한 경계
 │
 ├── qa/
-│   ├── browser-qa.ts    281줄  Playwright 4뷰포트 + axe
+│   ├── browser-qa.ts           Playwright 5뷰포트 + axe + clipped text
 │   ├── design-lint.ts   228줄  금지 패턴 정적 검사
 │   ├── run-lighthouse.ts 119줄
 │   └── run-qa.ts         40줄
@@ -210,8 +211,9 @@ forma render <spec>           단일 HTML 렌더
 forma build <spec>            렌더 + 브라우저 없는 정적 게이트
 forma preview <dir>           localhost 서버 (외부 접근 차단)
 forma qa <dir>                Playwright + axe + 반응형 + 오프라인 검사
-forma install-skills          canonical 스킬을 .claude/.agents 로 복사
-forma verify-skills           사본 체크섬 대조
+forma install-skills          네 Agent Skill을 호스트별로 빌드·설치·검증
+forma verify-skills           설치된 네 스킬과 정본의 체크섬 대조
+forma build-skills            Claude plugin과 Codex package 생성
 forma doctor                  로컬 환경 점검
 forma schema                  JSON Schema 출력
 forma generate                구조화 입력 스캐폴딩 (LLM 호출 없음)
@@ -258,18 +260,17 @@ inferred / unknown), `notes`를 가질 수 있다.
 **근거 없는 주장을 `verified`로 렌더하지 않는 것**이 이 스키마의 존재
 이유 중 하나다. `inferred`는 문서에 시각적으로 다르게 표시된다.
 
-### 블록 20종
+### 블록 59종
 
-| 그룹 | 블록 | 시각 문법 |
+| 소스 그룹 | 수 | 시각 문법 |
 |---|---|---|
-| 진입 | `cover`, `summary` | 표지, 요약 |
-| 문서 | `prose`, `key-points`, `glossary`, `source-note` | 본문 measure 폭 |
-| 코드 | `annotated-code`, `diff` | breakout + 줄 주석 rail |
-| 다이어그램 | `flow`, `sequence`, `timeline`, `architecture` | 전체 폭 SVG 캔버스 |
-| 데이터 | `comparison`, `test-summary`, `test-matrix`, `chart` | 표/밴드/차트 |
-| 판단 | `finding`, `risk`, `decision`, `actions` | 심각도·상태 색 |
+| document / code / diagram / data / decision | 20 | 본문, 코드, SVG, 표, 판단 |
+| report | 14 | 주장·근거·대안·위험·추천 |
+| manual | 13 | 단계·체크포인트·복구·호환성 |
+| dashboard | 7 | 상태·지표·분해·이상·freshness |
+| advanced | 5 | brief·evidence graph·challenge·simulation·record |
 
-그룹마다 레이아웃 문법이 다르다. 같은 카드 컴포넌트를 20번 반복하지
+그룹마다 레이아웃 문법이 다르다. 같은 카드 컴포넌트를 59번 반복하지
 않는 것이 설계 원칙이다.
 
 ---
@@ -393,7 +394,7 @@ subgrid(test-matrix, `@supports` fallback 포함), 논리 속성
 
 ### 5-6. 명시적 금지 목록
 
-`skills/forma/references/generic-ai-patterns.md`가 정본이고, 구조적으로
+`skills-src/_shared/references/generic-ai-patterns.md`가 정본이고, 구조적으로
 중요한 둘은 정적 lint가 잡는다.
 
 1. **좌측 bracket/갈고리 테두리 금지.** note rail은 요소 자신에
@@ -430,7 +431,7 @@ dot-grid, hover lift, 순차 fade-up 등.
 ```bash
 pnpm test           vitest 52개
 pnpm lint:design    금지 패턴 정적 검사
-pnpm qa             Playwright 1920/1440/1024/390 4뷰포트 + axe
+pnpm qa             Playwright 2048/1920/1440/1024/390 5뷰포트 + axe
 pnpm lighthouse     성능
 ```
 
@@ -470,30 +471,22 @@ axe 위반 0, 스크린샷.
 
 ### 동작하는 것
 
-spec 검증, registry 기반 블록 20종 렌더, artifact 4종 계약 강제,
+spec 검증, registry 기반 블록 59종 렌더, artifact 4종 계약 강제,
 0.1 하위 호환, 라이트/다크, 폰트 subset, 다이어그램 SVG,
-Shiki 하이라이팅, diff 파싱, 인쇄 스타일, 4뷰포트 QA, axe 통과,
-디자인 lint, 스킬 동기화. fixture 4종 + example 5종이 렌더된 상태로 있다.
+Shiki 하이라이팅, diff 파싱, 인쇄 스타일, 5뷰포트 QA, axe 통과,
+디자인 lint, 스킬 동기화. fixture 8종 + example 4종이 렌더된 상태로 있다.
 
 ### 알려진 문제
 
-**1. `dashboard`와 `advanced`는 계약만 있고 블록이 없다.**
-두 artifact의 composition contract는 정의돼 있고 planner가 강제하지만,
-`kpi` / `change` / `driver` / `freshness` / `evidence-graph` / `simulation` /
-`decision` 역할을 채울 블록이 아직 없다. 그래서 지금 dashboard 스펙을 쓰면
-"어떤 역할이 비었는지"를 지목하며 검증에 실패한다. 리포트에 카드를 얹어
-대시보드인 척하는 것보다 낫다고 판단한 결과다. PR5·PR7에서 채운다.
+`dashboard`와 `advanced`의 계약·블록·예제는 구현돼 있다. Dashboard는
+12열 Signal Grid 위에서 anomaly/action을 7:5로 배치하고, Advanced는
+evidence graph·simulation·decision record가 넓은 검토 캔버스를 쓴다.
 
-**2. artifact별 CSS는 파일만 분리됐고 내용은 아직 옛 테마 매핑이다.**
-`artifact-css.ts`로 떼어냈지만 규칙 자체는 기존 4테마를 옮긴 것이고,
-dashboard는 옛 workspace 레일 스타일을 쓰고 있다. Signal Grid 고유의
-12열 그리드와 수치 타이포는 PR5에서 만든다.
-
-**3. Storybook은 아직 없다.**
+**1. Storybook은 아직 없다.**
 TSX 전환의 목적 중 하나였지만 앱 하나를 새로 세우는 작업이라 분리했다.
 PR6(품질 계층)에서 aesthetic QA와 함께 넣는다.
 
-**4. 링크 끊긴 정적 목업 3개.**
+**2. 링크 끊긴 정적 목업 3개.**
 `prototypes/{precision-workbench,developer-docs,editorial-magazine}/onboarding.html`이
 갤러리에서 참조되지 않는 상태로 남아 있다. 정리 여부 미정.
 
@@ -528,6 +521,6 @@ node scripts/check-naming.mjs
 | artifact가 무엇을 약속하나 | `src/planner/profiles/` |
 | 색·간격·타이포 값 | `src/design/tokens.ts` |
 | 스타일 전부 | `src/design/css.ts` |
-| 하면 안 되는 것 | `src/qa/design-lint.ts`, `skills/forma/references/generic-ai-patterns.md` |
-| Agent가 따르는 절차 | `skills/forma/SKILL.md` |
+| 하면 안 되는 것 | `src/qa/design-lint.ts`, `skills-src/_shared/references/generic-ai-patterns.md` |
+| Agent가 따르는 절차 | `skills-src/{dashboard,report,manual,advanced}/instructions.md` |
 | 왜 이렇게 했나 | `docs/decisions.md`, `docs/design-iterations.md` |

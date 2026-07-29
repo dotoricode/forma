@@ -1,11 +1,4 @@
 #!/usr/bin/env node
-import { spawnSync } from "node:child_process";
-import path from "node:path";
-import { fileURLToPath } from "node:url";
+import { runFormaSource } from "./run-forma.mjs";
 
-const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../../..");
-const result = spawnSync("pnpm", ["tsx", "src/qa/design-lint.ts", ...process.argv.slice(2)], {
-  cwd: repoRoot,
-  stdio: "inherit",
-});
-process.exit(result.status ?? 1);
+process.exit(runFormaSource("src/qa/design-lint.ts", process.argv.slice(2)));

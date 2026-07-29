@@ -5,6 +5,11 @@ forma-output/
 *.log
 .DS_Store
 
+# Agent Skill packages are generated from skills-src/ and installed outside
+# the repository. Track the sources and installer, not eight copied packages.
+.agents/skills/forma-*/
+.claude/skills/forma-*/
+
 # fixtures/*/output/ is committed on purpose — it's the demo gallery
 # (rendered HTML + QA screenshots for the four required fixtures).
 # The four artifact examples commit their HTML, spec, and manifest; browser-QA

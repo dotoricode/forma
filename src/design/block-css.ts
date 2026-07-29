@@ -216,10 +216,56 @@ export function blockCss(): string {
 
   /* chart */
   .blk-chart { max-width: 100%; }
-  .blk-chart__title { font-size: 1rem; margin-block-end: var(--space-4); color: var(--color-text-muted); }
+  .blk-chart__title { font-size: 1rem; margin-block-end: var(--space-2); }
+  .blk-chart__reading {
+    max-width: 48rem;
+    margin-block-end: var(--space-4);
+    color: var(--color-text-muted);
+  }
   .blk-chart svg text { font-family: var(--font-sans); fill: var(--color-text-muted); font-size: 0.75rem; }
-  .blk-chart .chart-bar { fill: var(--color-accent); }
-  .blk-chart .chart-axis { stroke: var(--color-border); }
+  .blk-chart .chart-axis { stroke: var(--color-border-strong); }
+  .blk-chart .chart-grid { stroke: var(--color-border); stroke-width: 1; }
+  .blk-chart .chart-line {
+    fill: none;
+    stroke-width: 2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+  .blk-chart :is(.chart-line, .chart-point)[data-series="0"] { stroke: var(--color-chart-1); }
+  .blk-chart :is(.chart-line, .chart-point)[data-series="1"] { stroke: var(--color-chart-2); }
+  .blk-chart :is(.chart-line, .chart-point)[data-series="2"] { stroke: var(--color-chart-3); }
+  .blk-chart :is(.chart-line, .chart-point)[data-series="3"] { stroke: var(--color-chart-4); }
+  .blk-chart :is(.chart-line, .chart-point)[data-series="4"] { stroke: var(--color-chart-5); }
+  .blk-chart :is(.chart-line, .chart-point)[data-series="5"] { stroke: var(--color-chart-6); }
+  .blk-chart .chart-point[data-series="0"] { fill: var(--color-chart-1); }
+  .blk-chart .chart-point[data-series="1"] { fill: var(--color-chart-2); }
+  .blk-chart .chart-point[data-series="2"] { fill: var(--color-chart-3); }
+  .blk-chart .chart-point[data-series="3"] { fill: var(--color-chart-4); }
+  .blk-chart .chart-point[data-series="4"] { fill: var(--color-chart-5); }
+  .blk-chart .chart-point[data-series="5"] { fill: var(--color-chart-6); }
+  .blk-chart .chart-bar[data-series="0"] { fill: var(--color-chart-1); }
+  .blk-chart .chart-bar[data-series="1"] { fill: var(--color-chart-2); }
+  .blk-chart .chart-bar[data-series="2"] { fill: var(--color-chart-3); }
+  .blk-chart .chart-bar[data-series="3"] { fill: var(--color-chart-4); }
+  .blk-chart .chart-bar[data-series="4"] { fill: var(--color-chart-5); }
+  .blk-chart .chart-bar[data-series="5"] { fill: var(--color-chart-6); }
+  .blk-chart__legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2) var(--space-5);
+    list-style: none;
+    margin-block-start: var(--space-3);
+    font-size: 0.8125rem;
+    color: var(--color-text-muted);
+  }
+  .blk-chart__legend li { display: inline-flex; align-items: center; gap: var(--space-2); }
+  .blk-chart__swatch { inline-size: 0.75rem; block-size: 0.25rem; border-radius: 999px; }
+  .blk-chart__swatch[data-series="0"] { background: var(--color-chart-1); }
+  .blk-chart__swatch[data-series="1"] { background: var(--color-chart-2); }
+  .blk-chart__swatch[data-series="2"] { background: var(--color-chart-3); }
+  .blk-chart__swatch[data-series="3"] { background: var(--color-chart-4); }
+  .blk-chart__swatch[data-series="4"] { background: var(--color-chart-5); }
+  .blk-chart__swatch[data-series="5"] { background: var(--color-chart-6); }
 
   /* finding / risk / decision */
   .blk-finding__badge, .blk-risk__badge {
@@ -232,8 +278,7 @@ export function blockCss(): string {
   .blk-risk__grid { display: flex; gap: var(--space-6); margin-block: var(--space-2) var(--space-3); font-size: 0.875rem; }
   .blk-risk__grid dt { color: var(--color-text-muted); }
   .decision-strip {
-    border-inline-start: 3px solid var(--color-accent);
-    padding-inline-start: var(--space-4);
+    padding-block: var(--space-2);
   }
   .decision-strip__status {
     font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.03em; color: var(--color-accent-strong);
@@ -258,6 +303,7 @@ export function blockCss(): string {
 
   /* source-note */
   .blk-source-note { font-size: 0.8125rem; color: var(--color-text-muted); }
+  .blk-source-note:not(:first-child) { margin-block-start: var(--space-5); }
   .blk-source-note ul { display: grid; gap: var(--space-1); list-style: none; }
   .blk-source-note li { display: grid; gap: 0.15rem; }
   .blk-source-note__link {
@@ -299,7 +345,7 @@ export function blockCss(): string {
     &[data-tone="fail"] .test-band__value { color: var(--color-danger); }
     &[data-tone="pass"] .test-band__value { color: var(--color-success); }
   }
-  
+
   /* ---- report vocabulary ------------------------------------------- */
 
   /* The thesis is the one sentence a reader must not miss. It gets size and
@@ -353,11 +399,7 @@ export function blockCss(): string {
   .blk-headline-finding__meta:empty { display: none; }
   .blk-headline-finding [data-severity="high"] .blk-headline-finding__claim,
   .blk-headline-finding [data-severity="critical"] .blk-headline-finding__claim {
-    /* Severity is carried by a rule on the reading edge, not by tinting the
-       text: coloured body copy fails contrast before it reads as urgent. */
-    border-inline-start: 3px solid var(--color-danger);
-    padding-inline-start: var(--space-4);
-    margin-inline-start: calc(-1 * var(--space-4) - 3px);
+    color: var(--color-danger-text);
   }
 
   .blk-evidence-stack__list {
@@ -463,8 +505,7 @@ export function blockCss(): string {
   .blk-implication__list dd { margin: 0; }
 
   .blk-risk-register__table tr[data-impact="high"] th[scope="row"] {
-    border-inline-start: 3px solid var(--color-danger);
-    padding-inline-start: var(--space-3);
+    color: var(--color-danger-text);
   }
 
   .blk-action-plan__list {
@@ -520,7 +561,6 @@ export function blockCss(): string {
 
   .blk-appendix__title { font-size: 1rem; color: var(--color-text-muted); }
 
-  
   /* ---- manual vocabulary ------------------------------------------- */
 
   .blk-task-map__outcomes { padding-inline-start: var(--space-5); }
@@ -706,8 +746,8 @@ export function blockCss(): string {
     font-variant-numeric: tabular-nums;
   }
   .blk-version-note__note {
-    padding-inline-start: var(--space-4);
-    border-inline-start: 2px solid var(--color-border-strong);
+    padding-block-start: var(--space-3);
+    border-block-start: 1px solid var(--color-border);
   }
 
   .blk-completion-check__check {
@@ -738,7 +778,6 @@ export function blockCss(): string {
     color: var(--color-text-muted);
   }
 
-  
   .blk-narrative__title {
     font-size: clamp(1.75rem, 1.3rem + 1.8vw, 2.75rem);
     line-height: 1.15;
@@ -750,27 +789,18 @@ export function blockCss(): string {
     margin-block-end: var(--space-6);
   }
 
-  
   /* ---- dashboard vocabulary ---------------------------------------- */
 
   .status-header {
-    padding: var(--space-5) var(--space-6);
-    border-radius: var(--radius-md);
-    border: 1px solid var(--color-border);
-    /* The state band uses a left rule rather than a filled panel: a solid
-       colour block behind text is the thing that forces a colour choice
-       between legibility and urgency. */
-    border-inline-start-width: 4px;
+    padding-block: var(--space-5);
   }
-  .status-header[data-status="warning"] { border-inline-start-color: var(--color-warning); }
-  .status-header[data-status="critical"] { border-inline-start-color: var(--color-danger); }
-  .status-header[data-status="normal"] { border-inline-start-color: var(--color-success); }
   .status-header__state {
     font-size: 0.75rem;
     letter-spacing: 0.06em;
     text-transform: uppercase;
     color: var(--color-text-muted);
   }
+  .status-header[data-status="normal"] .status-header__state { color: var(--color-success-text); }
   .status-header[data-status="critical"] .status-header__state { color: var(--color-danger-text); }
   .status-header[data-status="warning"] .status-header__state { color: var(--color-warning-text); }
   .status-header__headline {
@@ -785,8 +815,8 @@ export function blockCss(): string {
 
   .metric-grid {
     display: grid;
-    gap: var(--space-5);
-    grid-template-columns: repeat(auto-fit, minmax(13rem, 1fr));
+    gap: var(--space-6);
+    grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr));
     /* Cells stretch so the sparklines share one baseline. Left to their
        natural height they stepped down the row, following whichever metric
        happened to carry a comparison line. */
@@ -797,14 +827,15 @@ export function blockCss(): string {
     flex-direction: column;
   }
   .metric__label {
-    font-size: 0.8125rem;
+    font-size: 0.875rem;
+    line-height: 1.5;
     color: var(--color-text-muted);
   }
   .metric__value {
     /* The number leads. Its size is what makes the grid scannable before
        any label is read. */
-    font-size: clamp(1.75rem, 1.4rem + 1.4vw, 2.5rem);
-    line-height: 1.05;
+    font-size: 2.125rem;
+    line-height: 1.1;
     font-weight: 600;
     font-variant-numeric: tabular-nums;
     margin-block: var(--space-1) 0;
@@ -832,7 +863,8 @@ export function blockCss(): string {
   .metric__delta-basis { color: var(--color-text-muted); font-size: 0.8125rem; }
   .metric__period {
     margin-block-start: var(--space-2);
-    font-size: 0.75rem;
+    font-size: 0.8125rem;
+    line-height: 1.5;
     color: var(--color-text-muted);
   }
   .metric__spark { margin-block-start: auto; padding-block-start: var(--space-3); }
@@ -845,17 +877,14 @@ export function blockCss(): string {
     stroke-dasharray: 3 3;
   }
 
-  .anomaly {
-    padding-inline-start: var(--space-4);
-    border-inline-start: 3px solid var(--color-border-strong);
-  }
-  .anomaly[data-severity="high"] { border-inline-start-color: var(--color-danger); }
-  .anomaly[data-severity="medium"] { border-inline-start-color: var(--color-warning); }
+  .anomaly { padding-block: var(--space-2); }
   .anomaly__meta {
     font-size: 0.8125rem;
     color: var(--color-text-muted);
     font-variant-numeric: tabular-nums;
   }
+  .anomaly[data-severity="high"] .anomaly__meta { color: var(--color-danger-text); }
+  .anomaly[data-severity="medium"] .anomaly__meta { color: var(--color-warning-text); }
   .anomaly__what { font-size: 1.125rem; margin-block: var(--space-1) var(--space-2); }
   .anomaly__suspected { font-size: 0.9375rem; }
   .anomaly__suspected span {
@@ -867,10 +896,11 @@ export function blockCss(): string {
   }
 
   .blk-breakdown__reading {
-    max-width: var(--measure-prose);
+    max-width: 48rem;
     margin-block-end: var(--space-4);
+    line-height: 1.65;
   }
-  .blk-breakdown__canvas svg { display: block; width: 100%; height: auto; }
+  .blk-breakdown__canvas svg { display: block; max-width: 100%; height: auto; }
   .breakdown-label, .breakdown-value {
     font-family: var(--font-sans);
     font-size: 12px;
@@ -887,13 +917,13 @@ export function blockCss(): string {
     margin-block-start: var(--space-4);
     display: grid;
     gap: var(--space-2);
-    max-width: var(--measure-prose);
+    max-width: 48rem;
   }
   .blk-breakdown__values li {
     display: flex;
     justify-content: space-between;
     gap: var(--space-4);
-    font-size: 0.875rem;
+    font-size: 0.9375rem;
     padding-block-end: var(--space-2);
     border-block-end: 1px solid var(--color-border);
   }
@@ -903,7 +933,7 @@ export function blockCss(): string {
   .blk-segmented-table__table {
     width: 100%;
     border-collapse: collapse;
-    font-size: 0.875rem;
+    font-size: 0.9375rem;
     font-variant-numeric: tabular-nums;
   }
   .blk-segmented-table__table th,
@@ -914,19 +944,21 @@ export function blockCss(): string {
     white-space: nowrap;
   }
   .blk-segmented-table__table thead th {
-    font-size: 0.75rem;
+    font-size: 0.8125rem;
     color: var(--color-text-muted);
     border-block-end-color: var(--color-border-strong);
   }
   .blk-segmented-table__table tr[data-status="critical"] th[scope="row"] {
-    border-inline-start: 3px solid var(--color-danger);
-    padding-inline-start: var(--space-2);
+    color: var(--color-danger-text);
   }
   .blk-segmented-table__table tr[data-status="warning"] th[scope="row"] {
-    border-inline-start: 3px solid var(--color-warning);
-    padding-inline-start: var(--space-2);
+    color: var(--color-warning-text);
   }
   .cell-missing { color: var(--color-text-muted); font-style: normal; }
+
+  @media (max-width: 600px) {
+    .blk-breakdown__canvas { display: none; }
+  }
 
   .blk-data-freshness__grid {
     display: flex;
@@ -950,7 +982,6 @@ export function blockCss(): string {
   }
   .blk-data-freshness__gaps { padding-inline-start: var(--space-5); font-size: 0.9375rem; }
 
-  
   /* ---- Decision Room ------------------------------------------------ */
 
   .blk-brief__question {
@@ -979,19 +1010,9 @@ export function blockCss(): string {
     display: grid;
     gap: var(--space-4);
   }
-  .claim {
-    padding-inline-start: var(--space-4);
-    border-inline-start: 3px solid var(--color-border);
-  }
-  /* Exposure is impact against confidence, so the rule weight tracks impact
-     and its style tracks how well the claim is backed. */
-  .claim[data-impact="high"] { border-inline-start-width: 5px; }
-  .claim[data-confidence="verified"] { border-inline-start-color: var(--color-border-strong); }
-  .claim[data-confidence="inferred"] { border-inline-start-style: dashed; }
-  .claim[data-confidence="unknown"] {
-    border-inline-start-style: dotted;
-    border-inline-start-color: var(--color-warning);
-  }
+  .claim { padding-block: var(--space-2); }
+  .claim[data-impact="high"] .claim__statement { font-weight: 700; }
+  .claim[data-confidence="unknown"] .claim__meta { color: var(--color-warning-text); }
   .claim__meta {
     font-size: 0.75rem;
     letter-spacing: 0.03em;
@@ -1009,8 +1030,7 @@ export function blockCss(): string {
 
   .blk-challenge__counter {
     margin: var(--space-4) 0;
-    padding-inline-start: var(--space-5);
-    border-inline-start: 3px solid var(--color-danger);
+    color: var(--color-danger-text);
     font-size: 1.125rem;
     line-height: 1.5;
   }
@@ -1064,11 +1084,7 @@ export function blockCss(): string {
     color: var(--color-text-muted);
   }
 
-  .decision-record {
-    padding-inline-start: var(--space-5);
-    border-inline-start: 4px solid var(--color-accent);
-  }
-  .decision-record[data-status="deferred"] { border-inline-start-color: var(--color-border-strong); }
+  .decision-record { padding-block: var(--space-3); }
   .decision-record__status {
     font-size: 0.75rem;
     letter-spacing: 0.05em;
@@ -1100,5 +1116,5 @@ export function blockCss(): string {
   .decision-record__dissent dd { margin: 0; }
   .decision-record__revisit { padding-inline-start: var(--space-5); }
 
-  `;
+`;
 }

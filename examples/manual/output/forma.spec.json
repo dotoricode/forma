@@ -64,7 +64,7 @@
       "doesNotCover": [
         "forma CLI 설치 자체 (fixtures/manual/quickstart 문서에 있다)",
         "Room Mode 실행과 Decision Freeze",
-        "논리 스킬 4종 분리 배포 (아직 없다)"
+        "호스트 플러그인 마켓플레이스 배포"
       ]
     },
     {
@@ -247,12 +247,12 @@
           "id": "namespaced",
           "label": "논리 스킬 4종 분리",
           "cells": {
-            "Claude Code": "unsupported",
-            "Codex": "unsupported"
+            "Claude Code": "supported",
+            "Codex": "supported"
           }
         }
       ],
-      "note": "논리 스킬 4종 분리는 아직 없다. unsupported로 적은 것은 계획이 없다는 뜻이 아니라 지금 동작하지 않는다는 뜻이다. 자동 호출 차단은 호스트마다 넣는 곳이 다르다. Claude Code는 SKILL.md frontmatter의 disable-model-invocation, Codex는 스킬 디렉터리 안의 agents/openai.yaml이다.",
+      "note": "논리 스킬 4종은 하나의 host-neutral source에서 생성된다. 자동 호출 차단은 호스트마다 넣는 곳이 다르다. Claude Code는 SKILL.md frontmatter의 disable-model-invocation, Codex는 스킬 디렉터리 안의 agents/openai.yaml이다.",
       "sourceRefs": [
         "skill"
       ]
@@ -261,7 +261,7 @@
       "id": "version",
       "type": "version-note",
       "appliesFrom": "0.2",
-      "note": "논리 스킬 4종 분리 배포는 아직 없다. 지금은 forma 스킬 하나가 네 artifact를 모두 다룬다."
+      "note": "0.2부터 dashboard, report, manual, advanced 논리 스킬 4종을 Claude Code 플러그인과 Codex 패키지로 각각 생성한다."
     },
     {
       "id": "trouble",
@@ -300,7 +300,7 @@
       "type": "next-task",
       "tasks": [
         {
-          "label": "pnpm qa out 으로 4개 뷰포트와 접근성 검사 돌리기",
+          "label": "pnpm qa out 으로 5개 뷰포트와 접근성 검사 돌리기",
           "why": "가로 오버플로와 대비 미달은 눈으로 잘 안 보인다"
         },
         {

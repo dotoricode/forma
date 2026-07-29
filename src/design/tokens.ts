@@ -1,50 +1,93 @@
 /**
  * Forma Design System — token definitions.
- * Primitive tokens are raw OKLCH values; semantic tokens are the only ones
- * the renderer's CSS is allowed to reference. See DESIGN.md for rationale.
+ *
+ * The palettes are traceable to VS Code's built-in Light+ and Dark+ themes:
+ * workbench defaults provide the surfaces and UI states, while the theme
+ * files provide the chart series hues. Components still consume semantic
+ * custom properties only; these source values never leak into block CSS.
  */
 
-export const primitiveColor = {
-  // Neutral ramp (near-achromatic, a touch warm) — used for canvas/surface/text.
-  neutral0: "oklch(100% 0 0)",
-  neutral50: "oklch(98.5% 0.002 90)",
-  neutral100: "oklch(96.5% 0.003 90)",
-  neutral200: "oklch(92% 0.004 90)",
-  neutral300: "oklch(85% 0.005 90)",
-  neutral400: "oklch(70% 0.006 90)",
-  neutral500: "oklch(55% 0.006 90)",
-  neutral600: "oklch(42% 0.006 90)",
-  neutral700: "oklch(30% 0.006 90)",
-  neutral800: "oklch(20% 0.005 90)",
-  neutral900: "oklch(13% 0.004 90)",
-  neutral950: "oklch(9% 0.003 90)",
+export interface FormaColorPalette {
+  canvas: string;
+  surface: string;
+  surfaceRaised: string;
+  text: string;
+  textMuted: string;
+  border: string;
+  borderStrong: string;
+  accent: string;
+  accentStrong: string;
+  onAccent: string;
+  success: string;
+  warning: string;
+  danger: string;
+  info: string;
+  successText: string;
+  warningText: string;
+  dangerText: string;
+  infoText: string;
+  chartBlue: string;
+  chartCyan: string;
+  chartYellow: string;
+  chartPurple: string;
+  chartOrange: string;
+  chartGreen: string;
+}
 
-  // Single accent: restrained, ink-blue. Used sparingly (links, focus, decision).
-  accent400: "oklch(62% 0.11 250)",
-  accent500: "oklch(54% 0.13 250)",
-  accent600: "oklch(46% 0.13 250)",
+export const vscodeLight: FormaColorPalette = {
+  canvas: "#FFFFFF",
+  surface: "#F3F3F3",
+  surfaceRaised: "#F0F0F0",
+  text: "#333333",
+  textMuted: "#616161",
+  border: "#D4D4D4",
+  borderStrong: "#C4C4C4",
+  accent: "#007ACC",
+  accentStrong: "#006AB1",
+  onAccent: "#FFFFFF",
+  success: "#388A34",
+  warning: "#BF8803",
+  danger: "#E51400",
+  info: "#0063D3",
+  // Darker than charts because these values are also used as body text.
+  successText: "#277A2E",
+  warningText: "#855F00",
+  dangerText: "#A1260D",
+  infoText: "#0063D3",
+  chartBlue: "#0070C1",
+  chartCyan: "#267F99",
+  chartYellow: "#795E26",
+  chartPurple: "#AF00DB",
+  chartOrange: "#A31515",
+  chartGreen: "#388A34",
+};
 
-  // Status colors — meaning-bound only, never decorative.
-  success500: "oklch(58% 0.13 152)",
-  warning500: "oklch(72% 0.15 80)",
-  danger500: "oklch(58% 0.18 25)",
-  info500: "oklch(60% 0.10 235)",
-
-  // Text-weight status colours. The 500 ramp was tuned for fills and large
-  // numerals, where 3:1 is the bar. As 14px body text on the light canvas
-  // it measured 3.84:1 and failed WCAG AA, so status words get their own
-  // darker step rather than being nudged case by case.
-  success700: "oklch(43% 0.12 152)",
-  warning700: "oklch(48% 0.12 80)",
-  danger700: "oklch(45% 0.17 25)",
-  info700: "oklch(45% 0.11 235)",
-
-  // The same four for dark surfaces, where the text must be lighter.
-  success300: "oklch(80% 0.13 152)",
-  warning300: "oklch(84% 0.13 80)",
-  danger300: "oklch(78% 0.14 25)",
-  info300: "oklch(80% 0.10 235)",
-} as const;
+export const vscodeDark: FormaColorPalette = {
+  canvas: "#1E1E1E",
+  surface: "#252526",
+  surfaceRaised: "#2A2D2E",
+  text: "#CCCCCC",
+  textMuted: "#969696",
+  border: "#3C3C3C",
+  borderStrong: "#5A5D5E",
+  accent: "#3794FF",
+  accentStrong: "#4FC1FF",
+  onAccent: "#1E1E1E",
+  success: "#89D185",
+  warning: "#CCA700",
+  danger: "#F14C4C",
+  info: "#59A4F9",
+  successText: "#89D185",
+  warningText: "#DCDCAA",
+  dangerText: "#F48771",
+  infoText: "#75BEFF",
+  chartBlue: "#4FC1FF",
+  chartCyan: "#4EC9B0",
+  chartYellow: "#DCDCAA",
+  chartPurple: "#C586C0",
+  chartOrange: "#CE9178",
+  chartGreen: "#89D185",
+};
 
 export const spacing = {
   0: "0",
@@ -92,7 +135,7 @@ export const motion = {
  */
 export const measure = {
   prose: "42rem", // ~672px: comfortable for both Latin and Hangul body text
-  wide: "min(100%, 64rem)", // ~1024px: tables, code, diagrams
+  wide: "min(100%, 72rem)", // ~1152px: tables, code, diagrams on wide displays
 };
 
 /**
@@ -118,4 +161,10 @@ export const semanticTokenNames = [
   "--color-warning-text",
   "--color-danger-text",
   "--color-info-text",
+  "--color-chart-1",
+  "--color-chart-2",
+  "--color-chart-3",
+  "--color-chart-4",
+  "--color-chart-5",
+  "--color-chart-6",
 ] as const;

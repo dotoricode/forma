@@ -20,6 +20,7 @@
     "qa": "tsx src/qa/run-qa.ts",
     "lint:design": "tsx src/qa/design-lint.ts",
     "lighthouse": "tsx src/qa/run-lighthouse.ts",
+    "pages:build": "tsx src/pages/build.ts",
     "check-naming": "node scripts/check-naming.mjs",
     "fonts:build": "tsx scripts/build-fonts.mjs"
   },

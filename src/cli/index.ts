@@ -1,15 +1,24 @@
 #!/usr/bin/env node
 import { Command } from "commander";
 import path from "node:path";
-import { readFile } from "node:fs/promises";
+import { mkdtemp, readFile, rm, writeFile } from "node:fs/promises";
 import { createServer } from "node:http";
-import { networkInterfaces } from "node:os";
+import { homedir, networkInterfaces, tmpdir } from "node:os";
 import { loadSpecFile, renderSpecFileToDir, FormaSpecError } from "../renderer/render.js";
 import { buildFormaJsonSchema } from "../spec/json-schema.js";
-import { installSkills, verifySkills } from "./skills.js";
+import {
+  installAgentSkills,
+  readConfiguredSkillTargets,
+  syncConfiguredSkills,
+  verifyInstalledSkills,
+  type InstallHost,
+  type InstallScope,
+} from "../skills/install.js";
+import { buildSkills, verifyBuiltSkills } from "../skills/build.js";
 import { writeStarterSpecFile } from "./starter-spec.js";
 import { inferArtifact, parseArtifact } from "../spec/infer-artifact.js";
 import { writeGeneratedSpec } from "./generate.js";
+import type { CandidateScore } from "../qa/candidates.js";
 
 const program = new Command();
 program.name("forma").description("Turn complex work into clear form.").version("0.1.0");
@@ -61,45 +70,90 @@ program
   .option("--seed <text>", "seed for candidate generation; same seed, same winner", "forma")
   .action(async (specPath: string, opts: { out: string; quality: string; seed: string }) => {
     try {
-      const outcome = await renderSpecFileToDir(specPath, opts.out);
-      console.log(`forma: rendered ${outcome.htmlPath} (${outcome.bytes} bytes)`);
       const { lintHtmlFile } = await import("../qa/design-lint.js");
-      const findings = await lintHtmlFile(outcome.htmlPath);
-      if (findings.length === 0) {
-        console.log("forma: design lint — no generic-AI pattern violations found");
-      } else {
-        console.log(`forma: design lint — ${findings.length} finding(s):`);
-        for (const f of findings) console.log(`  - [${f.rule}] ${f.message}`);
+      if (opts.quality !== "standard" && opts.quality !== "advanced") {
+        throw new Error("forma: --quality must be 'standard' or 'advanced'");
       }
 
       if (opts.quality === "advanced") {
         const { buildCandidates, scoreCandidate, seedFrom, selectWinner } = await import(
           "../qa/candidates.js"
         );
-        const { loadSpecFile } = await import("../renderer/render.js");
+        const { runBrowserQa } = await import("../qa/browser-qa.js");
+        const { chromium } = await import("playwright");
         const spec = await loadSpecFile(specPath);
         const candidates = buildCandidates(spec, 8, seedFrom(opts.seed));
-        // Every candidate is scored against the same rendered evidence for
-        // now: composition axes do not yet feed the stylesheet, so varying
-        // them would change nothing and pretending otherwise would make the
-        // tournament theatre. The selection machinery is real and pinned by
-        // tests; wiring the axes into the renderer is the remaining step.
-        const evidence = { lintFindings: findings };
-        const scores = candidates.map((candidate) => scoreCandidate(candidate, evidence));
+        const candidateRoot = await mkdtemp(path.join(tmpdir(), "forma-candidates-"));
+        const browser = await chromium.launch();
+        const scores: CandidateScore[] = [];
+        try {
+          for (const candidate of candidates) {
+            const candidateDir = path.join(candidateRoot, candidate.id);
+            const rendered = await renderSpecFileToDir(specPath, candidateDir, {
+              composition: candidate,
+            });
+            const candidateFindings = await lintHtmlFile(rendered.htmlPath);
+            const browserEvidence = await runBrowserQa({
+              target: candidateDir,
+              qaDir: path.join(candidateDir, "qa"),
+              label: candidate.id,
+              browser,
+              captureScreenshots: false,
+            });
+            scores.push(
+              scoreCandidate(candidate, {
+                lintFindings: candidateFindings,
+                axeViolations: browserEvidence.axeViolationCount,
+                horizontalOverflow: browserEvidence.overflowElements,
+                clippedText: browserEvidence.clippedTextElements,
+                externalRequests: browserEvidence.externalRequests.length,
+                brokenAnchors: browserEvidence.brokenAnchorTargets.length,
+              }),
+            );
+          }
+        } finally {
+          await browser.close();
+          await rm(candidateRoot, { recursive: true, force: true });
+        }
+
         const winner = selectWinner(scores);
         if (!winner) {
-          console.log("forma: every candidate failed a hard gate. Nothing to select.");
-        } else {
-          console.log(
-            `forma: quality advanced — ${candidates.length} candidates, winner '${winner.candidate.id}' at ${winner.score}/100`,
-          );
-          for (const [dimension, value] of Object.entries(winner.breakdown)) {
-            console.log(`  ${dimension}: ${value}`);
-          }
+          throw new Error("forma: every candidate failed a hard gate; no artifact was written");
         }
-      }
 
-      console.log(`forma: run \`forma qa ${opts.out}\` for the full browser/axe gate`);
+        const outcome = await renderSpecFileToDir(specPath, opts.out, {
+          composition: winner.candidate,
+        });
+        await writeFile(
+          path.join(opts.out, "qa", "tournament.json"),
+          JSON.stringify(
+            {
+              seed: opts.seed,
+              winner: winner.candidate.id,
+              candidates: scores,
+            },
+            null,
+            2,
+          ),
+          "utf-8",
+        );
+        console.log(`forma: rendered ${outcome.htmlPath} (${outcome.bytes} bytes)`);
+        console.log(
+          `forma: quality advanced — ${candidates.length} distinct renders, winner '${winner.candidate.id}' at ${winner.score}/100`,
+        );
+        console.log("forma: every candidate was measured at 2048, 1920, 1440, 1024, and 390px");
+      } else {
+        const outcome = await renderSpecFileToDir(specPath, opts.out);
+        console.log(`forma: rendered ${outcome.htmlPath} (${outcome.bytes} bytes)`);
+        const findings = await lintHtmlFile(outcome.htmlPath);
+        if (findings.length === 0) {
+          console.log("forma: design lint — no generic-AI pattern violations found");
+        } else {
+          console.log(`forma: design lint — ${findings.length} finding(s):`);
+          for (const f of findings) console.log(`  - [${f.rule}] ${f.message}`);
+        }
+        console.log(`forma: run \`forma qa ${opts.out}\` for the full browser/axe gate`);
+      }
     } catch (error) {
       exitWithError(error);
     }
@@ -279,19 +333,46 @@ program
 
 program
   .command("install-skills")
-  .description("Sync the canonical skill to the repo copies and every machine-wide skill target")
-  .action(async () => {
+  .description("Install all four Forma Agent Skills for Codex or Claude Code")
+  .option("--host <host>", "codex | claude (omit for maintainer sync)")
+  .option("--scope <scope>", "user | project | local", "user")
+  .action(async (opts: { host?: string; scope: string }) => {
     try {
-      const result = await installSkills(process.cwd(), { includeGlobalTargets: true });
-      for (const target of result.targets) console.log(`forma: synced ${target}`);
-      for (const target of result.globalTargets) console.log(`forma: synced ${target}`);
-      if (result.globalTargets.length === 0) {
-        console.log(
-          `forma: no ~/.agents/skill-targets.json — synced the repo copies only.`,
-        );
+      if (!opts.host) {
+        const result = await syncConfiguredSkills(process.cwd());
+        if (result.targetRoots.length === 0) {
+          console.log("forma: no ~/.agents/skill-targets.json — no configured roots to sync.");
+          return;
+        }
+        for (const target of result.targetRoots) console.log(`forma: synced ${target}`);
+        for (const legacy of result.removedLegacy) {
+          console.log(`forma: removed generated compatibility skill ${legacy}`);
+        }
+        for (const legacy of result.preservedLegacy) {
+          console.log(`forma: preserved modified compatibility skill ${legacy}`);
+        }
+        console.log("forma: installed four standalone skills in every configured root.");
+        console.log("forma: start a new Agent session if the skill list was already loaded.");
+        return;
       }
-      console.log(`forma: checksum ${result.checksum.slice(0, 12)} verified on every copy`);
-      console.log("forma: start a new Codex/Claude session if the skill list was already loaded.");
+
+      const host = parseInstallHost(opts.host);
+      const scope = parseInstallScope(opts.scope);
+      const result = await installAgentSkills(process.cwd(), { host, scope });
+      for (const skill of result.skills) {
+        console.log(`forma: installed ${skill.invocation.padEnd(20)} ${skill.path}`);
+      }
+      for (const legacy of result.removedLegacy) {
+        console.log(`forma: removed generated compatibility skill ${legacy}`);
+      }
+      for (const legacy of result.preservedLegacy) {
+        console.log(`forma: preserved modified compatibility skill ${legacy}`);
+      }
+      console.log(
+        host === "claude"
+          ? "forma: run /reload-plugins in Claude Code."
+          : "forma: start a new Codex session if the skill list was already loaded.",
+      );
     } catch (error) {
       exitWithError(error);
     }
@@ -300,7 +381,7 @@ program
 program
   .command("build-skills")
   .description("Generate the Claude Code plugin and Codex skill packages from skills-src/")
-  .option("--out <dir>", "output directory", "dist/skills")
+  .option("--out <dir>", "output directory", "dist/agent-skills")
   .action(async (opts: { out: string }) => {
     try {
       const { buildSkills } = await import("../skills/build.js");
@@ -310,8 +391,10 @@ program
         console.log(`  ${skill.invocation.padEnd(20)} ${skill.dir}`);
       }
       console.log("");
-      console.log("forma: Claude Code — install the plugin directory under dist/skills/claude/forma");
-      console.log("forma: Codex — copy dist/skills/codex/* into .agents/skills or ~/.codex/skills");
+      console.log(
+        `forma: Claude Code plugin — ${path.join(result.outDir, "claude/forma")}`,
+      );
+      console.log(`forma: Codex skills — ${path.join(result.outDir, "codex")}`);
     } catch (error) {
       exitWithError(error);
     }
@@ -319,14 +402,24 @@ program
 
 program
   .command("verify-skills")
-  .description("Check installed skill copies match the canonical checksum")
+  .description("Check configured standalone skill copies match skills-src")
   .action(async () => {
-    const result = await verifySkills(process.cwd(), { includeGlobalTargets: true });
-    if (result.ok) {
+    await buildSkills(process.cwd());
+    const builtIssues = await verifyBuiltSkills(process.cwd());
+    const configuredTargetRoots = await readConfiguredSkillTargets(homedir());
+    const issues = [
+      ...builtIssues,
+      ...(configuredTargetRoots.length === 0
+        ? []
+        : await verifyInstalledSkills(process.cwd(), {
+            targetRoots: configuredTargetRoots,
+          })),
+    ];
+    if (issues.length === 0) {
       console.log("forma: installed skills match canonical source");
     } else {
       console.error("forma: skill drift detected:");
-      for (const issue of result.issues) console.error(`  - ${issue}`);
+      for (const issue of issues) console.error(`  - ${issue}`);
       process.exitCode = 1;
     }
   });
@@ -393,6 +486,16 @@ function contentType(filePath: string): string {
   if (filePath.endsWith(".json")) return "application/json";
   if (filePath.endsWith(".png")) return "image/png";
   return "application/octet-stream";
+}
+
+function parseInstallHost(value: string): InstallHost {
+  if (value === "codex" || value === "claude") return value;
+  throw new Error("forma: --host must be 'codex' or 'claude'");
+}
+
+function parseInstallScope(value: string): InstallScope {
+  if (value === "user" || value === "project" || value === "local") return value;
+  throw new Error("forma: --scope must be 'user', 'project', or 'local'");
 }
 
 function exitWithError(error: unknown): never {

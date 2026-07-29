@@ -61,6 +61,6 @@ deterministic: the same spec always produces the same bytes (modulo the
   CSS to the `componentCss()` function in `design/css.ts`, add a unit test
   and (ideally) a fixture section exercising it.
 - **New purpose**: purposes are a narrative-grammar convention documented in
-  `skills/forma/references/modes.md` — they don't require renderer code
+  `skills-src/_shared/references/modes.md` — they don't require renderer code
   changes, since composition is entirely spec-side (which blocks, what
   order).

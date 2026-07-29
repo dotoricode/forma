@@ -18,6 +18,20 @@ Build a report: the conclusion comes first, then the evidence that earns it.
 | `risk` | `risk-register` — what could go wrong with that |
 | `provenance` | `source-ledger` — what each source covers and does not |
 
+## Writing voice
+
+Write like an edited brief making a case.
+
+- Open with a thesis that can be challenged, not a topic label.
+- Use complete claim sentences for headings. Each should still make sense
+  when read alone in the page outline.
+- Move from judgement to evidence to implication. Do not narrate the order
+  in which the analysis happened.
+- Name uncertainty precisely: "the sample excludes background sessions",
+  not "more investigation may be needed".
+- End recommendations with an owner, a condition, or a reversal trigger.
+  A polished conclusion without one is editorially incomplete.
+
 ## Workflow
 
 1. **Read the material before deciding what it says.** The thesis is a

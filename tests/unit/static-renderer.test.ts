@@ -67,4 +67,30 @@ describe("static compiler", () => {
     expect(html).not.toContain("<script>");
     expect(html).toContain("&lt;script&gt;");
   });
+
+  it("renders a line chart as colored, labelled series rather than identical bars", async () => {
+    const html = await renderBlockToHtml(
+      {
+        id: "trend",
+        type: "chart",
+        title: "Build health",
+        kind: "line",
+        categories: ["Mon", "Tue", "Wed"],
+        series: [
+          { label: "Pass", values: [91, 94, 98] },
+          { label: "Fail", values: [9, 6, 2] },
+        ],
+        unit: "%",
+      },
+      ctx,
+    );
+
+    expect(html).toContain('class="chart-line"');
+    expect(html).toContain('data-series="0"');
+    expect(html).toContain('data-series="1"');
+    expect(html).toContain('class="blk-chart__legend"');
+    expect(html).toContain("Pass");
+    expect(html).toContain("Fail");
+    expect(html).not.toContain('class="chart-bar"');
+  });
 });

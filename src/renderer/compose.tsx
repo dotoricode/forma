@@ -2,11 +2,12 @@ import { renderToStaticMarkup } from "react-dom/server";
 import type { FormaSpec } from "../spec/schema.js";
 import type { FormaSource } from "../spec/source.js";
 import { prepareBlocks, type RenderContext } from "../blocks/registry.js";
-import { DocumentBody, TableOfContents } from "./document.js";
+import { DocumentBody, ManualGuideNavigation, TableOfContents } from "./document.js";
 
 export interface ComposedDocument {
   bodyHtml: string;
   tocHtml: string;
+  guideNavHtml: string;
   sansText: string;
   monoText: string;
 }
@@ -31,10 +32,12 @@ export async function composeDocument(spec: FormaSpec): Promise<ComposedDocument
   );
   const toc = TableOfContents({ spec });
   const tocHtml = toc ? renderToStaticMarkup(toc) : "";
+  const guideNav = ManualGuideNavigation({ spec });
+  const guideNavHtml = guideNav ? renderToStaticMarkup(guideNav) : "";
 
   const { sansText, monoText } = collectText(spec);
 
-  return { bodyHtml, tocHtml, sansText, monoText };
+  return { bodyHtml, tocHtml, guideNavHtml, sansText, monoText };
 }
 
 /** Walks the whole spec to gather visible text, split by which typeface renders it. */

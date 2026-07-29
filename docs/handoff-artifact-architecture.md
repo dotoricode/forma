@@ -4,7 +4,7 @@
 
 이 문서만 읽고 이어서 작업할 수 있게 쓴 것이다. 배경은
 `docs/project-overview.md`, 디자인 규칙은 `DESIGN.md`,
-artifact 계약은 `skills/forma/references/artifacts.md`.
+artifact 계약은 `skills-src/_shared/references/artifacts.md`.
 
 ---
 
@@ -20,7 +20,7 @@ artifact 계약은 `skills/forma/references/artifacts.md`.
 | 6 | DOM lint 8종 + 후보 선택 계층 | 머지됨 (#6) |
 | 7 | Decision Room 블록 5종 + Portable 모드 | 머지됨 (#7) |
 | 8 | Room Mode + 협업 + Decision Freeze | **PR 열림 (`feat/room-mode`)** |
-| 9 | Codex/Claude 스킬 패키징 + 최종 QA | **패키징 완료, 실호출 검증 남음** |
+| 9 | Codex/Claude 스킬 패키징 + 최종 QA | **패키징·호스트 로더 검증 완료** |
 
 브랜치: `feat/room-mode`
 
@@ -36,8 +36,8 @@ artifact 계약은 `skills/forma/references/artifacts.md`.
 ```bash
 pnpm install
 pnpm build            # tsc, 오류 0
-pnpm test             # 231개 통과
-pnpm qa               # 8/8 (fixture 8종 x 4뷰포트 + axe)
+pnpm test             # 277개 통과
+pnpm qa               # 8/8 (fixture 8종 x 5뷰포트 + axe + clipped text)
 node scripts/check-naming.mjs
 pnpm forma verify-skills
 ```
@@ -57,7 +57,7 @@ src/
 ├── spec/          artifact.ts  roles.ts  source.ts  formula.ts
 │                  schema.ts  migrations.ts  validate.ts  infer-artifact.ts
 ├── blocks/        registry.ts  types.ts  primitives.tsx  strings.ts
-│                  document|code|diagram|data|decision.tsx   (공통 20종)
+│                  document|code|diagram|data|decision.tsx   (기반 20종)
 │                  report.tsx (14) manual.tsx (13)
 │                  dashboard.tsx (7) advanced.tsx (5)
 ├── planner/       plan.ts  profile.ts  profiles/{4종}
@@ -117,7 +117,7 @@ Freeze snapshot이 그대로 나온다. 두 경로가 갈라져 drift하는 일�
 `session`과 `snapshot`을 별도 객체로 유지한다. 하나로 합치면 둘 중 하나에
 대해 거짓이 되고, 어느 쪽인지는 읽는 사람이 무엇을 뜻했느냐에 달린다.
 `docs/security.md`의 "Room Mode is the one networked surface" 절과
-`skills/forma/references/artifacts.md`의 두 모드 표에 같은 내용이 있다.
+`skills-src/_shared/references/artifacts.md`의 두 모드 표에 같은 내용이 있다.
 
 로 백 바인드는 주장이 아니라 검증됐다. `--lan` 없이 호스트 자신의 LAN
 주소(`10.10.7.43:4181`)로 접속하면 connection refused, `127.0.0.1`은 200.
@@ -267,7 +267,7 @@ skills-src/
     └── instructions.md   frontmatter 없는 본문
 
 src/skills/{source.ts, adapters.ts, build.ts}
-pnpm forma build-skills → dist/skills/{claude/forma, codex/forma-*}
+pnpm forma build-skills → dist/agent-skills/{claude/forma, codex/forma-*}
 ```
 
 **frontmatter를 소스에서 뺀 것이 설계의 핵심이다.** 호스트마다 달라지는
@@ -280,17 +280,19 @@ frontmatter의 `disable-model-invocation`, Codex에서는
 검사는 **생성된 파일**에 대해 돈다. 입력만 보는 규칙은 어댑터가 이름을
 잘못 파생시키는 경우를 못 잡는데, 이 계층이 존재하는 이유가 바로 그거다.
 
-**남은 것: 실제 호스트에서 호출 검증.** 생성물의 모양과 규격 준수는
-테스트로 고정했지만, Claude Code에 플러그인을 설치해 `/forma:dashboard`가
-실제로 뜨는지, Codex에서 `$forma-advanced`가 자동 호출되지 않는지는
-확인하지 않았다. 세션 재시작이 필요하고 사용자 전역 설정을 건드리는
-일이라 하지 않았다.
+**실제 호스트 로더까지 검증했다.** Claude Code 2.1.220에서 생성된
+플러그인을 `--plugin-dir`로 로드해 `/forma:dashboard`, `/forma:report`,
+`/forma:manual`, `/forma:advanced`가 자동완성 목록에 나타나는 것을
+확인했다. Codex 0.145.0의 오프라인 prompt-input 검사에서는 일반 3종이
+스킬 목록에 나타나고 `forma-advanced`는 implicit 목록에서 빠졌다.
+모델 요청은 보안 규칙상 보내지 않았다.
 
-**`skills/forma/`(단일 스킬)와 `skills-src/_shared/`에 참조 11개가
-중복된다.** `install-skills`가 아직 전자를 동기화하므로 지웠다가 설치
-경로가 끊긴다. 대신 두 사본이 갈라지면 테스트가 실패하도록 했다
-(`tests/unit/skill-packaging.test.ts`). 근본 해결은 `install-skills`가
-`skills-src`에서 조립하게 만드는 것이다.
+네 artifact 스킬은 `skills-src/` 한 곳에서 관리하고,
+`install-skills`가 Codex standalone package 또는 Claude plugin으로
+빌드·설치한다. 구형 `skills/forma/SKILL.md`는 생성된 compatibility
+router를 체크섬으로 식별해 안전하게 제거하기 위한 마이그레이션
+자료로만 남아 있다. 생성 스크립트는 현재 checkout, 설치 시 기록한
+`.forma-runtime.json`, `FORMA_REPO`, PATH 순으로 실행기를 찾는다.
 
 ---
 
@@ -298,10 +300,10 @@ frontmatter의 `disable-model-invocation`, Codex에서는
 
 ```
 [x] advanced Decision Room 구현        ← Portable + Room Mode 완료 (PR7, PR8)
-[~] 4개 스킬 설치와 호출 검증   ← 생성·검사는 됨. 실제 호스트에서 호출은 미검증
+[x] 4개 스킬 설치와 호출 경로 검증
 [x] artifact별 fixture와 example 제공
-[ ] Visual Tournament advanced quality  ← 아래 "알려진 부채" 참조
-[ ] 관련 문서와 실제 코드의 drift 제거
+[x] Visual Tournament advanced quality
+[x] 관련 문서와 실제 코드의 drift 제거
 ```
 
 최종적으로 이 명령들이 전부 성공해야 한다:
@@ -321,12 +323,10 @@ pnpm forma verify-skills
 
 ## 알려진 부채
 
-**1. Visual Tournament의 축이 스타일시트로 내려가지 않는다.**
-`src/qa/candidates.ts`가 후보를 만들고 점수를 매기고 승자를 뽑는 것까지는
-실제로 동작하고 테스트로 고정돼 있다. 하지만 `density` / `measure` /
-`figurePlacement` / `typeScale` 네 축이 아직 렌더러에 연결되지 않아서
-모든 후보가 같은 증거로 채점된다. `src/cli/index.ts`의 해당 블록 주석과
-PR #6 본문에 명시해뒀다. **없는 걸 있는 척하지 말 것.**
+**1. ~~Visual Tournament의 축이 스타일시트로 내려가지 않는다.~~ 해소됨.**
+네 축이 실제 DOM/CSS와 섹션 순서에 반영된다. advanced quality는 후보마다
+정적 lint와 5개 viewport 브라우저 probe를 별도로 실행하고, overflow,
+clipped text, axe, 외부 요청, 깨진 anchor가 있는 후보를 탈락시킨다.
 
 **2. ~~`examples/`가 아직 0.1 구조다.~~ 해소됨.**
 `examples/forma-theme-*` 9개를 지우고 artifact별 4개로 다시 만들었다.
@@ -334,10 +334,10 @@ PR #6 본문에 명시해뒀다. **없는 걸 있는 척하지 말 것.**
 왜 spec 우선인가(report), Agent Skill로 쓰기(manual), 아직 안 한 결정
 하나(advanced). 4종 모두 검증·렌더·design lint·브라우저 QA를 통과한다.
 
-**3. artifact별 CSS가 아직 옛 4테마 매핑이다.**
-`src/design/artifact-css.ts`로 파일은 분리했지만 규칙 자체는 옛
-simple/workspace/guide/magazine을 옮긴 것이다. dashboard가 옛 workspace
-레일 스타일을 쓰고 있다. Signal Grid 고유의 12열 그리드는 아직 없다.
+**3. ~~artifact별 CSS가 아직 옛 4테마 매핑이다.~~ 해소됨.**
+CSS의 옛 theme 명칭과 workspace 전용 토큰을 제거했다. Dashboard는
+실제 12열 Signal Grid와 7:5 anomaly/action 분할을 쓰고, Advanced는
+evidence graph·simulation·matrix를 위한 96rem 검토 캔버스를 쓴다.
 
 **4. Storybook 미도입.**
 TSX 전환의 목적 중 하나였으나 앱 신설이라 미뤘다. PR6에 넣으려다
