@@ -1,6 +1,6 @@
 # Agent-first installation
 
-Status: proposal
+Status: implemented
 
 ## Decision to make
 

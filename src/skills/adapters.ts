@@ -163,6 +163,27 @@ export function emitClaudePluginManifest(sources: SkillSource[]): EmittedFile {
   };
 }
 
+/** The repository-local marketplace used by the Agent-driven installer. */
+export function emitClaudeMarketplaceManifest(): EmittedFile {
+  const marketplace = {
+    name: SKILL_NAMESPACE,
+    description: "Forma Agent Skills for clear, self-contained visual artifacts.",
+    owner: { name: "Forma contributors" },
+    plugins: [
+      {
+        name: SKILL_NAMESPACE,
+        source: `./${SKILL_NAMESPACE}`,
+        description:
+          "Four Agent Skills for turning complex work into polished, self-contained HTML artifacts.",
+      },
+    ],
+  };
+  return {
+    path: ".claude-plugin/marketplace.json",
+    contents: `${JSON.stringify(marketplace, null, 2)}\n`,
+  };
+}
+
 export function emitForHost(host: Host, source: SkillSource): EmittedSkill {
   return host === "claude" ? emitClaudeSkill(source) : emitCodexSkill(source);
 }

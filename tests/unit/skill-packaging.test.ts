@@ -5,6 +5,7 @@ import { tmpdir } from "node:os";
 import path from "node:path";
 import { describe, expect, it } from "vitest";
 import {
+  emitClaudeMarketplaceManifest,
   emitClaudePluginManifest,
   emitClaudeSkill,
   emitCodexSkill,
@@ -139,6 +140,17 @@ describe("host adapters diverge where the hosts do", () => {
       "./skills/dashboard",
       "./skills/manual",
       "./skills/report",
+    ]);
+  });
+
+  it("publishes the generated plugin through a local marketplace", () => {
+    const marketplace = JSON.parse(emitClaudeMarketplaceManifest().contents);
+    expect(marketplace.name).toBe("forma");
+    expect(marketplace.plugins).toEqual([
+      expect.objectContaining({
+        name: "forma",
+        source: "./forma",
+      }),
     ]);
   });
 });

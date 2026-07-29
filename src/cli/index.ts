@@ -3,10 +3,18 @@ import { Command } from "commander";
 import path from "node:path";
 import { mkdtemp, readFile, rm, writeFile } from "node:fs/promises";
 import { createServer } from "node:http";
-import { networkInterfaces, tmpdir } from "node:os";
+import { homedir, networkInterfaces, tmpdir } from "node:os";
 import { loadSpecFile, renderSpecFileToDir, FormaSpecError } from "../renderer/render.js";
 import { buildFormaJsonSchema } from "../spec/json-schema.js";
-import { installSkills, verifySkills } from "./skills.js";
+import {
+  installAgentSkills,
+  readConfiguredSkillTargets,
+  syncConfiguredSkills,
+  verifyInstalledSkills,
+  type InstallHost,
+  type InstallScope,
+} from "../skills/install.js";
+import { buildSkills, verifyBuiltSkills } from "../skills/build.js";
 import { writeStarterSpecFile } from "./starter-spec.js";
 import { inferArtifact, parseArtifact } from "../spec/infer-artifact.js";
 import { writeGeneratedSpec } from "./generate.js";
@@ -325,19 +333,46 @@ program
 
 program
   .command("install-skills")
-  .description("Sync the canonical skill to the repo copies and every machine-wide skill target")
-  .action(async () => {
+  .description("Install all four Forma Agent Skills for Codex or Claude Code")
+  .option("--host <host>", "codex | claude (omit for maintainer sync)")
+  .option("--scope <scope>", "user | project | local", "user")
+  .action(async (opts: { host?: string; scope: string }) => {
     try {
-      const result = await installSkills(process.cwd(), { includeGlobalTargets: true });
-      for (const target of result.targets) console.log(`forma: synced ${target}`);
-      for (const target of result.globalTargets) console.log(`forma: synced ${target}`);
-      if (result.globalTargets.length === 0) {
-        console.log(
-          `forma: no ~/.agents/skill-targets.json — synced the repo copies only.`,
-        );
+      if (!opts.host) {
+        const result = await syncConfiguredSkills(process.cwd());
+        if (result.targetRoots.length === 0) {
+          console.log("forma: no ~/.agents/skill-targets.json — no configured roots to sync.");
+          return;
+        }
+        for (const target of result.targetRoots) console.log(`forma: synced ${target}`);
+        for (const legacy of result.removedLegacy) {
+          console.log(`forma: removed generated compatibility skill ${legacy}`);
+        }
+        for (const legacy of result.preservedLegacy) {
+          console.log(`forma: preserved modified compatibility skill ${legacy}`);
+        }
+        console.log("forma: installed four standalone skills in every configured root.");
+        console.log("forma: start a new Agent session if the skill list was already loaded.");
+        return;
       }
-      console.log(`forma: checksum ${result.checksum.slice(0, 12)} verified on every copy`);
-      console.log("forma: start a new Codex/Claude session if the skill list was already loaded.");
+
+      const host = parseInstallHost(opts.host);
+      const scope = parseInstallScope(opts.scope);
+      const result = await installAgentSkills(process.cwd(), { host, scope });
+      for (const skill of result.skills) {
+        console.log(`forma: installed ${skill.invocation.padEnd(20)} ${skill.path}`);
+      }
+      for (const legacy of result.removedLegacy) {
+        console.log(`forma: removed generated compatibility skill ${legacy}`);
+      }
+      for (const legacy of result.preservedLegacy) {
+        console.log(`forma: preserved modified compatibility skill ${legacy}`);
+      }
+      console.log(
+        host === "claude"
+          ? "forma: run /reload-plugins in Claude Code."
+          : "forma: start a new Codex session if the skill list was already loaded.",
+      );
     } catch (error) {
       exitWithError(error);
     }
@@ -346,7 +381,7 @@ program
 program
   .command("build-skills")
   .description("Generate the Claude Code plugin and Codex skill packages from skills-src/")
-  .option("--out <dir>", "output directory", "dist/skills")
+  .option("--out <dir>", "output directory", "dist/agent-skills")
   .action(async (opts: { out: string }) => {
     try {
       const { buildSkills } = await import("../skills/build.js");
@@ -356,8 +391,10 @@ program
         console.log(`  ${skill.invocation.padEnd(20)} ${skill.dir}`);
       }
       console.log("");
-      console.log("forma: Claude Code — install the plugin directory under dist/skills/claude/forma");
-      console.log("forma: Codex — copy dist/skills/codex/* into .agents/skills or ~/.codex/skills");
+      console.log(
+        `forma: Claude Code plugin — ${path.join(result.outDir, "claude/forma")}`,
+      );
+      console.log(`forma: Codex skills — ${path.join(result.outDir, "codex")}`);
     } catch (error) {
       exitWithError(error);
     }
@@ -365,14 +402,24 @@ program
 
 program
   .command("verify-skills")
-  .description("Check installed skill copies match the canonical checksum")
+  .description("Check configured standalone skill copies match skills-src")
   .action(async () => {
-    const result = await verifySkills(process.cwd(), { includeGlobalTargets: true });
-    if (result.ok) {
+    await buildSkills(process.cwd());
+    const builtIssues = await verifyBuiltSkills(process.cwd());
+    const configuredTargetRoots = await readConfiguredSkillTargets(homedir());
+    const issues = [
+      ...builtIssues,
+      ...(configuredTargetRoots.length === 0
+        ? []
+        : await verifyInstalledSkills(process.cwd(), {
+            targetRoots: configuredTargetRoots,
+          })),
+    ];
+    if (issues.length === 0) {
       console.log("forma: installed skills match canonical source");
     } else {
       console.error("forma: skill drift detected:");
-      for (const issue of result.issues) console.error(`  - ${issue}`);
+      for (const issue of issues) console.error(`  - ${issue}`);
       process.exitCode = 1;
     }
   });
@@ -439,6 +486,16 @@ function contentType(filePath: string): string {
   if (filePath.endsWith(".json")) return "application/json";
   if (filePath.endsWith(".png")) return "image/png";
   return "application/octet-stream";
+}
+
+function parseInstallHost(value: string): InstallHost {
+  if (value === "codex" || value === "claude") return value;
+  throw new Error("forma: --host must be 'codex' or 'claude'");
+}
+
+function parseInstallScope(value: string): InstallScope {
+  if (value === "user" || value === "project" || value === "local") return value;
+  throw new Error("forma: --scope must be 'user', 'project', or 'local'");
 }
 
 function exitWithError(error: unknown): never {

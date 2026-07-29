@@ -211,8 +211,9 @@ forma render <spec>           단일 HTML 렌더
 forma build <spec>            렌더 + 브라우저 없는 정적 게이트
 forma preview <dir>           localhost 서버 (외부 접근 차단)
 forma qa <dir>                Playwright + axe + 반응형 + 오프라인 검사
-forma install-skills          router와 shared 파일을 조립해 대상 경로로 복사
-forma verify-skills           사본 체크섬 대조
+forma install-skills          네 Agent Skill을 호스트별로 빌드·설치·검증
+forma verify-skills           설치된 네 스킬과 정본의 체크섬 대조
+forma build-skills            Claude plugin과 Codex package 생성
 forma doctor                  로컬 환경 점검
 forma schema                  JSON Schema 출력
 forma generate                구조화 입력 스캐폴딩 (LLM 호출 없음)
@@ -521,5 +522,5 @@ node scripts/check-naming.mjs
 | 색·간격·타이포 값 | `src/design/tokens.ts` |
 | 스타일 전부 | `src/design/css.ts` |
 | 하면 안 되는 것 | `src/qa/design-lint.ts`, `skills-src/_shared/references/generic-ai-patterns.md` |
-| Agent가 따르는 절차 | `skills/forma/SKILL.md` |
+| Agent가 따르는 절차 | `skills-src/{dashboard,report,manual,advanced}/instructions.md` |
 | 왜 이렇게 했나 | `docs/decisions.md`, `docs/design-iterations.md` |

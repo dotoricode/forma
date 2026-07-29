@@ -23,6 +23,30 @@ function findUp(start) {
   }
 }
 
+function findConfiguredRepo(start) {
+  let current = path.resolve(start);
+  while (true) {
+    const configPath = path.join(current, ".forma-runtime.json");
+    if (existsSync(configPath)) {
+      let configured;
+      try {
+        configured = JSON.parse(readFileSync(configPath, "utf-8")).repo;
+      } catch (error) {
+        throw new Error(`Invalid Forma runtime metadata at ${configPath}: ${error.message}`);
+      }
+      if (typeof configured !== "string" || !isFormaRepo(configured)) {
+        throw new Error(
+          `Forma runtime metadata at ${configPath} does not point to a Forma checkout.`,
+        );
+      }
+      return path.resolve(configured);
+    }
+    const parent = path.dirname(current);
+    if (parent === current) return null;
+    current = parent;
+  }
+}
+
 export function findFormaRepo() {
   const override = process.env.FORMA_REPO;
   if (override) {
@@ -33,7 +57,7 @@ export function findFormaRepo() {
     return resolved;
   }
   const scriptDir = path.dirname(fileURLToPath(import.meta.url));
-  return findUp(process.cwd()) ?? findUp(scriptDir);
+  return findUp(process.cwd()) ?? findUp(scriptDir) ?? findConfiguredRepo(scriptDir);
 }
 
 export function runForma(args) {

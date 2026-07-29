@@ -267,7 +267,7 @@ skills-src/
     └── instructions.md   frontmatter 없는 본문
 
 src/skills/{source.ts, adapters.ts, build.ts}
-pnpm forma build-skills → dist/skills/{claude/forma, codex/forma-*}
+pnpm forma build-skills → dist/agent-skills/{claude/forma, codex/forma-*}
 ```
 
 **frontmatter를 소스에서 뺀 것이 설계의 핵심이다.** 호스트마다 달라지는
@@ -287,11 +287,12 @@ frontmatter의 `disable-model-invocation`, Codex에서는
 스킬 목록에 나타나고 `forma-advanced`는 implicit 목록에서 빠졌다.
 모델 요청은 보안 규칙상 보내지 않았다.
 
-`skills/forma/`와 `skills-src/_shared/`의 참조 중복도 제거했다.
-`skills/forma/SKILL.md`만 라우터 원문으로 남고, `install-skills`가
-여기에 `_shared`의 references/scripts/assets를 조립한다. 생성 스크립트는
-설치 위치를 기준으로 `../../..`를 추측하지 않고 현재 checkout,
-`FORMA_REPO`, PATH 순으로 실행기를 찾는다.
+네 artifact 스킬은 `skills-src/` 한 곳에서 관리하고,
+`install-skills`가 Codex standalone package 또는 Claude plugin으로
+빌드·설치한다. 구형 `skills/forma/SKILL.md`는 생성된 compatibility
+router를 체크섬으로 식별해 안전하게 제거하기 위한 마이그레이션
+자료로만 남아 있다. 생성 스크립트는 현재 checkout, 설치 시 기록한
+`.forma-runtime.json`, `FORMA_REPO`, PATH 순으로 실행기를 찾는다.
 
 ---
 
