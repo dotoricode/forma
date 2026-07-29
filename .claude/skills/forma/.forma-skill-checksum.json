@@ -1,4 +1,7 @@
 {
-  "checksum": "fe60707cbf0b9aa0a1540b23c07bea9df5c77a8fd0d18e78b7e3ae781519deca",
-  "source": "skills/forma"
+  "checksum": "d6bf9b6261df73127f2a8d0d186aaf0c14d5e2fae4ba063fd6c627f79efab68e",
+  "sources": [
+    "skills/forma/SKILL.md",
+    "skills-src/_shared"
+  ]
 }

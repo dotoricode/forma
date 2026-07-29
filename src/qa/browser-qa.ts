@@ -10,6 +10,7 @@ import {
 } from "playwright";
 
 export const QA_VIEWPORTS = [
+  { name: "desktop-2048", width: 2048, height: 1272 },
   { name: "desktop-1920", width: 1920, height: 1080 },
   { name: "desktop-1440", width: 1440, height: 900 },
   { name: "tablet-1024", width: 1024, height: 768 },
@@ -21,6 +22,8 @@ export interface BrowserQaOptions {
   label?: string;
   qaDir?: string;
   browser?: Browser;
+  /** Candidate tournaments need measurements, not six image files per arm. */
+  captureScreenshots?: boolean;
 }
 
 export interface BrowserQaResult {
@@ -32,6 +35,8 @@ export interface BrowserQaResult {
   externalRequests: string[];
   overflowElements: number;
   overflowByViewport: Record<string, number>;
+  clippedTextElements: number;
+  clippedTextByViewport: Record<string, number>;
   axeViolationCount: number;
   axeViolations: { id: string; impact: string | null; nodes: number }[];
   headingOrderOk: boolean;
@@ -104,6 +109,51 @@ async function checkHorizontalOverflow(page: Page): Promise<number> {
       }
     }
     return overflowing;
+  });
+}
+
+async function checkTextClipping(page: Page): Promise<number> {
+  return page.evaluate(() => {
+    let clipped = 0;
+    const intentionallyTruncated =
+      ".visually-hidden, .doc-bar__title, .side-toc .toc a";
+
+    for (const el of document.body.querySelectorAll<HTMLElement>("*")) {
+      if (el.matches(intentionallyTruncated) || el.closest("[hidden], [aria-hidden='true']")) {
+        continue;
+      }
+      if (el.getClientRects().length === 0) continue;
+      const style = getComputedStyle(el);
+      const clipsX = style.overflowX === "hidden" || style.overflowX === "clip";
+      const clipsY = style.overflowY === "hidden" || style.overflowY === "clip";
+      const hasText = Array.from(el.childNodes).some(
+        (node) => node.nodeType === Node.TEXT_NODE && (node.textContent ?? "").trim().length > 0,
+      );
+      if (
+        hasText &&
+        ((clipsX && el.scrollWidth > el.clientWidth + 1) ||
+          (clipsY && el.scrollHeight > el.clientHeight + 1))
+      ) {
+        clipped += 1;
+      }
+    }
+
+    for (const text of document.querySelectorAll<SVGTextElement>("svg text")) {
+      const svg = text.ownerSVGElement;
+      if (!svg) continue;
+      const svgBounds = svg.getBoundingClientRect();
+      const textBounds = text.getBoundingClientRect();
+      if (svgBounds.width === 0 || svgBounds.height === 0 || textBounds.width === 0) continue;
+      if (
+        textBounds.left < svgBounds.left - 1 ||
+        textBounds.right > svgBounds.right + 1 ||
+        textBounds.top < svgBounds.top - 1 ||
+        textBounds.bottom > svgBounds.bottom + 1
+      ) {
+        clipped += 1;
+      }
+    }
+    return clipped;
   });
 }
 
@@ -195,19 +245,26 @@ export async function runBrowserQa(options: BrowserQaOptions): Promise<BrowserQa
   }));
 
   const overflowByViewport: Record<string, number> = {};
+  const clippedTextByViewport: Record<string, number> = {};
   for (const viewport of QA_VIEWPORTS) {
     await page.setViewportSize({ width: viewport.width, height: viewport.height });
     await page.waitForTimeout(80);
     overflowByViewport[viewport.name] = await checkHorizontalOverflow(page);
-    await captureScreenshot(page, path.join(qaDir, `${viewport.name}.png`));
+    clippedTextByViewport[viewport.name] = await checkTextClipping(page);
+    if (options.captureScreenshots !== false) {
+      await captureScreenshot(page, path.join(qaDir, `${viewport.name}.png`));
+    }
   }
   const overflowElements = Math.max(0, ...Object.values(overflowByViewport));
+  const clippedTextElements = Math.max(0, ...Object.values(clippedTextByViewport));
 
-  await page.evaluate(() => document.documentElement.setAttribute("data-theme", "dark"));
-  await page.setViewportSize({ width: 1440, height: 900 });
-  await page.waitForTimeout(80);
-  await captureScreenshot(page, path.join(qaDir, "dark-1440.png"));
-  await page.evaluate(() => document.documentElement.removeAttribute("data-theme"));
+  if (options.captureScreenshots !== false) {
+    await page.evaluate(() => document.documentElement.setAttribute("data-theme", "dark"));
+    await page.setViewportSize({ width: 1440, height: 900 });
+    await page.waitForTimeout(80);
+    await captureScreenshot(page, path.join(qaDir, "dark-1440.png"));
+    await page.evaluate(() => document.documentElement.removeAttribute("data-theme"));
+  }
 
   await page.emulateMedia({ reducedMotion: "reduce" });
   await page.reload();
@@ -233,6 +290,7 @@ export async function runBrowserQa(options: BrowserQaOptions): Promise<BrowserQa
     consoleErrors.length === 0 &&
     externalRequests.length === 0 &&
     overflowElements === 0 &&
+    clippedTextElements === 0 &&
     axeViolations.length === 0 &&
     headingOrderOk &&
     brokenAnchorTargets.length === 0 &&
@@ -248,6 +306,8 @@ export async function runBrowserQa(options: BrowserQaOptions): Promise<BrowserQa
     externalRequests,
     overflowElements,
     overflowByViewport,
+    clippedTextElements,
+    clippedTextByViewport,
     axeViolationCount: axeViolations.length,
     axeViolations,
     headingOrderOk,
@@ -273,6 +333,7 @@ export function formatQaResult(result: BrowserQaResult): string {
   return (
     `[${status}] console=${result.consoleErrors.length} ` +
     `axe=${result.axeViolationCount} overflow=${result.overflowElements} ` +
+    `clippedText=${result.clippedTextElements} ` +
     `externalRequests=${result.externalRequests.length} ` +
     `headings=${result.headingOrderOk ? "ok" : "invalid"} ` +
     `anchors=${result.brokenAnchorTargets.length === 0 ? "ok" : "broken"} ` +

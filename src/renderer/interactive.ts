@@ -85,7 +85,7 @@ export function buildInteractiveScript(): string {
   if (document.readyState === "loading") {
     document.addEventListener("DOMContentLoaded", () => { initThemeToggle(); initCodeCopy(); initTocActiveState(); });
   } else {
-  
+
   /* Environment filter for manuals. Steps and commands declare which
      environments they belong to; this narrows the page to one of them.
      Nothing is hidden until a choice is made, so a manual whose script

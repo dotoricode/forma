@@ -36,6 +36,56 @@ function findBracketBorders(css: string): DesignLintFinding[] {
   return findings;
 }
 
+/**
+ * A non-uniform edge on a rounded panel reads as a large bracket once the
+ * other hairline edges disappear against the surface. Plain, unrounded
+ * one-pixel evidence rails remain valid.
+ */
+function findRoundedEdgeBorders(css: string): DesignLintFinding[] {
+  const findings: DesignLintFinding[] = [];
+  const source = css.replace(/\/\*[\s\S]*?\*\//g, "");
+  const ruleRegex = /([^{}]+)\{([^}]*)\}/g;
+  let match: RegExpExecArray | null;
+  while ((match = ruleRegex.exec(source)) !== null) {
+    const selector = (match[1] ?? "").trim();
+    const body = match[2] ?? "";
+    if (selector.includes("@")) continue;
+    const rounded = /border-radius\s*:\s*(?!0(?:\D|$))/.test(body);
+    const edgeAccent = /border-(?:inline-start|left|block-start|top)(?:-width)?\s*:/.test(body);
+    if (rounded && edgeAccent) {
+      findings.push({
+        rule: "rounded-edge-border",
+        message: `"${selector.slice(0, 60)}" combines rounded corners with an accented edge — the result reads as a decorative bracket frame.`,
+      });
+    }
+  }
+  return findings;
+}
+
+/** Thick reading-edge rails are the unrounded form of the same AI bracket. */
+function findThickSideBorders(css: string): DesignLintFinding[] {
+  const findings: DesignLintFinding[] = [];
+  const source = css.replace(/\/\*[\s\S]*?\*\//g, "");
+  const ruleRegex = /([^{}]+)\{([^}]*)\}/g;
+  let match: RegExpExecArray | null;
+  while ((match = ruleRegex.exec(source)) !== null) {
+    const selector = (match[1] ?? "").trim();
+    const body = match[2] ?? "";
+    if (selector.includes("@")) continue;
+    const declarations = body.matchAll(
+      /border-(?:inline-start|left)(?:-width)?\s*:\s*(\d+(?:\.\d+)?)px\b/g,
+    );
+    for (const declaration of declarations) {
+      if (Number(declaration[1]) < 2) continue;
+      findings.push({
+        rule: "thick-side-border",
+        message: `"${selector.slice(0, 60)}" uses a ${declaration[1]}px reading-edge rail — thick side rules read as decorative brackets.`,
+      });
+    }
+  }
+  return findings;
+}
+
 function findDecorativeContent(css: string): DesignLintFinding[] {
   const findings: DesignLintFinding[] = [];
   for (const needle of BANNED_CONTENT_VALUES) {
@@ -193,6 +243,8 @@ export function lintCss(css: string): DesignLintFinding[] {
   return [
     ...findHardcodedPaintColors(css),
     ...findBracketBorders(css),
+    ...findRoundedEdgeBorders(css),
+    ...findThickSideBorders(css),
     ...findDecorativeContent(css),
     ...findExcessiveGradients(css),
     ...findCenteringWidthCaps(css),

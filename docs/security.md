@@ -45,7 +45,7 @@ writing it to disk:
 
 These are pattern-based safety nets, not a guarantee — a document author
 should still avoid pasting live secrets into source material. See
-`skills/forma/references/source-handling.md` for the Agent-side guidance
+`skills-src/_shared/references/source-handling.md` for the Agent-side guidance
 (mask/strip before writing the spec, don't rely solely on the renderer).
 
 ## Network
@@ -53,7 +53,7 @@ should still avoid pasting live secrets into source material. See
 Rendered HTML makes **zero** external network requests — confirmed for
 all four fixtures in `pnpm qa` (`externalRequests: []`). No CDN scripts,
 no Google Fonts CSS API call (which would leak document text via the
-`text=` query parameter — see `skills/forma/references/typography.md`),
+`text=` query parameter — see `skills-src/_shared/references/typography.md`),
 no analytics/tracking. `file://` works with no server.
 
 `forma qa <html|dir>` records and aborts every non-`file:` browser request

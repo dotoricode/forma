@@ -1,4 +1,7 @@
-import { readFile, readdir } from "node:fs/promises";
+import { cp, mkdtemp, readFile, readdir, rm } from "node:fs/promises";
+import { execFile } from "node:child_process";
+import { promisify } from "node:util";
+import { tmpdir } from "node:os";
 import path from "node:path";
 import { describe, expect, it } from "vitest";
 import {
@@ -16,6 +19,7 @@ import { buildSkills, verifyBuiltSkills } from "../../src/skills/build.js";
 
 const CWD = process.cwd();
 const sources = await readSkillSources(CWD);
+const execFileAsync = promisify(execFile);
 
 /**
  * The rules below come from the Agent Skills specification and the two hosts'
@@ -126,10 +130,16 @@ describe("host adapters diverge where the hosts do", () => {
     expect(skillMd.contents).toContain(`description: "${advanced.meta.description}"`);
   });
 
-  it("names every skill in the plugin manifest", () => {
+  it("points the plugin manifest at every emitted skill directory", () => {
     const manifest = JSON.parse(emitClaudePluginManifest(sources).contents);
     expect(manifest.name).toBe("forma");
-    expect(manifest.skills.sort()).toEqual(["advanced", "dashboard", "manual", "report"]);
+    expect(manifest.author).toEqual({ name: "Forma contributors" });
+    expect(manifest.skills.sort()).toEqual([
+      "./skills/advanced",
+      "./skills/dashboard",
+      "./skills/manual",
+      "./skills/report",
+    ]);
   });
 });
 
@@ -150,27 +160,39 @@ describe("built output", () => {
     );
     expect(codex).toMatch(/^name: "forma-report"$/m);
   }, 60_000);
+
+  it("runs a generated wrapper from its emitted package location", async () => {
+    await buildSkills(CWD, "dist/skills-test");
+    const installedRoot = await mkdtemp(path.join(tmpdir(), "forma-installed-skill-"));
+    try {
+      await cp(
+        path.join(CWD, "dist/skills-test/codex/forma-report"),
+        path.join(installedRoot, "forma-report"),
+        { recursive: true },
+      );
+      const wrapper = path.join(installedRoot, "forma-report/scripts/validate.mjs");
+      const fixture = path.join(CWD, "fixtures/report/technical/forma.spec.json");
+      const { stdout } = await execFileAsync(process.execPath, [wrapper, fixture], {
+        cwd: CWD,
+      });
+      expect(stdout).toContain("is valid");
+    } finally {
+      await rm(installedRoot, { recursive: true, force: true });
+    }
+  }, 60_000);
 });
 
-/**
- * `skills-src/_shared/` and `skills/forma/` both carry the reference docs: the
- * first feeds the four generated packages, the second is the single skill
- * `install-skills` still syncs. Two copies of eleven files is exactly the kind
- * of duplication that goes stale silently, so the drift is a test failure
- * rather than something a reader has to notice.
- */
-describe("shared references have one source", () => {
-  for (const dir of ["references", "scripts", "assets"]) {
-    it(`keeps skills/forma/${dir} identical to skills-src/_shared/${dir}`, async () => {
-      const sharedDir = path.join(CWD, "skills-src/_shared", dir);
-      const legacyDir = path.join(CWD, "skills/forma", dir);
-      const names = (await readdir(sharedDir)).sort();
-      expect((await readdir(legacyDir)).sort()).toEqual(names);
-      for (const name of names) {
-        const a = await readFile(path.join(sharedDir, name), "utf-8");
-        const b = await readFile(path.join(legacyDir, name), "utf-8");
-        expect(b, `${dir}/${name} drifted`).toBe(a);
-      }
-    });
-  }
+describe("legacy router has no second copy of shared files", () => {
+  it("authors only the router instructions under skills/forma", async () => {
+    const authored = await readdir(path.join(CWD, "skills/forma"), { withFileTypes: true });
+    expect(authored.filter((entry) => entry.isFile()).map((entry) => entry.name)).toEqual([
+      "SKILL.md",
+    ]);
+    for (const entry of authored.filter((candidate) => candidate.isDirectory())) {
+      expect(await readdir(path.join(CWD, "skills/forma", entry.name))).toEqual([]);
+    }
+    for (const dir of ["references", "scripts", "assets"]) {
+      expect((await readdir(path.join(CWD, "skills-src/_shared", dir))).length).toBeGreaterThan(0);
+    }
+  });
 });

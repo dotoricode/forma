@@ -33,17 +33,16 @@ generates a webpage" (inconsistent, often generic-looking) and "AI writes
 structured content, a real compiler renders it" (consistent, accessible,
 fast, always on-brand).
 
-## Five modes and four themes
+## Four artifacts
 
-- `explain` — architecture/code/design understanding
-- `review` — PR/change review meetings
-- `test` — test result communication
-- `report` — stakeholder reporting
+- `dashboard` — state-first metrics and release/health gates
+- `report` — conclusion-first findings, evidence, and recommendations
 - `manual` — ordered procedures with verification and recovery
+- `advanced` — group decisions with evidence, simulation, and a record
 
-Modes determine the narrative job. The `simple`, `workspace`, `guide`, and
-`magazine` themes determine visual composition. They share the same tokens,
-20 semantic blocks, renderer, accessibility rules, and offline guarantee.
+Purpose remains metadata; the artifact fixes the information contract and
+visual grammar. All four share the same tokens, 59 semantic blocks, renderer,
+accessibility rules, and offline guarantee.
 
 ## Non-goals for this MVP
 

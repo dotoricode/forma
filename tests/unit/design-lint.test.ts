@@ -14,6 +14,9 @@ describe("lintCss", () => {
     expect(css).toMatch(/\.toc\s*\{[\s\S]*?flex-wrap:\s*nowrap;/);
     expect(css).toMatch(/\.toc\s*\{[\s\S]*?overflow-x:\s*auto;/);
     expect(css).toMatch(/\.layout > \.side-toc\s*\{[\s\S]*?min-width:\s*0;/);
+    expect(css).toMatch(
+      /@media \(max-width: 900px\)[\s\S]*?:root\[data-artifact="dashboard"\] \.side-toc \.toc__label[\s\S]*?display:\s*none;/,
+    );
   });
 
   it("flags a ::before rule combining left and top/bottom borders (bracket frame)", () => {
@@ -26,6 +29,31 @@ describe("lintCss", () => {
     const css = `.note::before { content: ""; border-left: 1px solid gray; }`;
     const findings = lintCss(css);
     expect(findings.some((f) => f.rule === "bracket-border")).toBe(false);
+  });
+
+  it("flags a rounded panel with a thick edge accent (bracket frame)", () => {
+    const css = `.status { border: 1px solid gray; border-radius: 0.5rem; border-inline-start-width: 4px; }`;
+    const findings = lintCss(css);
+    expect(findings.some((f) => f.rule === "rounded-edge-border")).toBe(true);
+  });
+
+  it("flags the same rounded accent when it is moved to the top edge", () => {
+    const css = `.status { border: 1px solid gray; border-radius: 0.5rem; border-block-start-width: 3px; }`;
+    const findings = lintCss(css);
+    expect(findings.some((f) => f.rule === "rounded-edge-border")).toBe(true);
+  });
+
+  it("allows an unrounded side rail used to group evidence", () => {
+    const css = `.evidence { border-inline-start: 1px solid gray; padding-inline-start: 1rem; }`;
+    const findings = lintCss(css);
+    expect(findings.some((f) => f.rule === "rounded-edge-border")).toBe(false);
+    expect(findings.some((f) => f.rule === "thick-side-border")).toBe(false);
+  });
+
+  it("flags thick reading-edge rails even without rounded corners", () => {
+    const css = `.decision { border-inline-start: 3px solid blue; padding-inline-start: 1rem; }`;
+    const findings = lintCss(css);
+    expect(findings.some((f) => f.rule === "thick-side-border")).toBe(true);
   });
 
   it("flags decorative content using bracket/angle-bracket glyphs", () => {
@@ -49,6 +77,38 @@ describe("lintCss", () => {
   it("returns no findings for Forma's own generated stylesheet shape", () => {
     const css = `.blk-timeline__item::before { content: ""; position: absolute; border-radius: 50%; }`;
     expect(lintCss(css)).toEqual([]);
+  });
+
+  it("keeps wide-screen artifact frames proportionate to the viewport", () => {
+    const css = buildStylesheet("");
+    expect(css).toContain('--measure-wide: min(100%, 72rem);');
+    expect(css).toContain('calc(232px + var(--space-7) + 66rem)');
+    expect(css).toContain(':root[data-artifact="manual"] .measure { max-width: 48rem; }');
+  });
+
+  it("does not box the dashboard status summary", () => {
+    const css = buildStylesheet("");
+    const statusRule = css.match(/\.status-header\s*\{([^}]*)\}/)?.[1] ?? "";
+    expect(statusRule).not.toMatch(/\bborder(?:-radius|-block-start)?\s*:/);
+    expect(statusRule).not.toMatch(/\bbackground\s*:/);
+  });
+
+  it("uses a white light canvas, including the dashboard workspace", () => {
+    const css = buildStylesheet("");
+    expect(css).toContain("--color-canvas: oklch(100% 0 0);");
+    const dashboardTokens =
+      css.match(/:root\[data-artifact="dashboard"\]\s*\{([^}]*)\}/)?.[1] ?? "";
+    expect(dashboardTokens).not.toContain("--color-canvas:");
+  });
+
+  it("gives dashboard data blocks one width and typography rhythm", () => {
+    const css = buildStylesheet("");
+    expect(css).toContain(':root[data-artifact="dashboard"] .breakout { max-width: 100%; }');
+    expect(css).toContain("font-size: 2.125rem;");
+    expect(css).toMatch(
+      /:root\[data-artifact="dashboard"\]\s+:is\([\s\S]*?\.blk-breakdown__title,[\s\S]*?\)\s*\{[\s\S]*?font-size:\s*1\.25rem;/,
+    );
+    expect(css).toContain(".blk-breakdown__canvas svg { display: block; max-width: 100%; height: auto; }");
   });
 
   describe("centered-width-cap", () => {

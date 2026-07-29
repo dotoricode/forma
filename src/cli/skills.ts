@@ -1,6 +1,7 @@
 /**
- * Syncs the canonical Agent Skill (`skills/forma/`) to the Codex and Claude
- * Code skill directories. We copy + checksum rather than symlink, so the
+ * Assembles the compatibility Agent Skill from `skills/forma/SKILL.md` and
+ * `skills-src/_shared/`, then syncs it to the Codex and Claude Code skill
+ * directories. We copy + checksum rather than symlink, so the
  * copies survive on Windows and when the repo is shared without symlink
  * support; CI re-runs `verify-skills` to catch drift.
  */
@@ -10,11 +11,12 @@ import { homedir } from "node:os";
 import path from "node:path";
 
 export const CANONICAL_SKILL_DIR = "skills/forma";
+export const SHARED_SKILL_DIR = "skills-src/_shared";
 export const INSTALL_TARGETS = [".agents/skills/forma", ".claude/skills/forma"];
 export const SKILL_TARGETS_FILE = ".agents/skill-targets.json";
 export const SKILL_NAME = "forma";
 const DO_NOT_EDIT_HEADER =
-  "<!-- GENERATED COPY — do not edit directly. Source of truth: skills/forma/. Run `pnpm forma install-skills` after editing the source. -->\n";
+  "<!-- GENERATED COPY — do not edit directly. Sources: skills/forma/SKILL.md + skills-src/_shared/. Run `pnpm forma install-skills` after editing either source. -->\n";
 const CHECKSUM_FILE = ".forma-skill-checksum.json";
 
 function addDoNotEditHeader(skillMd: string): string {
@@ -39,11 +41,13 @@ async function listFilesRecursive(dir: string): Promise<string[]> {
   return files.sort();
 }
 
-async function hashDirectory(dir: string): Promise<string> {
-  const files = await listFilesRecursive(dir);
+async function hashSkillSources(cwd: string): Promise<string> {
+  const canonicalSkill = path.join(cwd, CANONICAL_SKILL_DIR, "SKILL.md");
+  const sharedDir = path.join(cwd, SHARED_SKILL_DIR);
+  const files = [canonicalSkill, ...(await listFilesRecursive(sharedDir))];
   const hash = createHash("sha256");
   for (const file of files) {
-    hash.update(path.relative(dir, file));
+    hash.update(path.relative(cwd, file));
     hash.update(await readFile(file));
   }
   return hash.digest("hex");
@@ -104,8 +108,7 @@ export async function installSkills(
   cwd: string,
   options: SyncOptions = {},
 ): Promise<InstallResult> {
-  const sourceDir = path.join(cwd, CANONICAL_SKILL_DIR);
-  const checksum = await hashDirectory(sourceDir);
+  const checksum = await hashSkillSources(cwd);
 
   const local = INSTALL_TARGETS.map((relTarget) => path.join(cwd, relTarget));
   // Every path in the targets file gets a `forma` subdirectory, so the file
@@ -117,7 +120,7 @@ export async function installSkills(
     : [];
 
   for (const targetDir of [...local, ...globals]) {
-    await writeSkillCopy(sourceDir, targetDir, checksum);
+    await writeSkillCopy(cwd, targetDir, checksum);
   }
 
   // The rule that produced the targets file asks for a post-copy check rather
@@ -138,15 +141,24 @@ export async function installSkills(
 }
 
 async function writeSkillCopy(
-  sourceDir: string,
+  cwd: string,
   targetDir: string,
   checksum: string,
 ): Promise<void> {
   await rm(targetDir, { recursive: true, force: true });
-  await mkdir(path.dirname(targetDir), { recursive: true });
+  await mkdir(targetDir, { recursive: true });
   // Real copies, not symlinks: skill discovery differs between agents and a
   // link that one resolves and another ignores is worse than two files.
-  await cp(sourceDir, targetDir, { recursive: true });
+  await cp(
+    path.join(cwd, CANONICAL_SKILL_DIR, "SKILL.md"),
+    path.join(targetDir, "SKILL.md"),
+  );
+  const sharedDir = path.join(cwd, SHARED_SKILL_DIR);
+  for (const entry of await readdir(sharedDir, { withFileTypes: true })) {
+    await cp(path.join(sharedDir, entry.name), path.join(targetDir, entry.name), {
+      recursive: entry.isDirectory(),
+    });
+  }
 
   const skillMdPath = path.join(targetDir, "SKILL.md");
   const existing = await readFile(skillMdPath, "utf-8").catch(() => "");
@@ -155,7 +167,11 @@ async function writeSkillCopy(
   }
   await writeFile(
     path.join(targetDir, CHECKSUM_FILE),
-    JSON.stringify({ checksum, source: CANONICAL_SKILL_DIR }, null, 2),
+    JSON.stringify(
+      { checksum, sources: [`${CANONICAL_SKILL_DIR}/SKILL.md`, SHARED_SKILL_DIR] },
+      null,
+      2,
+    ),
     "utf-8",
   );
 }
@@ -175,8 +191,7 @@ export async function verifySkills(
   cwd: string,
   options: SyncOptions = {},
 ): Promise<VerifyResult> {
-  const sourceDir = path.join(cwd, CANONICAL_SKILL_DIR);
-  const canonicalChecksum = await hashDirectory(sourceDir);
+  const canonicalChecksum = await hashSkillSources(cwd);
   const issues: string[] = [];
 
   const checkable: Array<{ label: string; dir: string; required: boolean }> = [

@@ -12,6 +12,7 @@ const clean: CandidateEvidence = {
   lintFindings: [],
   axeViolations: 0,
   horizontalOverflow: 0,
+  clippedText: 0,
   externalRequests: 0,
   brokenAnchors: 0,
 };
@@ -51,6 +52,7 @@ describe("hard gates", () => {
   it.each([
     ["externalRequests", { externalRequests: 1 }],
     ["horizontalOverflow", { horizontalOverflow: 1 }],
+    ["clippedText", { clippedText: 1 }],
     ["axeViolations", { axeViolations: 1 }],
     ["brokenAnchors", { brokenAnchors: 1 }],
   ])("disqualifies a candidate for %s", (_name, overrides) => {

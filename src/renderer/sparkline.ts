@@ -120,7 +120,7 @@ export interface BreakdownBar {
  * them or truncates them, and both make the chart slower to read than the
  * table it replaced.
  */
-export function renderBreakdownSvg(bars: readonly BreakdownBar[], width = 560): string {
+export function renderBreakdownSvg(bars: readonly BreakdownBar[], width = 768): string {
   const rowHeight = 28;
   const gap = 8;
   const labelWidth = Math.min(200, Math.max(96, width * 0.32));

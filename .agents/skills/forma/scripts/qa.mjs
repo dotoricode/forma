@@ -1,13 +1,9 @@
 #!/usr/bin/env node
-import { spawnSync } from "node:child_process";
-import path from "node:path";
-import { fileURLToPath } from "node:url";
+import { runForma } from "./run-forma.mjs";
 
-const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../../..");
 const targets = process.argv.slice(2);
-const command = targets.length > 0 ? ["forma", "qa", ...targets] : ["qa"];
-const result = spawnSync("pnpm", command, {
-  cwd: repoRoot,
-  stdio: "inherit",
-});
-process.exit(result.status ?? 1);
+if (targets.length === 0) {
+  console.error("forma: qa.mjs requires an HTML file or output directory.");
+  process.exit(1);
+}
+process.exit(runForma(["qa", ...targets]));

@@ -24,9 +24,9 @@ ${fontFaceCss}
 
 @layer tokens {
   :root {
-    --color-canvas: ${primitiveColor.neutral50};
+    --color-canvas: ${primitiveColor.neutral0};
     --color-surface: ${primitiveColor.neutral0};
-    --color-surface-raised: ${primitiveColor.neutral100};
+    --color-surface-raised: ${primitiveColor.neutral50};
     --color-text: ${primitiveColor.neutral900};
     --color-text-muted: ${primitiveColor.neutral600};
     --color-border: ${primitiveColor.neutral200};
@@ -173,6 +173,10 @@ ${fontFaceCss}
     margin-inline: auto;
     padding-inline: var(--space-5);
   }
+  .doc[data-measure="narrow"] { --measure-prose: 36rem; }
+  .doc[data-measure="wide"] { --measure-prose: 48rem; }
+  .doc[data-type-scale="compact"] :is(h1, h2, h3, h4) { zoom: 0.92; }
+  .doc[data-type-scale="generous"] :is(h1, h2, h3, h4) { zoom: 1.08; }
   .doc[data-density="compact"] .section { padding-block: var(--space-5); }
   .doc[data-density="comfortable"] .section { padding-block: var(--space-7); }
 

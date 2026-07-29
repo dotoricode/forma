@@ -2,7 +2,7 @@
 name: forma
 description: Create polished, self-contained visual HTML artifacts from complex documents, code, review topics, test results, and stakeholder reports. Use when the user wants to understand, review, verify, present, or explain technical material visually. Do not use for marketing landing pages or general web-app development.
 ---
-<!-- GENERATED COPY — do not edit directly. Source of truth: skills/forma/. Run `pnpm forma install-skills` after editing the source. -->
+<!-- GENERATED COPY — do not edit directly. Sources: skills/forma/SKILL.md + skills-src/_shared/. Run `pnpm forma install-skills` after editing either source. -->
 
 # Forma
 

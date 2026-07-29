@@ -81,9 +81,9 @@
 
 @layer tokens {
   :root {
-    --color-canvas: oklch(98.5% 0.002 90);
+    --color-canvas: oklch(100% 0 0);
     --color-surface: oklch(100% 0 0);
-    --color-surface-raised: oklch(96.5% 0.003 90);
+    --color-surface-raised: oklch(98.5% 0.002 90);
     --color-text: oklch(13% 0.004 90);
     --color-text-muted: oklch(42% 0.006 90);
     --color-border: oklch(92% 0.004 90);
@@ -104,7 +104,7 @@
     --font-mono: "Geist Mono", ui-monospace, "SFMono-Regular", Consolas, "Liberation Mono", monospace;
 
     --measure-prose: 42rem;
-    --measure-wide: min(100%, 64rem);
+    --measure-wide: min(100%, 72rem);
 
     --space-1: 0.25rem; --space-2: 0.5rem; --space-3: 0.75rem;
     --space-4: 1rem; --space-5: 1.5rem; --space-6: 2rem;
@@ -230,6 +230,10 @@
     margin-inline: auto;
     padding-inline: var(--space-5);
   }
+  .doc[data-measure="narrow"] { --measure-prose: 36rem; }
+  .doc[data-measure="wide"] { --measure-prose: 48rem; }
+  .doc[data-type-scale="compact"] :is(h1, h2, h3, h4) { zoom: 0.92; }
+  .doc[data-type-scale="generous"] :is(h1, h2, h3, h4) { zoom: 1.08; }
   .doc[data-density="compact"] .section { padding-block: var(--space-5); }
   .doc[data-density="comfortable"] .section { padding-block: var(--space-7); }
 
@@ -673,8 +677,7 @@
   .blk-risk__grid { display: flex; gap: var(--space-6); margin-block: var(--space-2) var(--space-3); font-size: 0.875rem; }
   .blk-risk__grid dt { color: var(--color-text-muted); }
   .decision-strip {
-    border-inline-start: 3px solid var(--color-accent);
-    padding-inline-start: var(--space-4);
+    padding-block: var(--space-2);
   }
   .decision-strip__status {
     font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.03em; color: var(--color-accent-strong);
@@ -699,6 +702,7 @@
 
   /* source-note */
   .blk-source-note { font-size: 0.8125rem; color: var(--color-text-muted); }
+  .blk-source-note:not(:first-child) { margin-block-start: var(--space-5); }
   .blk-source-note ul { display: grid; gap: var(--space-1); list-style: none; }
   .blk-source-note li { display: grid; gap: 0.15rem; }
   .blk-source-note__link {
@@ -740,7 +744,7 @@
     &[data-tone="fail"] .test-band__value { color: var(--color-danger); }
     &[data-tone="pass"] .test-band__value { color: var(--color-success); }
   }
-  
+
   /* ---- report vocabulary ------------------------------------------- */
 
   /* The thesis is the one sentence a reader must not miss. It gets size and
@@ -794,11 +798,7 @@
   .blk-headline-finding__meta:empty { display: none; }
   .blk-headline-finding [data-severity="high"] .blk-headline-finding__claim,
   .blk-headline-finding [data-severity="critical"] .blk-headline-finding__claim {
-    /* Severity is carried by a rule on the reading edge, not by tinting the
-       text: coloured body copy fails contrast before it reads as urgent. */
-    border-inline-start: 3px solid var(--color-danger);
-    padding-inline-start: var(--space-4);
-    margin-inline-start: calc(-1 * var(--space-4) - 3px);
+    color: var(--color-danger-text);
   }
 
   .blk-evidence-stack__list {
@@ -904,8 +904,7 @@
   .blk-implication__list dd { margin: 0; }
 
   .blk-risk-register__table tr[data-impact="high"] th[scope="row"] {
-    border-inline-start: 3px solid var(--color-danger);
-    padding-inline-start: var(--space-3);
+    color: var(--color-danger-text);
   }
 
   .blk-action-plan__list {
@@ -961,7 +960,6 @@
 
   .blk-appendix__title { font-size: 1rem; color: var(--color-text-muted); }
 
-  
   /* ---- manual vocabulary ------------------------------------------- */
 
   .blk-task-map__outcomes { padding-inline-start: var(--space-5); }
@@ -1147,8 +1145,8 @@
     font-variant-numeric: tabular-nums;
   }
   .blk-version-note__note {
-    padding-inline-start: var(--space-4);
-    border-inline-start: 2px solid var(--color-border-strong);
+    padding-block-start: var(--space-3);
+    border-block-start: 1px solid var(--color-border);
   }
 
   .blk-completion-check__check {
@@ -1179,7 +1177,6 @@
     color: var(--color-text-muted);
   }
 
-  
   .blk-narrative__title {
     font-size: clamp(1.75rem, 1.3rem + 1.8vw, 2.75rem);
     line-height: 1.15;
@@ -1191,27 +1188,18 @@
     margin-block-end: var(--space-6);
   }
 
-  
   /* ---- dashboard vocabulary ---------------------------------------- */
 
   .status-header {
-    padding: var(--space-5) var(--space-6);
-    border-radius: var(--radius-md);
-    border: 1px solid var(--color-border);
-    /* The state band uses a left rule rather than a filled panel: a solid
-       colour block behind text is the thing that forces a colour choice
-       between legibility and urgency. */
-    border-inline-start-width: 4px;
+    padding-block: var(--space-5);
   }
-  .status-header[data-status="warning"] { border-inline-start-color: var(--color-warning); }
-  .status-header[data-status="critical"] { border-inline-start-color: var(--color-danger); }
-  .status-header[data-status="normal"] { border-inline-start-color: var(--color-success); }
   .status-header__state {
     font-size: 0.75rem;
     letter-spacing: 0.06em;
     text-transform: uppercase;
     color: var(--color-text-muted);
   }
+  .status-header[data-status="normal"] .status-header__state { color: var(--color-success-text); }
   .status-header[data-status="critical"] .status-header__state { color: var(--color-danger-text); }
   .status-header[data-status="warning"] .status-header__state { color: var(--color-warning-text); }
   .status-header__headline {
@@ -1226,8 +1214,8 @@
 
   .metric-grid {
     display: grid;
-    gap: var(--space-5);
-    grid-template-columns: repeat(auto-fit, minmax(13rem, 1fr));
+    gap: var(--space-6);
+    grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr));
     /* Cells stretch so the sparklines share one baseline. Left to their
        natural height they stepped down the row, following whichever metric
        happened to carry a comparison line. */
@@ -1238,14 +1226,15 @@
     flex-direction: column;
   }
   .metric__label {
-    font-size: 0.8125rem;
+    font-size: 0.875rem;
+    line-height: 1.5;
     color: var(--color-text-muted);
   }
   .metric__value {
     /* The number leads. Its size is what makes the grid scannable before
        any label is read. */
-    font-size: clamp(1.75rem, 1.4rem + 1.4vw, 2.5rem);
-    line-height: 1.05;
+    font-size: 2.125rem;
+    line-height: 1.1;
     font-weight: 600;
     font-variant-numeric: tabular-nums;
     margin-block: var(--space-1) 0;
@@ -1273,7 +1262,8 @@
   .metric__delta-basis { color: var(--color-text-muted); font-size: 0.8125rem; }
   .metric__period {
     margin-block-start: var(--space-2);
-    font-size: 0.75rem;
+    font-size: 0.8125rem;
+    line-height: 1.5;
     color: var(--color-text-muted);
   }
   .metric__spark { margin-block-start: auto; padding-block-start: var(--space-3); }
@@ -1286,17 +1276,14 @@
     stroke-dasharray: 3 3;
   }
 
-  .anomaly {
-    padding-inline-start: var(--space-4);
-    border-inline-start: 3px solid var(--color-border-strong);
-  }
-  .anomaly[data-severity="high"] { border-inline-start-color: var(--color-danger); }
-  .anomaly[data-severity="medium"] { border-inline-start-color: var(--color-warning); }
+  .anomaly { padding-block: var(--space-2); }
   .anomaly__meta {
     font-size: 0.8125rem;
     color: var(--color-text-muted);
     font-variant-numeric: tabular-nums;
   }
+  .anomaly[data-severity="high"] .anomaly__meta { color: var(--color-danger-text); }
+  .anomaly[data-severity="medium"] .anomaly__meta { color: var(--color-warning-text); }
   .anomaly__what { font-size: 1.125rem; margin-block: var(--space-1) var(--space-2); }
   .anomaly__suspected { font-size: 0.9375rem; }
   .anomaly__suspected span {
@@ -1308,10 +1295,11 @@
   }
 
   .blk-breakdown__reading {
-    max-width: var(--measure-prose);
+    max-width: 48rem;
     margin-block-end: var(--space-4);
+    line-height: 1.65;
   }
-  .blk-breakdown__canvas svg { display: block; width: 100%; height: auto; }
+  .blk-breakdown__canvas svg { display: block; max-width: 100%; height: auto; }
   .breakdown-label, .breakdown-value {
     font-family: var(--font-sans);
     font-size: 12px;
@@ -1328,13 +1316,13 @@
     margin-block-start: var(--space-4);
     display: grid;
     gap: var(--space-2);
-    max-width: var(--measure-prose);
+    max-width: 48rem;
   }
   .blk-breakdown__values li {
     display: flex;
     justify-content: space-between;
     gap: var(--space-4);
-    font-size: 0.875rem;
+    font-size: 0.9375rem;
     padding-block-end: var(--space-2);
     border-block-end: 1px solid var(--color-border);
   }
@@ -1344,7 +1332,7 @@
   .blk-segmented-table__table {
     width: 100%;
     border-collapse: collapse;
-    font-size: 0.875rem;
+    font-size: 0.9375rem;
     font-variant-numeric: tabular-nums;
   }
   .blk-segmented-table__table th,
@@ -1355,19 +1343,21 @@
     white-space: nowrap;
   }
   .blk-segmented-table__table thead th {
-    font-size: 0.75rem;
+    font-size: 0.8125rem;
     color: var(--color-text-muted);
     border-block-end-color: var(--color-border-strong);
   }
   .blk-segmented-table__table tr[data-status="critical"] th[scope="row"] {
-    border-inline-start: 3px solid var(--color-danger);
-    padding-inline-start: var(--space-2);
+    color: var(--color-danger-text);
   }
   .blk-segmented-table__table tr[data-status="warning"] th[scope="row"] {
-    border-inline-start: 3px solid var(--color-warning);
-    padding-inline-start: var(--space-2);
+    color: var(--color-warning-text);
   }
   .cell-missing { color: var(--color-text-muted); font-style: normal; }
+
+  @media (max-width: 600px) {
+    .blk-breakdown__canvas { display: none; }
+  }
 
   .blk-data-freshness__grid {
     display: flex;
@@ -1391,7 +1381,6 @@
   }
   .blk-data-freshness__gaps { padding-inline-start: var(--space-5); font-size: 0.9375rem; }
 
-  
   /* ---- Decision Room ------------------------------------------------ */
 
   .blk-brief__question {
@@ -1420,19 +1409,9 @@
     display: grid;
     gap: var(--space-4);
   }
-  .claim {
-    padding-inline-start: var(--space-4);
-    border-inline-start: 3px solid var(--color-border);
-  }
-  /* Exposure is impact against confidence, so the rule weight tracks impact
-     and its style tracks how well the claim is backed. */
-  .claim[data-impact="high"] { border-inline-start-width: 5px; }
-  .claim[data-confidence="verified"] { border-inline-start-color: var(--color-border-strong); }
-  .claim[data-confidence="inferred"] { border-inline-start-style: dashed; }
-  .claim[data-confidence="unknown"] {
-    border-inline-start-style: dotted;
-    border-inline-start-color: var(--color-warning);
-  }
+  .claim { padding-block: var(--space-2); }
+  .claim[data-impact="high"] .claim__statement { font-weight: 700; }
+  .claim[data-confidence="unknown"] .claim__meta { color: var(--color-warning-text); }
   .claim__meta {
     font-size: 0.75rem;
     letter-spacing: 0.03em;
@@ -1450,8 +1429,7 @@
 
   .blk-challenge__counter {
     margin: var(--space-4) 0;
-    padding-inline-start: var(--space-5);
-    border-inline-start: 3px solid var(--color-danger);
+    color: var(--color-danger-text);
     font-size: 1.125rem;
     line-height: 1.5;
   }
@@ -1505,11 +1483,7 @@
     color: var(--color-text-muted);
   }
 
-  .decision-record {
-    padding-inline-start: var(--space-5);
-    border-inline-start: 4px solid var(--color-accent);
-  }
-  .decision-record[data-status="deferred"] { border-inline-start-color: var(--color-border-strong); }
+  .decision-record { padding-block: var(--space-3); }
   .decision-record__status {
     font-size: 0.75rem;
     letter-spacing: 0.05em;
@@ -1541,7 +1515,7 @@
   .decision-record__dissent dd { margin: 0; }
   .decision-record__revisit { padding-inline-start: var(--space-5); }
 
-  
+
 }
 
 @layer utilities {
@@ -1635,7 +1609,7 @@
   }
 
 
-  /* Simple — the default edited-memo treatment. A strong opening rule and
+  /* Technical report — an edited-memo treatment. A strong opening rule and
      tight display type create one leverage point without adding decoration. */
   :root[data-artifact="report"]:not([data-variant="editorial"]) .blk-cover {
     border-block-start: 3px solid var(--color-text);
@@ -1649,25 +1623,16 @@
     font-size: clamp(1.35rem, 1.1rem + 0.7vw, 1.75rem);
   }
 
-  /* Workspace — tool-like navigation and a denser rhythm. Raised surfaces
+  /* Signal Grid — tool-like navigation and a denser rhythm. Raised surfaces
      are reserved for visual evidence; ordinary prose stays on the canvas so
      the entire document does not collapse into a uniform card stack. */
   :root[data-artifact="dashboard"] {
     --shadow: 0 1px 2px oklch(0% 0 0 / 0.05), 0 4px 16px oklch(0% 0 0 / 0.08);
-    --color-canvas: oklch(96.5% 0.003 90);
-    --workspace-rail: var(--color-canvas);
-    --workspace-rail-border: var(--color-border);
-    --workspace-rail-text: var(--color-text-muted);
-    --workspace-rail-text-strong: var(--color-text);
-    --workspace-rail-active: var(--color-surface);
-  }
-  [data-theme="dark"]:root[data-artifact="dashboard"] {
-    --color-canvas: oklch(9% 0.003 90);
-  }
-  @media (prefers-color-scheme: dark) {
-    :root[data-artifact="dashboard"]:not([data-theme="light"]) {
-      --color-canvas: oklch(9% 0.003 90);
-    }
+    --dashboard-rail: var(--color-canvas);
+    --dashboard-rail-border: var(--color-border);
+    --dashboard-rail-text: var(--color-text-muted);
+    --dashboard-rail-text-strong: var(--color-text);
+    --dashboard-rail-active: var(--color-surface);
   }
   :root[data-artifact="dashboard"] .layout {
     grid-template-columns: 224px minmax(0, 1fr);
@@ -1680,8 +1645,8 @@
     position: static;
     max-height: none;
     overflow: visible;
-    background: var(--workspace-rail);
-    border-inline-end: 1px solid var(--workspace-rail-border);
+    background: var(--dashboard-rail);
+    border-inline-end: 1px solid var(--dashboard-rail-border);
     border-block-end: none;
     padding: var(--space-6) var(--space-4);
     margin-inline-start: calc(-1 * var(--space-5));
@@ -1696,18 +1661,19 @@
     gap: var(--space-1);
   }
   :root[data-artifact="dashboard"] .side-toc .toc a {
-    color: var(--workspace-rail-text);
+    color: var(--dashboard-rail-text);
     padding: 0.5em 0.75em;
     border-radius: var(--radius-sm);
   }
   :root[data-artifact="dashboard"] .side-toc .toc a:hover {
-    color: var(--workspace-rail-text-strong);
+    color: var(--dashboard-rail-text-strong);
   }
   :root[data-artifact="dashboard"] .side-toc .toc a[aria-current="true"] {
-    background: var(--workspace-rail-active);
+    background: var(--dashboard-rail-active);
     box-shadow: var(--shadow);
   }
   :root[data-artifact="dashboard"] .layout > .doc { padding-block: var(--space-6); }
+  :root[data-artifact="dashboard"] .breakout { max-width: 100%; }
   :root[data-artifact="dashboard"] .section {
     border-block-end: 1px solid var(--color-border);
     padding: var(--space-6) 0;
@@ -1725,9 +1691,19 @@
     padding: var(--space-6);
     margin-block-end: var(--space-5);
   }
+  :root[data-artifact="dashboard"] :is(
+    .blk-metric-group__title,
+    .blk-segmented-table__title,
+    .blk-breakdown__title,
+    .blk-data-freshness__title
+  ) {
+    font-size: 1.25rem;
+    line-height: 1.3;
+    margin-block-end: var(--space-4);
+  }
 
-  /* Guide — light left nav rail, callout-style finding/decision
-     blocks, tighter reading measure like a docs site's center column. */
+  /* Guided Path — a persistent orientation rail and a controlled reading
+     measure keep long procedures scannable without narrowing the workspace. */
   :root[data-artifact="manual"] .layout {
     grid-template-columns: 232px minmax(0, 1fr);
     max-width: none;
@@ -1756,9 +1732,8 @@
   :root[data-artifact="manual"] .side-toc .toc a[aria-current="true"] {
     background: color-mix(in oklab, var(--color-accent) 10%, transparent);
     color: var(--color-text);
-    border-inline-start: 3px solid var(--color-accent);
   }
-  :root[data-artifact="manual"] .measure { max-width: 38rem; }
+  :root[data-artifact="manual"] .measure { max-width: 48rem; }
 
   /* A guide reads as a sequence of headed steps, so the separator belongs
      under the heading, grouping it with the content it introduces. The old
@@ -1801,15 +1776,11 @@
     transform: translateY(0.15em);
   }
 
-  /* "What you will have when you finish" is the strongest thing a guide can
-     say, and it was rendering as a plain heading and bullets, visually
-     identical to every other section. As a bordered callout it reads as the
-     promise it is. */
+  /* "What you will have when you finish" gets an editorial separator rather
+     than another rounded callout card. */
   :root[data-artifact="manual"] .blk-task-map > .measure {
-    background: var(--color-surface);
-    border: 1px solid var(--color-border);
-    border-radius: var(--radius-lg);
-    padding: var(--space-5);
+    border-block: 1px solid var(--color-border);
+    padding-block: var(--space-5);
     max-width: 42rem;
   }
   /* The .section class is repeated here to outrank the generic heading-rule
@@ -1863,7 +1834,7 @@
      a wide viewport left empty on the right, which read as an unfinished
      page rather than a deliberate column. */
   :root[data-artifact="manual"] .layout {
-    max-width: calc(232px + var(--space-7) + 54rem);
+    max-width: calc(232px + var(--space-7) + 66rem);
     margin-inline: auto;
   }
   /* The rail's divider stopped where its list ended, leaving a vertical line
@@ -1934,15 +1905,7 @@
     padding-inline: 0.65em;
     margin-block-end: var(--space-2);
   }
-  :root[data-artifact="manual"] .blk-finding,
-  :root[data-artifact="manual"] .blk-decision .decision-strip {
-    background: color-mix(in oklab, var(--color-accent) 6%, var(--color-surface));
-    border-radius: var(--radius-md);
-    padding: var(--space-4) var(--space-5);
-  }
-  :root[data-artifact="manual"] .blk-decision .decision-strip { border-inline-start-width: 3px; }
-
-  /* Magazine — serif display type, a high-leverage cover, and an editorial
+  /* Editorial report — serif display type, a high-leverage cover, and an editorial
      opening rhythm without decorative images or motion. */
   :root[data-artifact="report"][data-variant="editorial"] {
     --font-serif: Georgia, "Nanum Myeongjo", serif;
@@ -2001,6 +1964,30 @@
     }
   }
 
+  /* A dashboard earns its name by aligning quantitative blocks to one
+     shared grid. The first five sections use the full evidence width; the
+     anomaly and action list form a 7/5 split before provenance returns to
+     the full span. Narrow screens fall back to normal document flow. */
+  @media (min-width: 1000px) {
+    :root[data-artifact="dashboard"] .doc {
+      display: grid;
+      grid-template-columns: repeat(12, minmax(0, 1fr));
+      column-gap: var(--space-5);
+      align-content: start;
+    }
+    :root[data-artifact="dashboard"] .doc > .section { grid-column: 1 / -1; }
+    :root[data-artifact="dashboard"] .doc > .blk-anomaly { grid-column: 1 / span 7; }
+    :root[data-artifact="dashboard"] .doc > .blk-action-plan { grid-column: 8 / -1; }
+  }
+
+  /* Decision Room needs enough horizontal room for evidence graphs,
+     simulations, and option matrices to be compared without shrinking their
+     labels. Prose inside those blocks still uses the reading measure. */
+  :root[data-artifact="advanced"] .layout {
+    max-width: min(100%, 96rem);
+  }
+  :root[data-artifact="advanced"] .breakout { max-width: 100%; }
+
   @media (max-width: 900px) {
     :root[data-artifact="dashboard"] .layout,
     :root[data-artifact="manual"] .layout {
@@ -2028,12 +2015,16 @@
       flex-direction: row;
       flex-wrap: nowrap;
     }
+    :root[data-artifact="dashboard"] .side-toc .toc__label,
+    :root[data-artifact="manual"] .side-toc .toc__label {
+      display: none;
+    }
     :root[data-artifact="dashboard"] .side-toc .toc a,
     :root[data-artifact="manual"] .side-toc .toc a {
       white-space: nowrap;
     }
   }
-  
+
 }
 </style>
 </head>
@@ -2053,7 +2044,7 @@
 </header>
 <div class="layout">
   <main class="doc" id="main" data-density="compact">
-<section class="section blk-narrative" id="narrative"><div class="measure"><h1 class="blk-narrative__title">SDK 4.2.0 출시 게이트</h1><p class="blk-narrative__question">SDK 4.2.0을 지금 출시할 수 있는 상태인가?</p><div class="blk-narrative__summary"><p>통과율은 기준을 넘었지만 blocker 3건이 열려 있고 크래시율이 이틀째 오르고 있다. 게이트는 아직 닫혀 있다.</p></div><ul class="blk-takeaways"><li>통과율 95.2%로 기준 95%는 넘겼다</li><li>blocker 3건이 전부 백그라운드 실행 제한에서 파생됐다</li><li>크래시율 상승분의 78%가 Android 17 단일 OS에서 나온다</li></ul></div></section><section class="section blk-status-header" id="status"><div class="status-header" data-status="warning"><p class="status-header__state">주의</p><h1 class="status-header__headline">출시 게이트가 열리지 않았다. blocker 3건이 남아 있다.</h1><p class="status-header__detail">통과율 기준은 충족했다. 남은 것은 백그라운드 실행 제한에서 파생된 blocker 3건이다.</p></div><div class="blk-source-note" aria-label="출처"><ul><li><span class="blk-source-note__label">CI 파이프라인</span><code class="blk-source-note__locator">ci/runs/4.2.0</code></li></ul></div></section><section class="section blk-metric-group breakout" id="kpi"><h2 class="blk-metric-group__title">게이트 지표</h2><div class="metric-grid"><div class="metric-grid__cell"><div class="metric" data-status="normal"><p class="metric__label">통과율</p><p class="metric__value">95.2<span class="metric__unit">%</span></p><p class="metric__delta" data-direction="up" data-sentiment="positive"><span class="metric__delta-arrow" aria-hidden="true">▲</span><span class="metric__delta-value">증가 1.8</span><span class="metric__delta-basis">전주 93.4% 대비</span></p><p class="metric__period">2026-07-24 CI 실행</p></div><div class="metric__spark"><svg class="spark" viewBox="0 0 160 40" width="160" height="40" xmlns="http://www.w3.org/2000/svg"><polyline class="spark-line" points="3.0,34.2 28.7,24.7 54.3,18.0 80.0,20.0" fill="none"></polyline><polyline class="spark-line" points="131.3,9.9 157.0,5.8" fill="none"></polyline><circle class="spark-last" cx="157.0" cy="5.8" r="2.2"></circle></svg></div></div><div class="metric-grid__cell"><div class="metric" data-status="critical"><p class="metric__label">출시 blocker</p><p class="metric__value">3<span class="metric__unit">건</span></p><p class="metric__delta" data-direction="up" data-sentiment="negative"><span class="metric__delta-arrow" aria-hidden="true">▲</span><span class="metric__delta-value">증가 1</span><span class="metric__delta-basis">전일 2건 대비</span></p><p class="metric__period">2026-07-24 기준</p></div><div class="metric__spark"><svg class="spark" viewBox="0 0 160 40" width="160" height="40" xmlns="http://www.w3.org/2000/svg"><polyline class="spark-line" points="3.0,34.2 28.7,34.2 54.3,24.7 80.0,24.7 105.7,15.3 131.3,15.3 157.0,5.8" fill="none"></polyline><circle class="spark-last" cx="157.0" cy="5.8" r="2.2"></circle></svg></div></div><div class="metric-grid__cell"><div class="metric" data-status="warning"><p class="metric__label">크래시율</p><p class="metric__value">0.42<span class="metric__unit">%</span></p><p class="metric__delta" data-direction="up" data-sentiment="negative"><span class="metric__delta-arrow" aria-hidden="true">▲</span><span class="metric__delta-value">증가 0.15</span><span class="metric__delta-basis">기준선 0.27% 대비</span></p><p class="metric__period">최근 24시간</p></div><div class="metric__spark"><svg class="spark" viewBox="0 0 160 40" width="160" height="40" xmlns="http://www.w3.org/2000/svg"><polyline class="spark-line" points="3.0,32.5 28.7,30.8 54.3,34.2 80.0,29.2 105.7,24.2 131.3,12.5 157.0,5.8" fill="none"></polyline><circle class="spark-last" cx="157.0" cy="5.8" r="2.2"></circle></svg></div></div><div class="metric-grid__cell"><div class="metric" data-status="warning"><p class="metric__label">단말 커버리지</p><p class="metric__value">12<span class="metric__unit">종</span></p><p class="metric__delta" data-direction="flat" data-sentiment="neutral"><span class="metric__delta-arrow" aria-hidden="true">—</span><span class="metric__delta-value">변화 없음 0</span><span class="metric__delta-basis">전주와 동일</span></p><p class="metric__period">2026-07-24 기준</p></div></div></div><div class="blk-source-note" aria-label="출처"><ul><li><span class="blk-source-note__label">CI 파이프라인</span><code class="blk-source-note__locator">ci/runs/4.2.0</code></li><li><span class="blk-source-note__label">Crashlytics</span><code class="blk-source-note__locator">artifacts/crash-2026-07.csv</code></li></ul></div></section><section class="section blk-anomaly" id="anomaly"><div class="measure"><div class="anomaly" data-severity="high"><p class="anomaly__meta">2026-07-22 이후 · 0.27% → 0.42%</p><h3 class="anomaly__what">크래시율이 이틀 연속 올라 기준선의 1.55배가 됐다.</h3><p class="anomaly__suspected"><span>의심 원인</span> Android 17의 백그라운드 서비스 종료 이후 재연결 실패</p></div><div class="blk-source-note" aria-label="출처"><ul><li><span class="blk-source-note__label">Crashlytics</span><code class="blk-source-note__locator">artifacts/crash-2026-07.csv</code></li></ul></div></div></section><section class="section blk-breakdown breakout" id="drivers"><h2 class="blk-breakdown__title">크래시율 상승분의 출처</h2><p class="blk-breakdown__reading">상승분 0.15%p 가운데 0.117%p, 즉 78%가 Android 17 한 OS에서 나왔다. 나머지 OS는 기준선 안에 있다.</p><div class="blk-breakdown__canvas"><svg class="breakdown" viewBox="0 0 560 152" width="560" height="152" xmlns="http://www.w3.org/2000/svg"><text class="breakdown-label" x="0" y="26">Android 17</text><rect class="breakdown-bar" data-sign="positive" x="179.20000000000002" y="12" width="38.0" height="20" rx="2"></rect><text class="breakdown-value" x="225.2016" y="26">+0.117</text><text class="breakdown-label" x="0" y="62">Android 16</text><rect class="breakdown-bar" data-sign="positive" x="179.20000000000002" y="48" width="6.8" height="20" rx="2"></rect><text class="breakdown-value" x="194.0208" y="62">+0.021</text><text class="breakdown-label" x="0" y="98">Android 15</text><rect class="breakdown-bar" data-sign="positive" x="179.20000000000002" y="84" width="4.5" height="20" rx="2"></rect><text class="breakdown-value" x="191.74720000000002" y="98">+0.014</text><text class="breakdown-label" x="0" y="134">Android 14 이하</text><rect class="breakdown-bar" data-sign="negative" x="179.20000000000002" y="120" width="0.6" height="20" rx="2"></rect><text class="breakdown-value" x="187.8496" y="134">-0.002</text></svg></div><ul class="blk-breakdown__values"><li><span>Android 17</span><span class="blk-breakdown__value">+0.117%p</span></li><li><span>Android 16</span><span class="blk-breakdown__value">+0.021%p</span></li><li><span>Android 15</span><span class="blk-breakdown__value">+0.014%p</span></li><li><span>Android 14 이하</span><span class="blk-breakdown__value">-0.002%p</span></li></ul><div class="blk-source-note" aria-label="출처"><ul><li><span class="blk-source-note__label">Crashlytics</span><code class="blk-source-note__locator">artifacts/crash-2026-07.csv</code></li></ul></div></section><section class="section blk-segmented-table breakout" id="segments"><h2 class="blk-segmented-table__title">OS별 상세</h2><div class="blk-segmented-table__scroll" tabindex="0"><table class="blk-segmented-table__table"><thead><tr><th scope="col">구분</th><th scope="col">테스트</th><th scope="col">실패</th><th scope="col">크래시율 %</th><th scope="col">단말</th></tr></thead><tbody><tr data-status="critical"><th scope="row">Android 17</th><td>124</td><td>6</td><td>0.71</td><td>5</td></tr><tr data-status="normal"><th scope="row">Android 16</th><td>124</td><td>0</td><td>0.29</td><td>4</td></tr><tr data-status="normal"><th scope="row">Android 15</th><td>124</td><td>0</td><td>0.26</td><td>3</td></tr><tr data-status="unknown"><th scope="row">Android 14</th><td><span class="cell-missing">데이터 없음</span></td><td><span class="cell-missing">데이터 없음</span></td><td>0.24</td><td>0</td></tr></tbody></table></div><div class="blk-source-note" aria-label="출처"><ul><li><span class="blk-source-note__label">CI 파이프라인</span><code class="blk-source-note__locator">ci/runs/4.2.0</code></li><li><span class="blk-source-note__label">Crashlytics</span><code class="blk-source-note__locator">artifacts/crash-2026-07.csv</code></li></ul></div></section><section class="section blk-action-plan" id="actions"><div class="measure"><h3 class="blk-action-plan__title">게이트를 열려면</h3><ol class="blk-action-plan__list"><li class="blk-action-plan__item" data-blocking="true"><span class="blk-action-plan__label">재연결 스케줄러를 foregroundServiceType 기반으로 수정</span><span class="blk-action-plan__owner">플랫폼팀 · 2026-07-31</span><span class="blk-action-plan__flag">선행 필요</span></li><li class="blk-action-plan__item" data-blocking="true"><span class="blk-action-plan__label">Android 15·16 전체 회귀 실행</span><span class="blk-action-plan__owner">QA · 2026-08-01</span><span class="blk-action-plan__flag">선행 필요</span></li><li class="blk-action-plan__item" data-blocking="false"><span class="blk-action-plan__label">Android 14 단말 확보 후 재측정</span><span class="blk-action-plan__owner">QA · 2026-08-05</span></li></ol></div></section><section class="section blk-data-freshness" id="freshness"><div class="measure"><h2 class="blk-data-freshness__title">데이터 기준</h2><dl class="blk-data-freshness__grid"><div><dt>기준 시각</dt><dd>2026-07-24 18:00 KST</dd></div><div><dt>포함 범위</dt><dd>사내 베타 사용자 2,140명 / 단말 12종</dd></div><div><dt>마지막 갱신</dt><dd>2026-07-24 18:12 KST</dd></div></dl><p class="blk-data-freshness__gaps-label">알려진 누락</p><ul class="blk-data-freshness__gaps"><li>Android 14 이하는 검증 단말이 없어 CI 수치가 없다</li><li>베타 사용자 구성이 실사용자와 달라 크래시율을 그대로 환산할 수 없다</li></ul><div class="blk-source-note" aria-label="출처"><ul><li><span class="blk-source-note__label">CI 파이프라인</span><code class="blk-source-note__locator">ci/runs/4.2.0</code></li><li><span class="blk-source-note__label">Crashlytics</span><code class="blk-source-note__locator">artifacts/crash-2026-07.csv</code></li><li><span class="blk-source-note__label">사내 베타 텔레메트리</span><code class="blk-source-note__locator">artifacts/beta-telemetry.csv</code></li></ul></div></div></section>
+<section class="section blk-narrative" id="narrative"><div class="measure"><h1 class="blk-narrative__title">SDK 4.2.0 출시 게이트</h1><p class="blk-narrative__question">SDK 4.2.0을 지금 출시할 수 있는 상태인가?</p><div class="blk-narrative__summary"><p>통과율은 기준을 넘었지만 blocker 3건이 열려 있고 크래시율이 이틀째 오르고 있다. 게이트는 아직 닫혀 있다.</p></div><ul class="blk-takeaways"><li>통과율 95.2%로 기준 95%는 넘겼다</li><li>blocker 3건이 전부 백그라운드 실행 제한에서 파생됐다</li><li>크래시율 상승분의 78%가 Android 17 단일 OS에서 나온다</li></ul></div></section><section class="section blk-status-header" id="status"><div class="status-header" data-status="warning"><p class="status-header__state">주의</p><h1 class="status-header__headline">출시 게이트가 열리지 않았다. blocker 3건이 남아 있다.</h1><p class="status-header__detail">통과율 기준은 충족했다. 남은 것은 백그라운드 실행 제한에서 파생된 blocker 3건이다.</p></div><div class="blk-source-note" aria-label="출처"><ul><li><span class="blk-source-note__label">CI 파이프라인</span><code class="blk-source-note__locator">ci/runs/4.2.0</code></li></ul></div></section><section class="section blk-metric-group breakout" id="kpi"><h2 class="blk-metric-group__title">게이트 지표</h2><div class="metric-grid"><div class="metric-grid__cell"><div class="metric" data-status="normal"><p class="metric__label">통과율</p><p class="metric__value">95.2<span class="metric__unit">%</span></p><p class="metric__delta" data-direction="up" data-sentiment="positive"><span class="metric__delta-arrow" aria-hidden="true">▲</span><span class="metric__delta-value">증가 1.8</span><span class="metric__delta-basis">전주 93.4% 대비</span></p><p class="metric__period">2026-07-24 CI 실행</p></div><div class="metric__spark"><svg class="spark" viewBox="0 0 160 40" width="160" height="40" xmlns="http://www.w3.org/2000/svg"><polyline class="spark-line" points="3.0,34.2 28.7,24.7 54.3,18.0 80.0,20.0" fill="none"></polyline><polyline class="spark-line" points="131.3,9.9 157.0,5.8" fill="none"></polyline><circle class="spark-last" cx="157.0" cy="5.8" r="2.2"></circle></svg></div></div><div class="metric-grid__cell"><div class="metric" data-status="critical"><p class="metric__label">출시 blocker</p><p class="metric__value">3<span class="metric__unit">건</span></p><p class="metric__delta" data-direction="up" data-sentiment="negative"><span class="metric__delta-arrow" aria-hidden="true">▲</span><span class="metric__delta-value">증가 1</span><span class="metric__delta-basis">전일 2건 대비</span></p><p class="metric__period">2026-07-24 기준</p></div><div class="metric__spark"><svg class="spark" viewBox="0 0 160 40" width="160" height="40" xmlns="http://www.w3.org/2000/svg"><polyline class="spark-line" points="3.0,34.2 28.7,34.2 54.3,24.7 80.0,24.7 105.7,15.3 131.3,15.3 157.0,5.8" fill="none"></polyline><circle class="spark-last" cx="157.0" cy="5.8" r="2.2"></circle></svg></div></div><div class="metric-grid__cell"><div class="metric" data-status="warning"><p class="metric__label">크래시율</p><p class="metric__value">0.42<span class="metric__unit">%</span></p><p class="metric__delta" data-direction="up" data-sentiment="negative"><span class="metric__delta-arrow" aria-hidden="true">▲</span><span class="metric__delta-value">증가 0.15</span><span class="metric__delta-basis">기준선 0.27% 대비</span></p><p class="metric__period">최근 24시간</p></div><div class="metric__spark"><svg class="spark" viewBox="0 0 160 40" width="160" height="40" xmlns="http://www.w3.org/2000/svg"><polyline class="spark-line" points="3.0,32.5 28.7,30.8 54.3,34.2 80.0,29.2 105.7,24.2 131.3,12.5 157.0,5.8" fill="none"></polyline><circle class="spark-last" cx="157.0" cy="5.8" r="2.2"></circle></svg></div></div><div class="metric-grid__cell"><div class="metric" data-status="warning"><p class="metric__label">단말 커버리지</p><p class="metric__value">12<span class="metric__unit">종</span></p><p class="metric__delta" data-direction="flat" data-sentiment="neutral"><span class="metric__delta-arrow" aria-hidden="true">—</span><span class="metric__delta-value">변화 없음 0</span><span class="metric__delta-basis">전주와 동일</span></p><p class="metric__period">2026-07-24 기준</p></div></div></div><div class="blk-source-note" aria-label="출처"><ul><li><span class="blk-source-note__label">CI 파이프라인</span><code class="blk-source-note__locator">ci/runs/4.2.0</code></li><li><span class="blk-source-note__label">Crashlytics</span><code class="blk-source-note__locator">artifacts/crash-2026-07.csv</code></li></ul></div></section><section class="section blk-anomaly" id="anomaly"><div class="measure"><div class="anomaly" data-severity="high"><p class="anomaly__meta">2026-07-22 이후 · 0.27% → 0.42%</p><h3 class="anomaly__what">크래시율이 이틀 연속 올라 기준선의 1.55배가 됐다.</h3><p class="anomaly__suspected"><span>의심 원인</span> Android 17의 백그라운드 서비스 종료 이후 재연결 실패</p></div><div class="blk-source-note" aria-label="출처"><ul><li><span class="blk-source-note__label">Crashlytics</span><code class="blk-source-note__locator">artifacts/crash-2026-07.csv</code></li></ul></div></div></section><section class="section blk-breakdown breakout" id="drivers"><h2 class="blk-breakdown__title">크래시율 상승분의 출처</h2><p class="blk-breakdown__reading">상승분 0.15%p 가운데 0.117%p, 즉 78%가 Android 17 한 OS에서 나왔다. 나머지 OS는 기준선 안에 있다.</p><div class="blk-breakdown__canvas"><svg class="breakdown" viewBox="0 0 768 152" width="768" height="152" xmlns="http://www.w3.org/2000/svg"><text class="breakdown-label" x="0" y="26">Android 17</text><rect class="breakdown-bar" data-sign="positive" x="200" y="12" width="59.9" height="20" rx="2"></rect><text class="breakdown-value" x="267.904" y="26">+0.117</text><text class="breakdown-label" x="0" y="62">Android 16</text><rect class="breakdown-bar" data-sign="positive" x="200" y="48" width="10.8" height="20" rx="2"></rect><text class="breakdown-value" x="218.752" y="62">+0.021</text><text class="breakdown-label" x="0" y="98">Android 15</text><rect class="breakdown-bar" data-sign="positive" x="200" y="84" width="7.2" height="20" rx="2"></rect><text class="breakdown-value" x="215.168" y="98">+0.014</text><text class="breakdown-label" x="0" y="134">Android 14 이하</text><rect class="breakdown-bar" data-sign="negative" x="200" y="120" width="1.0" height="20" rx="2"></rect><text class="breakdown-value" x="209.024" y="134">-0.002</text></svg></div><ul class="blk-breakdown__values"><li><span>Android 17</span><span class="blk-breakdown__value">+0.117%p</span></li><li><span>Android 16</span><span class="blk-breakdown__value">+0.021%p</span></li><li><span>Android 15</span><span class="blk-breakdown__value">+0.014%p</span></li><li><span>Android 14 이하</span><span class="blk-breakdown__value">-0.002%p</span></li></ul><div class="blk-source-note" aria-label="출처"><ul><li><span class="blk-source-note__label">Crashlytics</span><code class="blk-source-note__locator">artifacts/crash-2026-07.csv</code></li></ul></div></section><section class="section blk-segmented-table breakout" id="segments"><h2 class="blk-segmented-table__title">OS별 상세</h2><div class="blk-segmented-table__scroll" tabindex="0"><table class="blk-segmented-table__table"><thead><tr><th scope="col">구분</th><th scope="col">테스트</th><th scope="col">실패</th><th scope="col">크래시율 %</th><th scope="col">단말</th></tr></thead><tbody><tr data-status="critical"><th scope="row">Android 17</th><td>124</td><td>6</td><td>0.71</td><td>5</td></tr><tr data-status="normal"><th scope="row">Android 16</th><td>124</td><td>0</td><td>0.29</td><td>4</td></tr><tr data-status="normal"><th scope="row">Android 15</th><td>124</td><td>0</td><td>0.26</td><td>3</td></tr><tr data-status="unknown"><th scope="row">Android 14</th><td><span class="cell-missing">데이터 없음</span></td><td><span class="cell-missing">데이터 없음</span></td><td>0.24</td><td>0</td></tr></tbody></table></div><div class="blk-source-note" aria-label="출처"><ul><li><span class="blk-source-note__label">CI 파이프라인</span><code class="blk-source-note__locator">ci/runs/4.2.0</code></li><li><span class="blk-source-note__label">Crashlytics</span><code class="blk-source-note__locator">artifacts/crash-2026-07.csv</code></li></ul></div></section><section class="section blk-action-plan" id="actions"><div class="measure"><h3 class="blk-action-plan__title">게이트를 열려면</h3><ol class="blk-action-plan__list"><li class="blk-action-plan__item" data-blocking="true"><span class="blk-action-plan__label">재연결 스케줄러를 foregroundServiceType 기반으로 수정</span><span class="blk-action-plan__owner">플랫폼팀 · 2026-07-31</span><span class="blk-action-plan__flag">선행 필요</span></li><li class="blk-action-plan__item" data-blocking="true"><span class="blk-action-plan__label">Android 15·16 전체 회귀 실행</span><span class="blk-action-plan__owner">QA · 2026-08-01</span><span class="blk-action-plan__flag">선행 필요</span></li><li class="blk-action-plan__item" data-blocking="false"><span class="blk-action-plan__label">Android 14 단말 확보 후 재측정</span><span class="blk-action-plan__owner">QA · 2026-08-05</span></li></ol></div></section><section class="section blk-data-freshness" id="freshness"><div class="measure"><h2 class="blk-data-freshness__title">데이터 기준</h2><dl class="blk-data-freshness__grid"><div><dt>기준 시각</dt><dd>2026-07-24 18:00 KST</dd></div><div><dt>포함 범위</dt><dd>사내 베타 사용자 2,140명 / 단말 12종</dd></div><div><dt>마지막 갱신</dt><dd>2026-07-24 18:12 KST</dd></div></dl><p class="blk-data-freshness__gaps-label">알려진 누락</p><ul class="blk-data-freshness__gaps"><li>Android 14 이하는 검증 단말이 없어 CI 수치가 없다</li><li>베타 사용자 구성이 실사용자와 달라 크래시율을 그대로 환산할 수 없다</li></ul><div class="blk-source-note" aria-label="출처"><ul><li><span class="blk-source-note__label">CI 파이프라인</span><code class="blk-source-note__locator">ci/runs/4.2.0</code></li><li><span class="blk-source-note__label">Crashlytics</span><code class="blk-source-note__locator">artifacts/crash-2026-07.csv</code></li><li><span class="blk-source-note__label">사내 베타 텔레메트리</span><code class="blk-source-note__locator">artifacts/beta-telemetry.csv</code></li></ul></div></div></section>
   </main>
   <aside class="side-toc no-print"><nav class="toc" aria-label="섹션 이동"><p class="toc__label" aria-hidden="true">이 문서의 목차</p><a href="#status">출시 게이트가 열리지 않았다. blocker 3건이 남아 있다.</a><a href="#kpi">게이트 지표</a><a href="#anomaly">크래시율이 이틀 연속 올라 기준선의 1.55배가 됐다.</a><a href="#drivers">크래시율 상승분의 출처</a><a href="#segments">OS별 상세</a><a href="#actions">게이트를 열려면</a><a href="#freshness">데이터 기준</a></nav></aside>
 </div>
@@ -2139,7 +2130,7 @@
   if (document.readyState === "loading") {
     document.addEventListener("DOMContentLoaded", () => { initThemeToggle(); initCodeCopy(); initTocActiveState(); });
   } else {
-  
+
   /* Environment filter for manuals. Steps and commands declare which
      environments they belong to; this narrows the page to one of them.
      Nothing is hidden until a choice is made, so a manual whose script

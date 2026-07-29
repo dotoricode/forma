@@ -19,18 +19,38 @@ input (markdown / diff / JUnit XML / CSV / notes)
    pass/fail QA report
 ```
 
-Five modes and four plain-language themes ([`DESIGN.md`](./DESIGN.md)):
+Four artifact contracts ([`DESIGN.md`](./DESIGN.md)):
 
-| Mode | For |
+| Artifact | For |
 |---|---|
-| `explain` | Make a design, architecture, or code path understandable |
-| `review` | Turn a diff/PR into a fast, decision-ready review page |
-| `test` | Turn test results into a scannable pass/fail story with evidence |
-| `report` | Turn notes/analysis into a stakeholder-ready report |
-| `manual` | Turn a procedure into a safe, ordered, checkable guide |
+| `dashboard` | State-first metrics, release gates, and health checks |
+| `report` | Findings, evidence, alternatives, and recommendations |
+| `manual` | Safe ordered procedures with checks and recovery |
+| `advanced` | Evidence-led group decisions and a durable record |
 
-Themes are `simple`, `workspace`, `guide`, and `magazine`. Older theme
+Purpose remains metadata; artifact determines composition. Older theme
 identifiers still load and are normalized to these names.
+
+## What Forma changes
+
+Most generated pages make one Agent responsible for both understanding the
+material and inventing the presentation. Forma gives those jobs different
+owners:
+
+- The **Agent** owns meaning, narrative, source attribution, and semantic
+  block selection.
+- The **compiler** owns layout, typography, accessibility, sanitization, and
+  visual consistency.
+- The **QA pipeline** checks the rendered result across browsers, viewports,
+  accessibility rules, and the offline boundary.
+
+This split makes the output repeatable without reducing every document to one
+template. The artifact contract changes the information structure; the shared
+renderer keeps the result coherent, portable, and inspectable.
+
+**[Open the visual introduction](./docs/forma-introduction/output/index.html)**
+· [View its source spec](./docs/forma-introduction/forma.spec.json)
+· [Read the product brief](./docs/product-brief.md)
 
 ## Try it
 
@@ -88,7 +108,7 @@ forma qa <html|dir>             # browser/axe/responsive/offline checks
 forma preview <dir>             # serve rendered output over localhost
 forma generate <input> --instruction "..." # infer mode and write a starter spec
 forma build <spec>              # render + static design lint
-forma install-skills            # sync skills/forma/ → repo + machine-wide targets
+forma install-skills            # assemble router + shared files → configured targets
 forma verify-skills             # check the synced copies aren't stale
 forma build-skills              # skills-src/ → Claude Code plugin + Codex packages
 forma schema                    # print the Forma Spec JSON Schema
@@ -137,6 +157,7 @@ excluded).
 ## Project docs
 
 - [`DESIGN.md`](./DESIGN.md) — the design system
+- [`docs/forma-introduction/output/index.html`](./docs/forma-introduction/output/index.html) — a visual introduction to Forma, rendered by Forma
 - [`docs/product-brief.md`](./docs/product-brief.md) — what Forma is and isn't
 - [`docs/architecture.md`](./docs/architecture.md) — how the pieces fit together
 - [`docs/security.md`](./docs/security.md) — sanitization, offline guarantees, secret redaction

@@ -10,11 +10,9 @@
  * explicitly reset anything `@layer layout` set inside a media query — a
  * property left alone there keeps the layout layer's value.
  */
-import { primitiveColor } from "./tokens.js";
-
 export function artifactCss(): string {
   return `
-  /* Simple — the default edited-memo treatment. A strong opening rule and
+  /* Technical report — an edited-memo treatment. A strong opening rule and
      tight display type create one leverage point without adding decoration. */
   :root[data-artifact="report"]:not([data-variant="editorial"]) .blk-cover {
     border-block-start: 3px solid var(--color-text);
@@ -28,25 +26,16 @@ export function artifactCss(): string {
     font-size: clamp(1.35rem, 1.1rem + 0.7vw, 1.75rem);
   }
 
-  /* Workspace — tool-like navigation and a denser rhythm. Raised surfaces
+  /* Signal Grid — tool-like navigation and a denser rhythm. Raised surfaces
      are reserved for visual evidence; ordinary prose stays on the canvas so
      the entire document does not collapse into a uniform card stack. */
   :root[data-artifact="dashboard"] {
     --shadow: 0 1px 2px oklch(0% 0 0 / 0.05), 0 4px 16px oklch(0% 0 0 / 0.08);
-    --color-canvas: ${primitiveColor.neutral100};
-    --workspace-rail: var(--color-canvas);
-    --workspace-rail-border: var(--color-border);
-    --workspace-rail-text: var(--color-text-muted);
-    --workspace-rail-text-strong: var(--color-text);
-    --workspace-rail-active: var(--color-surface);
-  }
-  [data-theme="dark"]:root[data-artifact="dashboard"] {
-    --color-canvas: ${primitiveColor.neutral950};
-  }
-  @media (prefers-color-scheme: dark) {
-    :root[data-artifact="dashboard"]:not([data-theme="light"]) {
-      --color-canvas: ${primitiveColor.neutral950};
-    }
+    --dashboard-rail: var(--color-canvas);
+    --dashboard-rail-border: var(--color-border);
+    --dashboard-rail-text: var(--color-text-muted);
+    --dashboard-rail-text-strong: var(--color-text);
+    --dashboard-rail-active: var(--color-surface);
   }
   :root[data-artifact="dashboard"] .layout {
     grid-template-columns: 224px minmax(0, 1fr);
@@ -59,8 +48,8 @@ export function artifactCss(): string {
     position: static;
     max-height: none;
     overflow: visible;
-    background: var(--workspace-rail);
-    border-inline-end: 1px solid var(--workspace-rail-border);
+    background: var(--dashboard-rail);
+    border-inline-end: 1px solid var(--dashboard-rail-border);
     border-block-end: none;
     padding: var(--space-6) var(--space-4);
     margin-inline-start: calc(-1 * var(--space-5));
@@ -75,18 +64,19 @@ export function artifactCss(): string {
     gap: var(--space-1);
   }
   :root[data-artifact="dashboard"] .side-toc .toc a {
-    color: var(--workspace-rail-text);
+    color: var(--dashboard-rail-text);
     padding: 0.5em 0.75em;
     border-radius: var(--radius-sm);
   }
   :root[data-artifact="dashboard"] .side-toc .toc a:hover {
-    color: var(--workspace-rail-text-strong);
+    color: var(--dashboard-rail-text-strong);
   }
   :root[data-artifact="dashboard"] .side-toc .toc a[aria-current="true"] {
-    background: var(--workspace-rail-active);
+    background: var(--dashboard-rail-active);
     box-shadow: var(--shadow);
   }
   :root[data-artifact="dashboard"] .layout > .doc { padding-block: var(--space-6); }
+  :root[data-artifact="dashboard"] .breakout { max-width: 100%; }
   :root[data-artifact="dashboard"] .section {
     border-block-end: 1px solid var(--color-border);
     padding: var(--space-6) 0;
@@ -104,9 +94,19 @@ export function artifactCss(): string {
     padding: var(--space-6);
     margin-block-end: var(--space-5);
   }
+  :root[data-artifact="dashboard"] :is(
+    .blk-metric-group__title,
+    .blk-segmented-table__title,
+    .blk-breakdown__title,
+    .blk-data-freshness__title
+  ) {
+    font-size: 1.25rem;
+    line-height: 1.3;
+    margin-block-end: var(--space-4);
+  }
 
-  /* Guide — light left nav rail, callout-style finding/decision
-     blocks, tighter reading measure like a docs site's center column. */
+  /* Guided Path — a persistent orientation rail and a controlled reading
+     measure keep long procedures scannable without narrowing the workspace. */
   :root[data-artifact="manual"] .layout {
     grid-template-columns: 232px minmax(0, 1fr);
     max-width: none;
@@ -135,9 +135,8 @@ export function artifactCss(): string {
   :root[data-artifact="manual"] .side-toc .toc a[aria-current="true"] {
     background: color-mix(in oklab, var(--color-accent) 10%, transparent);
     color: var(--color-text);
-    border-inline-start: 3px solid var(--color-accent);
   }
-  :root[data-artifact="manual"] .measure { max-width: 38rem; }
+  :root[data-artifact="manual"] .measure { max-width: 48rem; }
 
   /* A guide reads as a sequence of headed steps, so the separator belongs
      under the heading, grouping it with the content it introduces. The old
@@ -180,15 +179,11 @@ export function artifactCss(): string {
     transform: translateY(0.15em);
   }
 
-  /* "What you will have when you finish" is the strongest thing a guide can
-     say, and it was rendering as a plain heading and bullets, visually
-     identical to every other section. As a bordered callout it reads as the
-     promise it is. */
+  /* "What you will have when you finish" gets an editorial separator rather
+     than another rounded callout card. */
   :root[data-artifact="manual"] .blk-task-map > .measure {
-    background: var(--color-surface);
-    border: 1px solid var(--color-border);
-    border-radius: var(--radius-lg);
-    padding: var(--space-5);
+    border-block: 1px solid var(--color-border);
+    padding-block: var(--space-5);
     max-width: 42rem;
   }
   /* The .section class is repeated here to outrank the generic heading-rule
@@ -242,7 +237,7 @@ export function artifactCss(): string {
      a wide viewport left empty on the right, which read as an unfinished
      page rather than a deliberate column. */
   :root[data-artifact="manual"] .layout {
-    max-width: calc(232px + var(--space-7) + 54rem);
+    max-width: calc(232px + var(--space-7) + 66rem);
     margin-inline: auto;
   }
   /* The rail's divider stopped where its list ended, leaving a vertical line
@@ -313,15 +308,7 @@ export function artifactCss(): string {
     padding-inline: 0.65em;
     margin-block-end: var(--space-2);
   }
-  :root[data-artifact="manual"] .blk-finding,
-  :root[data-artifact="manual"] .blk-decision .decision-strip {
-    background: color-mix(in oklab, var(--color-accent) 6%, var(--color-surface));
-    border-radius: var(--radius-md);
-    padding: var(--space-4) var(--space-5);
-  }
-  :root[data-artifact="manual"] .blk-decision .decision-strip { border-inline-start-width: 3px; }
-
-  /* Magazine — serif display type, a high-leverage cover, and an editorial
+  /* Editorial report — serif display type, a high-leverage cover, and an editorial
      opening rhythm without decorative images or motion. */
   :root[data-artifact="report"][data-variant="editorial"] {
     --font-serif: Georgia, "Nanum Myeongjo", serif;
@@ -380,6 +367,30 @@ export function artifactCss(): string {
     }
   }
 
+  /* A dashboard earns its name by aligning quantitative blocks to one
+     shared grid. The first five sections use the full evidence width; the
+     anomaly and action list form a 7/5 split before provenance returns to
+     the full span. Narrow screens fall back to normal document flow. */
+  @media (min-width: 1000px) {
+    :root[data-artifact="dashboard"] .doc {
+      display: grid;
+      grid-template-columns: repeat(12, minmax(0, 1fr));
+      column-gap: var(--space-5);
+      align-content: start;
+    }
+    :root[data-artifact="dashboard"] .doc > .section { grid-column: 1 / -1; }
+    :root[data-artifact="dashboard"] .doc > .blk-anomaly { grid-column: 1 / span 7; }
+    :root[data-artifact="dashboard"] .doc > .blk-action-plan { grid-column: 8 / -1; }
+  }
+
+  /* Decision Room needs enough horizontal room for evidence graphs,
+     simulations, and option matrices to be compared without shrinking their
+     labels. Prose inside those blocks still uses the reading measure. */
+  :root[data-artifact="advanced"] .layout {
+    max-width: min(100%, 96rem);
+  }
+  :root[data-artifact="advanced"] .breakout { max-width: 100%; }
+
   @media (max-width: 900px) {
     :root[data-artifact="dashboard"] .layout,
     :root[data-artifact="manual"] .layout {
@@ -407,10 +418,14 @@ export function artifactCss(): string {
       flex-direction: row;
       flex-wrap: nowrap;
     }
+    :root[data-artifact="dashboard"] .side-toc .toc__label,
+    :root[data-artifact="manual"] .side-toc .toc__label {
+      display: none;
+    }
     :root[data-artifact="dashboard"] .side-toc .toc a,
     :root[data-artifact="manual"] .side-toc .toc a {
       white-space: nowrap;
     }
   }
-  `;
+`;
 }

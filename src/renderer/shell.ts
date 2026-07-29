@@ -5,6 +5,7 @@ import { buildFontFaceCss } from "../design/fonts.js";
 import { buildInteractiveScript } from "./interactive.js";
 import { composeDocument } from "./compose.js";
 import { DEFAULT_VARIANT } from "../spec/artifact.js";
+import { applyComposition, type CompositionAxes } from "./composition.js";
 
 /* The button is icon-only, so its accessible name has to cover both
    directions — CSS swaps the glyph, but it cannot rewrite a label. */
@@ -20,7 +21,11 @@ export interface RenderResult {
   html: string;
 }
 
-export async function renderSpecToHtml(spec: FormaSpec): Promise<RenderResult> {
+export async function renderSpecToHtml(
+  sourceSpec: FormaSpec,
+  composition?: CompositionAxes,
+): Promise<RenderResult> {
+  const spec = composition ? applyComposition(sourceSpec, composition) : sourceSpec;
   const composed = await composeDocument(spec);
   const fontFaceCss = await buildFontFaceCss({
     sansText: composed.sansText,
@@ -38,6 +43,9 @@ export async function renderSpecToHtml(spec: FormaSpec): Promise<RenderResult> {
   // "every report" without repeating itself once per variant.
   const variant = spec.meta.variant ?? DEFAULT_VARIANT[spec.meta.artifact];
   const designAttr = ` data-artifact="${spec.meta.artifact}" data-variant="${variant}"`;
+  const compositionAttr = composition
+    ? ` data-measure="${composition.measure}" data-figure-placement="${composition.figurePlacement}" data-type-scale="${composition.typeScale}"`
+    : "";
 
   const html = `<!doctype html>
 <html lang="${htmlLangAttr}"${themeAttr}${designAttr}>
@@ -67,7 +75,7 @@ export async function renderSpecToHtml(spec: FormaSpec): Promise<RenderResult> {
   </div>
 </header>
 <div class="layout">
-  <main class="doc" id="main" data-density="${spec.meta.density}">
+  <main class="doc" id="main" data-density="${spec.meta.density}"${compositionAttr}>
 ${composed.bodyHtml}
   </main>
   ${composed.tocHtml ? `<aside class="side-toc no-print">${composed.tocHtml}</aside>` : ""}

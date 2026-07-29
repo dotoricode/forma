@@ -4,6 +4,7 @@ import { validateFormaSpec, formatValidationIssues } from "../spec/validate.js";
 import { renderSpecToHtml } from "./shell.js";
 import { redactSecrets, stripHomeDirectory } from "../security/sanitize.js";
 import { FORMA_SPEC_VERSION } from "../spec/schema.js";
+import type { CompositionAxes } from "./composition.js";
 
 export class FormaSpecError extends Error {}
 
@@ -21,6 +22,8 @@ export interface RenderOptions {
    * What it adds is the claim, written down where a reviewer can check it.
    */
   portable?: boolean;
+  /** Optional advanced-quality composition selected by the tournament. */
+  composition?: CompositionAxes;
 }
 
 /** Reads and validates a `forma.spec.json` file, throwing FormaSpecError on failure. */
@@ -54,7 +57,7 @@ export async function renderSpecFileToDir(
   options: RenderOptions = {},
 ): Promise<RenderOutcome> {
   const { spec, raw } = await loadSpecFileWithSource(specPath);
-  const { html } = await renderSpecToHtml(spec);
+  const { html } = await renderSpecToHtml(spec, options.composition);
 
   const guarded = stripHomeDirectory(redactSecrets(html).text);
 
@@ -88,6 +91,7 @@ export async function renderSpecFileToDir(
     // to see the claim and check it with `forma qa`, which measures the
     // same property in a real browser.
     externalNetworkRequests: 0,
+    ...(options.composition ? { composition: options.composition } : {}),
     ...(options.portable ? { portable: true, selfContainedDirectory: true } : {}),
   };
   const manifestPath = path.join(outDir, "manifest.json");

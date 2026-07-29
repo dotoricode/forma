@@ -6,6 +6,19 @@ import { installSkills, verifySkills } from "../../src/cli/skills.js";
 
 const tempDirs: string[] = [];
 
+async function writeFixtureSkillSources(cwd: string): Promise<void> {
+  const canonicalDir = path.join(cwd, "skills", "forma");
+  const sharedDir = path.join(cwd, "skills-src", "_shared", "references");
+  await mkdir(canonicalDir, { recursive: true });
+  await mkdir(sharedDir, { recursive: true });
+  await writeFile(
+    path.join(canonicalDir, "SKILL.md"),
+    "---\nname: forma\ndescription: Test skill.\n---\n\n# Forma\n",
+    "utf-8",
+  );
+  await writeFile(path.join(sharedDir, "test.md"), "# Shared reference\n", "utf-8");
+}
+
 afterEach(async () => {
   await Promise.all(tempDirs.splice(0).map((dir) => rm(dir, { recursive: true, force: true })));
 });
@@ -14,13 +27,7 @@ describe("installSkills", () => {
   it("keeps YAML frontmatter at the start of installed SKILL.md files", async () => {
     const cwd = await mkdtemp(path.join(tmpdir(), "forma-skills-"));
     tempDirs.push(cwd);
-    const canonicalDir = path.join(cwd, "skills", "forma");
-    await mkdir(canonicalDir, { recursive: true });
-    await writeFile(
-      path.join(canonicalDir, "SKILL.md"),
-      "---\nname: forma\ndescription: Test skill.\n---\n\n# Forma\n",
-      "utf-8",
-    );
+    await writeFixtureSkillSources(cwd);
 
     await installSkills(cwd);
 
@@ -31,8 +38,11 @@ describe("installSkills", () => {
       const installed = await readFile(path.join(cwd, installedPath), "utf-8");
       expect(installed).toMatch(/^---\r?\nname: forma\r?\n/);
       expect(installed).toContain(
-        "<!-- GENERATED COPY — do not edit directly. Source of truth: skills/forma/.",
+        "<!-- GENERATED COPY — do not edit directly. Sources: skills/forma/SKILL.md",
       );
+      expect(
+        await readFile(path.join(cwd, path.dirname(installedPath), "references/test.md"), "utf-8"),
+      ).toBe("# Shared reference\n");
     }
   });
 });
@@ -48,13 +58,7 @@ describe("machine-wide skill targets", () => {
     const cwd = await mkdtemp(path.join(tmpdir(), "forma-skills-cwd-"));
     const home = await mkdtemp(path.join(tmpdir(), "forma-skills-home-"));
     tempDirs.push(cwd, home);
-    const canonicalDir = path.join(cwd, "skills", "forma");
-    await mkdir(canonicalDir, { recursive: true });
-    await writeFile(
-      path.join(canonicalDir, "SKILL.md"),
-      "---\nname: forma\ndescription: Test skill.\n---\n\n# Forma\n",
-      "utf-8",
-    );
+    await writeFixtureSkillSources(cwd);
     if (targets !== undefined) {
       await mkdir(path.join(home, ".agents"), { recursive: true });
       await writeFile(

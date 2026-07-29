@@ -1,15 +1,16 @@
 #!/usr/bin/env node
 import { Command } from "commander";
 import path from "node:path";
-import { readFile } from "node:fs/promises";
+import { mkdtemp, readFile, rm, writeFile } from "node:fs/promises";
 import { createServer } from "node:http";
-import { networkInterfaces } from "node:os";
+import { networkInterfaces, tmpdir } from "node:os";
 import { loadSpecFile, renderSpecFileToDir, FormaSpecError } from "../renderer/render.js";
 import { buildFormaJsonSchema } from "../spec/json-schema.js";
 import { installSkills, verifySkills } from "./skills.js";
 import { writeStarterSpecFile } from "./starter-spec.js";
 import { inferArtifact, parseArtifact } from "../spec/infer-artifact.js";
 import { writeGeneratedSpec } from "./generate.js";
+import type { CandidateScore } from "../qa/candidates.js";
 
 const program = new Command();
 program.name("forma").description("Turn complex work into clear form.").version("0.1.0");
@@ -61,45 +62,90 @@ program
   .option("--seed <text>", "seed for candidate generation; same seed, same winner", "forma")
   .action(async (specPath: string, opts: { out: string; quality: string; seed: string }) => {
     try {
-      const outcome = await renderSpecFileToDir(specPath, opts.out);
-      console.log(`forma: rendered ${outcome.htmlPath} (${outcome.bytes} bytes)`);
       const { lintHtmlFile } = await import("../qa/design-lint.js");
-      const findings = await lintHtmlFile(outcome.htmlPath);
-      if (findings.length === 0) {
-        console.log("forma: design lint — no generic-AI pattern violations found");
-      } else {
-        console.log(`forma: design lint — ${findings.length} finding(s):`);
-        for (const f of findings) console.log(`  - [${f.rule}] ${f.message}`);
+      if (opts.quality !== "standard" && opts.quality !== "advanced") {
+        throw new Error("forma: --quality must be 'standard' or 'advanced'");
       }
 
       if (opts.quality === "advanced") {
         const { buildCandidates, scoreCandidate, seedFrom, selectWinner } = await import(
           "../qa/candidates.js"
         );
-        const { loadSpecFile } = await import("../renderer/render.js");
+        const { runBrowserQa } = await import("../qa/browser-qa.js");
+        const { chromium } = await import("playwright");
         const spec = await loadSpecFile(specPath);
         const candidates = buildCandidates(spec, 8, seedFrom(opts.seed));
-        // Every candidate is scored against the same rendered evidence for
-        // now: composition axes do not yet feed the stylesheet, so varying
-        // them would change nothing and pretending otherwise would make the
-        // tournament theatre. The selection machinery is real and pinned by
-        // tests; wiring the axes into the renderer is the remaining step.
-        const evidence = { lintFindings: findings };
-        const scores = candidates.map((candidate) => scoreCandidate(candidate, evidence));
+        const candidateRoot = await mkdtemp(path.join(tmpdir(), "forma-candidates-"));
+        const browser = await chromium.launch();
+        const scores: CandidateScore[] = [];
+        try {
+          for (const candidate of candidates) {
+            const candidateDir = path.join(candidateRoot, candidate.id);
+            const rendered = await renderSpecFileToDir(specPath, candidateDir, {
+              composition: candidate,
+            });
+            const candidateFindings = await lintHtmlFile(rendered.htmlPath);
+            const browserEvidence = await runBrowserQa({
+              target: candidateDir,
+              qaDir: path.join(candidateDir, "qa"),
+              label: candidate.id,
+              browser,
+              captureScreenshots: false,
+            });
+            scores.push(
+              scoreCandidate(candidate, {
+                lintFindings: candidateFindings,
+                axeViolations: browserEvidence.axeViolationCount,
+                horizontalOverflow: browserEvidence.overflowElements,
+                clippedText: browserEvidence.clippedTextElements,
+                externalRequests: browserEvidence.externalRequests.length,
+                brokenAnchors: browserEvidence.brokenAnchorTargets.length,
+              }),
+            );
+          }
+        } finally {
+          await browser.close();
+          await rm(candidateRoot, { recursive: true, force: true });
+        }
+
         const winner = selectWinner(scores);
         if (!winner) {
-          console.log("forma: every candidate failed a hard gate. Nothing to select.");
-        } else {
-          console.log(
-            `forma: quality advanced — ${candidates.length} candidates, winner '${winner.candidate.id}' at ${winner.score}/100`,
-          );
-          for (const [dimension, value] of Object.entries(winner.breakdown)) {
-            console.log(`  ${dimension}: ${value}`);
-          }
+          throw new Error("forma: every candidate failed a hard gate; no artifact was written");
         }
-      }
 
-      console.log(`forma: run \`forma qa ${opts.out}\` for the full browser/axe gate`);
+        const outcome = await renderSpecFileToDir(specPath, opts.out, {
+          composition: winner.candidate,
+        });
+        await writeFile(
+          path.join(opts.out, "qa", "tournament.json"),
+          JSON.stringify(
+            {
+              seed: opts.seed,
+              winner: winner.candidate.id,
+              candidates: scores,
+            },
+            null,
+            2,
+          ),
+          "utf-8",
+        );
+        console.log(`forma: rendered ${outcome.htmlPath} (${outcome.bytes} bytes)`);
+        console.log(
+          `forma: quality advanced — ${candidates.length} distinct renders, winner '${winner.candidate.id}' at ${winner.score}/100`,
+        );
+        console.log("forma: every candidate was measured at 2048, 1920, 1440, 1024, and 390px");
+      } else {
+        const outcome = await renderSpecFileToDir(specPath, opts.out);
+        console.log(`forma: rendered ${outcome.htmlPath} (${outcome.bytes} bytes)`);
+        const findings = await lintHtmlFile(outcome.htmlPath);
+        if (findings.length === 0) {
+          console.log("forma: design lint — no generic-AI pattern violations found");
+        } else {
+          console.log(`forma: design lint — ${findings.length} finding(s):`);
+          for (const f of findings) console.log(`  - [${f.rule}] ${f.message}`);
+        }
+        console.log(`forma: run \`forma qa ${opts.out}\` for the full browser/axe gate`);
+      }
     } catch (error) {
       exitWithError(error);
     }

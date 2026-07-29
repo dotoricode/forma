@@ -92,7 +92,7 @@ export const motion = {
  */
 export const measure = {
   prose: "42rem", // ~672px: comfortable for both Latin and Hangul body text
-  wide: "min(100%, 64rem)", // ~1024px: tables, code, diagrams
+  wide: "min(100%, 72rem)", // ~1152px: tables, code, diagrams on wide displays
 };
 
 /**

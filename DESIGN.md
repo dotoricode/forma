@@ -4,7 +4,7 @@ Single source of truth for Forma's visual language. Every Rendered Output
 shares the same semantic tokens, accessibility rules, and offline
 guarantees, then belongs to one of four artifacts: `dashboard`, `report`,
 `manual`, or `advanced`. See `docs/design-research-2026.md` for the research
-and naming rationale, and `skills/forma/references/artifacts.md` for each
+and naming rationale, and `skills-src/_shared/references/artifacts.md` for each
 artifact's composition contract.
 
 ## Design intent
@@ -12,7 +12,7 @@ artifact's composition contract.
 Refined, purposeful, legible, and visibly authored. Theme differences come
 from composition, rhythm, and typography rather than ornamental effects.
 Explicitly not a SaaS landing page or a generic AI-tool demo.
-See `skills/forma/references/generic-ai-patterns.md` for the exhaustive
+See `skills-src/_shared/references/generic-ai-patterns.md` for the exhaustive
 banned-pattern list — none of it appears here by construction.
 
 ## Tokens
@@ -25,10 +25,11 @@ never references a primitive or raw hex/OKLCH value directly.
 - **Color**: `--color-canvas/surface/surface-raised/text/text-muted/
   border/border-strong/accent/accent-strong/on-accent/success/warning/
   danger/info`. All OKLCH. One accent hue (restrained ink-blue). At most 3
-  surface levels in either theme.
+  surface levels in either theme. The light canvas is pure white; subtle
+  neutrals are reserved for raised surfaces, separators, and controls.
 - **Typography**: `--font-sans` (Geist → IBM Plex Sans KR → system-ui),
   `--font-mono` (Geist Mono → system mono). `--measure-prose` (42rem),
-  `--measure-wide` (`min(100%, 64rem)`). These are rem, not ch: `ch` is the
+  `--measure-wide` (`min(100%, 72rem)`). These are rem, not ch: `ch` is the
   advance width of "0", so it rescales with each block's own font-size and
   fits roughly half as much Korean per line. `src/qa/design-lint.ts` rejects
   ch-based measures.
@@ -43,6 +44,9 @@ never references a primitive or raw hex/OKLCH value directly.
 - Prose measure `--measure-prose` (`.measure`). Only code, tables, and
   diagrams use `.breakout`. Width caps never centre: `margin-inline` stays
   `0` so every block shares one left baseline.
+- Dashboard quantitative sections use the full content workspace. Charts
+  keep their intrinsic text size and shrink only when the viewport is
+  narrower than the chart; they are never enlarged to fill empty space.
 - Section headings are, where the content supports it, complete claims
   ("The change resets connection state explicitly") rather than bare
   labels ("Overview") — this is a content decision the Agent Skill makes,
@@ -55,10 +59,13 @@ never references a primitive or raw hex/OKLCH value directly.
   (`margin-inline`, `border-block-end`, …) throughout; CSS Subgrid is used
   for the test-matrix table behind `@supports (grid-template-rows:
   subgrid)` with a working non-subgrid fallback.
+- Browser QA covers phone, tablet, standard desktop, wide desktop, and
+  2048px monitors. It rejects clipped HTML text and SVG labels in addition
+  to page-level horizontal overflow.
 
 ## What's explicitly banned
 
-See `skills/forma/references/generic-ai-patterns.md` for the full list;
+See `skills-src/_shared/references/generic-ai-patterns.md` for the full list;
 the two most important structural rules:
 
 0. **Blocks are TSX components** (`src/blocks/*.tsx`), compiled to HTML with
@@ -69,8 +76,10 @@ the two most important structural rules:
 1. **No left-side bracket/hook borders.** Note rails use a plain
    `border-inline-start: 1px solid` on the element itself — never a
    `::before`/`::after` pseudo-element combining a left border with a
-   top/bottom border or hook. `src/qa/design-lint.ts` checks this
-   automatically.
+   top/bottom border or hook. Content blocks never use a reading-edge rail
+   thicker than 1px, and rounded panels never combine their corners with a
+   non-uniform edge accent. Both treatments read as oversized AI-style
+   brackets. `src/qa/design-lint.ts` checks these forms automatically.
 2. **No decorative oversized brackets.** No `content: "["`, `content:
    "{"`, `content: "</>"` anywhere. Also lint-checked.
 
