@@ -1,0 +1,7 @@
+{
+  "id": "manual",
+  "description": "Build a Guided Path manual: a procedural HTML artifact that tells a reader what to do, in what order, how to check each step worked, and what to do when it does not. Use for quickstarts, runbooks, onboarding guides, troubleshooting docs, and any request to turn a process into something someone can follow. Renders to a single offline file that makes no network requests.",
+  "whenToUse": "Trigger on: manual, guide, quickstart, runbook, how do I, walk me through, setup instructions, onboarding, troubleshooting, step by step, procedure.",
+  "explicitOnly": false,
+  "license": "MIT"
+}

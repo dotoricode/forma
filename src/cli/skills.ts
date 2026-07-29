@@ -6,10 +6,13 @@
  */
 import { createHash } from "node:crypto";
 import { cp, mkdir, readdir, readFile, rm, stat, writeFile } from "node:fs/promises";
+import { homedir } from "node:os";
 import path from "node:path";
 
 export const CANONICAL_SKILL_DIR = "skills/forma";
 export const INSTALL_TARGETS = [".agents/skills/forma", ".claude/skills/forma"];
+export const SKILL_TARGETS_FILE = ".agents/skill-targets.json";
+export const SKILL_NAME = "forma";
 const DO_NOT_EDIT_HEADER =
   "<!-- GENERATED COPY — do not edit directly. Source of truth: skills/forma/. Run `pnpm forma install-skills` after editing the source. -->\n";
 const CHECKSUM_FILE = ".forma-skill-checksum.json";
@@ -46,36 +49,121 @@ async function hashDirectory(dir: string): Promise<string> {
   return hash.digest("hex");
 }
 
+/**
+ * The machine-wide list of directories every agent on this box reads skills
+ * from. It is deliberately not hardcoded here: the file is the single place
+ * the list is edited, and duplicating it in source would mean a path added
+ * there silently stops being synced.
+ *
+ * Absent file means "no machine-wide targets configured", which is the case
+ * in CI. That is not an error — the repo-local copies are the CI contract.
+ */
+export async function readGlobalSkillTargets(home: string = homedir()): Promise<string[]> {
+  const raw = await readFile(path.join(home, SKILL_TARGETS_FILE), "utf-8").catch(() => null);
+  if (raw === null) return [];
+  let parsed: unknown;
+  try {
+    parsed = JSON.parse(raw);
+  } catch (error) {
+    throw new Error(`forma: could not parse ~/${SKILL_TARGETS_FILE} — ${(error as Error).message}`);
+  }
+  const targets = (parsed as { targets?: unknown }).targets;
+  if (!Array.isArray(targets) || targets.some((entry) => typeof entry !== "string")) {
+    throw new Error(`forma: ~/${SKILL_TARGETS_FILE} must have a "targets" array of strings`);
+  }
+  return (targets as string[]).map((entry) => expandHome(entry, home));
+}
+
+function expandHome(target: string, home: string): string {
+  if (target === "~") return home;
+  if (target.startsWith("~/")) return path.join(home, target.slice(2));
+  return target;
+}
+
 export interface InstallResult {
   targets: string[];
+  /** Machine-wide copies, absolute. Empty when no targets file is configured. */
+  globalTargets: string[];
   checksum: string;
 }
 
-export async function installSkills(cwd: string): Promise<InstallResult> {
+export interface SyncOptions {
+  /** Override the home directory the targets file is read from. */
+  home?: string;
+  /**
+   * Write to the machine-wide targets too. Off by default, and deliberately:
+   * with it defaulted on, a unit test that built a throwaway skill in a temp
+   * directory and called `installSkills(cwd)` reached into the real home and
+   * replaced the user's installed skill with its fixture. A function that can
+   * overwrite five directories outside the repo has to be asked to.
+   */
+  includeGlobalTargets?: boolean;
+}
+
+export async function installSkills(
+  cwd: string,
+  options: SyncOptions = {},
+): Promise<InstallResult> {
   const sourceDir = path.join(cwd, CANONICAL_SKILL_DIR);
   const checksum = await hashDirectory(sourceDir);
-  const targets: string[] = [];
 
-  for (const relTarget of INSTALL_TARGETS) {
-    const targetDir = path.join(cwd, relTarget);
-    await rm(targetDir, { recursive: true, force: true });
-    await mkdir(path.dirname(targetDir), { recursive: true });
-    await cp(sourceDir, targetDir, { recursive: true });
+  const local = INSTALL_TARGETS.map((relTarget) => path.join(cwd, relTarget));
+  // Every path in the targets file gets a `forma` subdirectory, so the file
+  // lists skill roots rather than one entry per skill.
+  const globals = options.includeGlobalTargets
+    ? (await readGlobalSkillTargets(options.home ?? homedir())).map((dir) =>
+        path.join(dir, SKILL_NAME),
+      )
+    : [];
 
-    const skillMdPath = path.join(targetDir, "SKILL.md");
-    const existing = await readFile(skillMdPath, "utf-8").catch(() => "");
-    if (existing && !existing.startsWith(DO_NOT_EDIT_HEADER)) {
-      await writeFile(skillMdPath, addDoNotEditHeader(existing), "utf-8");
-    }
-    await writeFile(
-      path.join(targetDir, CHECKSUM_FILE),
-      JSON.stringify({ checksum, source: CANONICAL_SKILL_DIR }, null, 2),
-      "utf-8",
-    );
-    targets.push(relTarget);
+  for (const targetDir of [...local, ...globals]) {
+    await writeSkillCopy(sourceDir, targetDir, checksum);
   }
 
-  return { targets, checksum };
+  // The rule that produced the targets file asks for a post-copy check rather
+  // than trust. A copy that silently half-failed is the failure mode where one
+  // agent reads current instructions and another reads stale ones.
+  const mismatched: string[] = [];
+  for (const targetDir of [...local, ...globals]) {
+    const recorded = await readRecordedChecksum(targetDir);
+    if (recorded !== checksum) mismatched.push(targetDir);
+  }
+  if (mismatched.length > 0) {
+    throw new Error(
+      `forma: these copies did not land with the canonical checksum:\n  ${mismatched.join("\n  ")}`,
+    );
+  }
+
+  return { targets: INSTALL_TARGETS, globalTargets: globals, checksum };
+}
+
+async function writeSkillCopy(
+  sourceDir: string,
+  targetDir: string,
+  checksum: string,
+): Promise<void> {
+  await rm(targetDir, { recursive: true, force: true });
+  await mkdir(path.dirname(targetDir), { recursive: true });
+  // Real copies, not symlinks: skill discovery differs between agents and a
+  // link that one resolves and another ignores is worse than two files.
+  await cp(sourceDir, targetDir, { recursive: true });
+
+  const skillMdPath = path.join(targetDir, "SKILL.md");
+  const existing = await readFile(skillMdPath, "utf-8").catch(() => "");
+  if (existing && !existing.startsWith(DO_NOT_EDIT_HEADER)) {
+    await writeFile(skillMdPath, addDoNotEditHeader(existing), "utf-8");
+  }
+  await writeFile(
+    path.join(targetDir, CHECKSUM_FILE),
+    JSON.stringify({ checksum, source: CANONICAL_SKILL_DIR }, null, 2),
+    "utf-8",
+  );
+}
+
+async function readRecordedChecksum(targetDir: string): Promise<string | null> {
+  const raw = await readFile(path.join(targetDir, CHECKSUM_FILE), "utf-8").catch(() => null);
+  if (raw === null) return null;
+  return (JSON.parse(raw) as { checksum?: string }).checksum ?? null;
 }
 
 export interface VerifyResult {
@@ -83,30 +171,49 @@ export interface VerifyResult {
   issues: string[];
 }
 
-export async function verifySkills(cwd: string): Promise<VerifyResult> {
+export async function verifySkills(
+  cwd: string,
+  options: SyncOptions = {},
+): Promise<VerifyResult> {
   const sourceDir = path.join(cwd, CANONICAL_SKILL_DIR);
   const canonicalChecksum = await hashDirectory(sourceDir);
   const issues: string[] = [];
 
-  for (const relTarget of INSTALL_TARGETS) {
-    const targetDir = path.join(cwd, relTarget);
-    const checksumPath = path.join(targetDir, CHECKSUM_FILE);
-    const exists = await stat(targetDir).then(
+  const checkable: Array<{ label: string; dir: string; required: boolean }> = [
+    ...INSTALL_TARGETS.map((relTarget) => ({
+      label: relTarget,
+      dir: path.join(cwd, relTarget),
+      required: true,
+    })),
+    // Machine-wide copies are checked when the box has them configured but are
+    // not required: CI has no targets file and must still pass.
+    ...(options.includeGlobalTargets
+      ? (await readGlobalSkillTargets(options.home ?? homedir())).map((dir) => ({
+          label: path.join(dir, SKILL_NAME),
+          dir: path.join(dir, SKILL_NAME),
+          required: false,
+        }))
+      : []),
+  ];
+
+  for (const target of checkable) {
+    const exists = await stat(target.dir).then(
       () => true,
       () => false,
     );
     if (!exists) {
-      issues.push(`${relTarget} is missing — run \`pnpm forma install-skills\``);
+      issues.push(`${target.label} is missing — run \`pnpm forma install-skills\``);
       continue;
     }
-    const recorded = await readFile(checksumPath, "utf-8").catch(() => null);
+    const recorded = await readRecordedChecksum(target.dir);
     if (!recorded) {
-      issues.push(`${relTarget} has no checksum file — run \`pnpm forma install-skills\``);
+      issues.push(`${target.label} has no checksum file — run \`pnpm forma install-skills\``);
       continue;
     }
-    const { checksum } = JSON.parse(recorded) as { checksum: string };
-    if (checksum !== canonicalChecksum) {
-      issues.push(`${relTarget} is out of date with ${CANONICAL_SKILL_DIR} — re-run install-skills`);
+    if (recorded !== canonicalChecksum) {
+      issues.push(
+        `${target.label} is out of date with ${CANONICAL_SKILL_DIR} — re-run install-skills`,
+      );
     }
   }
 

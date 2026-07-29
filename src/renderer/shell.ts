@@ -6,7 +6,10 @@ import { buildInteractiveScript } from "./interactive.js";
 import { composeDocument } from "./compose.js";
 import { DEFAULT_VARIANT } from "../spec/artifact.js";
 
-const THEME_LABEL: Record<"ko" | "en", string> = { en: "Toggle dark mode", ko: "다크 모드 전환" };
+/* The button is icon-only, so its accessible name has to cover both
+   directions — CSS swaps the glyph, but it cannot rewrite a label. */
+const THEME_LABEL: Record<"ko" | "en", string> = { en: "Switch theme", ko: "테마 전환" };
+const THEME_ICONS = `<svg class="theme-toggle__icon theme-toggle__icon--moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 14.5A8.5 8.5 0 0 1 9.5 4a7 7 0 1 0 10.5 10.5Z" /></svg><svg class="theme-toggle__icon theme-toggle__icon--sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4" /><path d="M12 3v2M12 19v2M3 12h2M19 12h2M5.6 5.6l1.4 1.4M17 17l1.4 1.4M18.4 5.6 17 7M7 17l-1.4 1.4" /></svg>`;
 const SKIP_LABEL: Record<"ko" | "en", string> = {
   en: "Skip to main content",
   ko: "본문으로 건너뛰기",
@@ -51,8 +54,17 @@ export async function renderSpecToHtml(spec: FormaSpec): Promise<RenderResult> {
 </head>
 <body>
 <a class="skip-link" href="#main">${escapeHtml(SKIP_LABEL[htmlLangAttr])}</a>
-<header class="doc no-print">
-  <button type="button" class="theme-toggle" data-forma-theme-toggle hidden>${escapeHtml(THEME_LABEL[htmlLangAttr])}</button>
+<header class="doc-bar no-print">
+  <div class="doc-bar__inner">
+    <p class="doc-bar__identity">
+      <span class="doc-bar__mark" aria-hidden="true"></span>
+      <span class="doc-bar__title">${escapeHtml(spec.meta.title)}</span>
+    </p>
+    <div class="doc-bar__actions">
+      <span class="doc-bar__tag">${escapeHtml(spec.meta.confidentiality)}</span>
+      <button type="button" class="theme-toggle" data-forma-theme-toggle hidden aria-label="${escapeHtml(THEME_LABEL[htmlLangAttr])}" title="${escapeHtml(THEME_LABEL[htmlLangAttr])}">${THEME_ICONS}</button>
+    </div>
+  </div>
 </header>
 <div class="layout">
   <main class="doc" id="main" data-density="${spec.meta.density}">

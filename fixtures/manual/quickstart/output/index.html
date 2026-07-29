@@ -185,7 +185,27 @@
     text-wrap: balance;
     line-height: 1.2;
   }
+  /* Display sizes need negative tracking. At 44px the default spacing that
+     is correct for body text reads as gappy, and the heading stops looking
+     set and starts looking typed. The correction scales with size, so it is
+     applied per level rather than once on the group. */
+  h1 { letter-spacing: -0.032em; line-height: 1.08; }
+  h2 { letter-spacing: -0.018em; }
+  h3 { letter-spacing: -0.01em; }
   p { text-wrap: pretty; }
+
+  /* Prose wants more leading than the 1.6 the whole document inherits;
+     tables, labels, and metric rows want less. Scoping the increase to the
+     reading measure gives long text air without stretching dense blocks. */
+  .measure p, .measure li { line-height: 1.72; }
+
+  /* Default discs sit large and dark enough to compete with the text they
+     introduce. A smaller muted marker still separates items without
+     drawing the eye first. */
+  .measure ul > li::marker {
+    color: var(--color-text-muted);
+    font-size: 0.8em;
+  }
   code, pre, kbd, samp { font-family: var(--font-mono); }
   a { color: var(--color-accent); }
   a:focus-visible, button:focus-visible, summary:focus-visible, [tabindex]:focus-visible {
@@ -213,14 +233,79 @@
   .doc[data-density="compact"] .section { padding-block: var(--space-5); }
   .doc[data-density="comfortable"] .section { padding-block: var(--space-7); }
 
-  /* The theme toggle ships with [hidden] and is revealed by the init
-     script, so the header grew from 0 to the button's height after paint
-     and shoved the whole document down — the only measured layout shift
-     on the page. Reserving the row up front costs nothing when JS is off. */
-  header.doc {
+  /* A document bar rather than a bare button floating in the corner.
+     The old header was a single unlabelled control against the page
+     background, which read as an unstyled artifact: nothing said what the
+     document was, and the control had no surface to belong to.
+
+     It also keeps the confidentiality label visible while scrolling. That
+     label matters most on exactly the internal material Forma is for, and
+     in the footer it was only visible to someone who reached the end.
+
+     The theme toggle ships with [hidden] and is revealed by the init
+     script, so the bar reserves its row up front. Before that it grew from
+     0 to the button's height after paint and shoved the whole document
+     down, which was the only measured layout shift on the page. */
+  .doc-bar {
+    position: sticky;
+    inset-block-start: 0;
+    z-index: 15;
+    background: color-mix(in oklab, var(--color-canvas) 88%, transparent);
+    backdrop-filter: saturate(1.4) blur(8px);
+    border-block-end: 1px solid var(--color-border);
+  }
+  .doc-bar__inner {
     display: flex;
-    justify-content: flex-end;
-    min-block-size: 2rem;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-4);
+    padding: var(--space-3) var(--space-5);
+    min-block-size: 3rem;
+  }
+  .doc-bar__identity {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    margin: 0;
+    min-width: 0;
+  }
+  .doc-bar__mark {
+    inline-size: 0.9rem;
+    block-size: 0.9rem;
+    border-radius: 3px;
+    background: var(--color-text);
+    flex: none;
+  }
+  .doc-bar__title {
+    font-size: 0.875rem;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+    /* One line. A long title must not push the bar into two rows and move
+       the document under it. */
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .doc-bar__actions {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    flex: none;
+  }
+  .doc-bar__tag {
+    font-size: 0.6875rem;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--color-text-muted);
+    border: 1px solid var(--color-border);
+    border-radius: 999px;
+    padding: 0.25em 0.6em;
+    white-space: nowrap;
+  }
+  @media (max-width: 390px) {
+    .doc-bar__inner { padding-inline: var(--space-4); }
+    .doc-bar__tag { display: none; }
   }
 
   main { display: block; }
@@ -264,8 +349,9 @@
     text-decoration: none;
     /* Active state changes color, not glyph width. Changing font weight only
        after IntersectionObserver runs can rewrap the mobile TOC and shift the
-       entire document after first paint. */
-    font-weight: 600;
+       entire document after first paint. Nav is orientation, not content, so
+       it sits at body weight and never competes with section headings. */
+    font-weight: 400;
     white-space: nowrap;
   }
   /* Report blocks contribute their claim sentence, which is the honest
@@ -278,6 +364,17 @@
       -webkit-box-orient: vertical;
       overflow: hidden;
     }
+  }
+  /* Hidden by default: the narrow-screen TOC is a single horizontally
+     scrolling row with no room for a heading. The vertical rails opt in. */
+  .toc__label {
+    display: none;
+    margin: 0;
+    font-size: 0.6875rem;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--color-text-muted);
   }
   .toc a:hover { color: var(--color-accent); }
   .toc a[aria-current="true"] {
@@ -333,6 +430,8 @@
     .side-toc .toc a {
       white-space: normal;
     }
+    /* The rail is vertical from here up, so it has room for its heading. */
+    .side-toc .toc__label { display: block; margin-block-end: var(--space-2); }
   }
 
   @container (min-width: 720px) {
@@ -1093,6 +1192,356 @@
   }
 
   
+  /* ---- dashboard vocabulary ---------------------------------------- */
+
+  .status-header {
+    padding: var(--space-5) var(--space-6);
+    border-radius: var(--radius-md);
+    border: 1px solid var(--color-border);
+    /* The state band uses a left rule rather than a filled panel: a solid
+       colour block behind text is the thing that forces a colour choice
+       between legibility and urgency. */
+    border-inline-start-width: 4px;
+  }
+  .status-header[data-status="warning"] { border-inline-start-color: var(--color-warning); }
+  .status-header[data-status="critical"] { border-inline-start-color: var(--color-danger); }
+  .status-header[data-status="normal"] { border-inline-start-color: var(--color-success); }
+  .status-header__state {
+    font-size: 0.75rem;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--color-text-muted);
+  }
+  .status-header[data-status="critical"] .status-header__state { color: var(--color-danger-text); }
+  .status-header[data-status="warning"] .status-header__state { color: var(--color-warning-text); }
+  .status-header__headline {
+    font-size: clamp(1.375rem, 1.1rem + 1.1vw, 2rem);
+    line-height: 1.25;
+    margin-block: var(--space-2) 0;
+  }
+  .status-header__detail {
+    margin-block-start: var(--space-3);
+    color: var(--color-text-muted);
+  }
+
+  .metric-grid {
+    display: grid;
+    gap: var(--space-5);
+    grid-template-columns: repeat(auto-fit, minmax(13rem, 1fr));
+    /* Cells stretch so the sparklines share one baseline. Left to their
+       natural height they stepped down the row, following whichever metric
+       happened to carry a comparison line. */
+    align-items: stretch;
+  }
+  .metric-grid__cell {
+    display: flex;
+    flex-direction: column;
+  }
+  .metric__label {
+    font-size: 0.8125rem;
+    color: var(--color-text-muted);
+  }
+  .metric__value {
+    /* The number leads. Its size is what makes the grid scannable before
+       any label is read. */
+    font-size: clamp(1.75rem, 1.4rem + 1.4vw, 2.5rem);
+    line-height: 1.05;
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+    margin-block: var(--space-1) 0;
+  }
+  .metric__unit {
+    font-size: 0.5em;
+    font-weight: 400;
+    color: var(--color-text-muted);
+    margin-inline-start: 0.15em;
+  }
+  .metric__delta {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: var(--space-1) var(--space-2);
+    margin-block-start: var(--space-2);
+    font-size: 0.875rem;
+    font-variant-numeric: tabular-nums;
+  }
+  /* Colour follows sentiment, not direction. Cost up and pass rate up are
+     both "up" and mean opposite things. */
+  .metric__delta[data-sentiment="positive"] { color: var(--color-success-text); }
+  .metric__delta[data-sentiment="negative"] { color: var(--color-danger-text); }
+  .metric__delta[data-sentiment="neutral"] { color: var(--color-text-muted); }
+  .metric__delta-basis { color: var(--color-text-muted); font-size: 0.8125rem; }
+  .metric__period {
+    margin-block-start: var(--space-2);
+    font-size: 0.75rem;
+    color: var(--color-text-muted);
+  }
+  .metric__spark { margin-block-start: auto; padding-block-start: var(--space-3); }
+  .metric__spark svg { display: block; width: 100%; height: auto; }
+  .spark-line { stroke: var(--color-accent); stroke-width: 1.5; }
+  .spark-point, .spark-last { fill: var(--color-accent); }
+  .spark-baseline {
+    stroke: var(--color-border-strong);
+    stroke-width: 1;
+    stroke-dasharray: 3 3;
+  }
+
+  .anomaly {
+    padding-inline-start: var(--space-4);
+    border-inline-start: 3px solid var(--color-border-strong);
+  }
+  .anomaly[data-severity="high"] { border-inline-start-color: var(--color-danger); }
+  .anomaly[data-severity="medium"] { border-inline-start-color: var(--color-warning); }
+  .anomaly__meta {
+    font-size: 0.8125rem;
+    color: var(--color-text-muted);
+    font-variant-numeric: tabular-nums;
+  }
+  .anomaly__what { font-size: 1.125rem; margin-block: var(--space-1) var(--space-2); }
+  .anomaly__suspected { font-size: 0.9375rem; }
+  .anomaly__suspected span {
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+    color: var(--color-text-muted);
+    margin-inline-end: var(--space-2);
+  }
+
+  .blk-breakdown__reading {
+    max-width: var(--measure-prose);
+    margin-block-end: var(--space-4);
+  }
+  .blk-breakdown__canvas svg { display: block; width: 100%; height: auto; }
+  .breakdown-label, .breakdown-value {
+    font-family: var(--font-sans);
+    font-size: 12px;
+    fill: var(--color-text-muted);
+  }
+  .breakdown-value { font-variant-numeric: tabular-nums; }
+  .breakdown-bar[data-sign="positive"] { fill: var(--color-accent); }
+  .breakdown-bar[data-sign="negative"] { fill: var(--color-danger); }
+  /* The SVG is presentational; the same numbers exist as a list for
+     assistive tech and for print, where the chart may be dropped. */
+  .blk-breakdown__values {
+    list-style: none;
+    padding: 0;
+    margin-block-start: var(--space-4);
+    display: grid;
+    gap: var(--space-2);
+    max-width: var(--measure-prose);
+  }
+  .blk-breakdown__values li {
+    display: flex;
+    justify-content: space-between;
+    gap: var(--space-4);
+    font-size: 0.875rem;
+    padding-block-end: var(--space-2);
+    border-block-end: 1px solid var(--color-border);
+  }
+  .blk-breakdown__value { font-variant-numeric: tabular-nums; }
+
+  .blk-segmented-table__scroll { overflow-x: auto; }
+  .blk-segmented-table__table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.875rem;
+    font-variant-numeric: tabular-nums;
+  }
+  .blk-segmented-table__table th,
+  .blk-segmented-table__table td {
+    text-align: start;
+    padding: var(--space-2) var(--space-3);
+    border-block-end: 1px solid var(--color-border);
+    white-space: nowrap;
+  }
+  .blk-segmented-table__table thead th {
+    font-size: 0.75rem;
+    color: var(--color-text-muted);
+    border-block-end-color: var(--color-border-strong);
+  }
+  .blk-segmented-table__table tr[data-status="critical"] th[scope="row"] {
+    border-inline-start: 3px solid var(--color-danger);
+    padding-inline-start: var(--space-2);
+  }
+  .blk-segmented-table__table tr[data-status="warning"] th[scope="row"] {
+    border-inline-start: 3px solid var(--color-warning);
+    padding-inline-start: var(--space-2);
+  }
+  .cell-missing { color: var(--color-text-muted); font-style: normal; }
+
+  .blk-data-freshness__grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-4) var(--space-7);
+  }
+  .blk-data-freshness__grid > div { display: flex; flex-direction: column; gap: var(--space-1); }
+  .blk-data-freshness__grid dt { font-size: 0.75rem; color: var(--color-text-muted); }
+  .blk-data-freshness__grid dd { margin: 0; font-variant-numeric: tabular-nums; }
+  .blk-data-freshness__delayed {
+    margin-block-start: var(--space-4);
+    color: var(--color-warning-text);
+    font-size: 0.9375rem;
+  }
+  .blk-data-freshness__gaps-label {
+    margin-block-start: var(--space-4);
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+    color: var(--color-text-muted);
+  }
+  .blk-data-freshness__gaps { padding-inline-start: var(--space-5); font-size: 0.9375rem; }
+
+  
+  /* ---- Decision Room ------------------------------------------------ */
+
+  .blk-brief__question {
+    font-size: clamp(1.5rem, 1.2rem + 1.3vw, 2.25rem);
+    line-height: 1.2;
+  }
+  .blk-brief__summary { margin-block: var(--space-4) var(--space-6); }
+  .blk-brief__heading {
+    font-size: 0.8125rem;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--color-text-muted);
+    margin-block-start: var(--space-5);
+  }
+  .blk-brief__list { padding-inline-start: var(--space-5); }
+  .blk-brief__list[data-tone="unknown"] { color: var(--color-text-muted); }
+
+  .blk-evidence-graph__legend {
+    font-size: 0.875rem;
+    color: var(--color-text-muted);
+    margin-block-end: var(--space-5);
+  }
+  .blk-evidence-graph__claims {
+    list-style: none;
+    padding: 0;
+    display: grid;
+    gap: var(--space-4);
+  }
+  .claim {
+    padding-inline-start: var(--space-4);
+    border-inline-start: 3px solid var(--color-border);
+  }
+  /* Exposure is impact against confidence, so the rule weight tracks impact
+     and its style tracks how well the claim is backed. */
+  .claim[data-impact="high"] { border-inline-start-width: 5px; }
+  .claim[data-confidence="verified"] { border-inline-start-color: var(--color-border-strong); }
+  .claim[data-confidence="inferred"] { border-inline-start-style: dashed; }
+  .claim[data-confidence="unknown"] {
+    border-inline-start-style: dotted;
+    border-inline-start-color: var(--color-warning);
+  }
+  .claim__meta {
+    font-size: 0.75rem;
+    letter-spacing: 0.03em;
+    text-transform: uppercase;
+    color: var(--color-text-muted);
+  }
+  .claim__statement { font-size: 1.0625rem; margin-block: var(--space-1) var(--space-2); }
+  .claim__support, .claim__contradiction { font-size: 0.875rem; color: var(--color-text-muted); }
+  .claim__support[data-empty="true"] { color: var(--color-warning-text); }
+  .claim__contradiction span, .claim__support span {
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+  }
+
+  .blk-challenge__counter {
+    margin: var(--space-4) 0;
+    padding-inline-start: var(--space-5);
+    border-inline-start: 3px solid var(--color-danger);
+    font-size: 1.125rem;
+    line-height: 1.5;
+  }
+  .blk-challenge__heading {
+    font-size: 0.8125rem;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--color-text-muted);
+    margin-block-start: var(--space-5);
+  }
+  .blk-challenge__list { padding-inline-start: var(--space-5); }
+
+  .blk-simulation__panel {
+    margin-block-start: var(--space-4);
+    padding: var(--space-5);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+  }
+  .blk-simulation__inputs { display: grid; gap: var(--space-4); }
+  .sim-input {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: var(--space-2) var(--space-4);
+    align-items: center;
+  }
+  .sim-input__label { font-size: 0.875rem; }
+  .sim-input__unit { color: var(--color-text-muted); margin-inline-start: var(--space-1); }
+  .sim-input input[type="range"] { grid-column: 1 / -1; width: 100%; accent-color: var(--color-accent); }
+  .sim-input__value {
+    font-variant-numeric: tabular-nums;
+    font-weight: 600;
+  }
+  .blk-simulation__outputs {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-4) var(--space-7);
+    margin-block-start: var(--space-5);
+    padding-block-start: var(--space-4);
+    border-block-start: 1px solid var(--color-border);
+  }
+  .blk-simulation__outputs dt { font-size: 0.75rem; color: var(--color-text-muted); }
+  .blk-simulation__outputs dd {
+    margin: 0;
+    font-size: 1.5rem;
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+  }
+  .blk-simulation__fallback {
+    margin-block-start: var(--space-4);
+    font-size: 0.8125rem;
+    color: var(--color-text-muted);
+  }
+
+  .decision-record {
+    padding-inline-start: var(--space-5);
+    border-inline-start: 4px solid var(--color-accent);
+  }
+  .decision-record[data-status="deferred"] { border-inline-start-color: var(--color-border-strong); }
+  .decision-record__status {
+    font-size: 0.75rem;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    color: var(--color-accent-strong);
+  }
+  .decision-record__decision {
+    font-size: 1.375rem;
+    line-height: 1.3;
+    margin-block: var(--space-2) var(--space-4);
+  }
+  .decision-record__meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-3) var(--space-6);
+    margin-block-start: var(--space-4);
+  }
+  .decision-record__meta > div { display: flex; flex-direction: column; gap: var(--space-1); }
+  .decision-record__meta dt { font-size: 0.75rem; color: var(--color-text-muted); }
+  .decision-record__meta dd { margin: 0; }
+  .decision-record__heading {
+    font-size: 0.8125rem;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--color-text-muted);
+    margin-block-start: var(--space-5);
+  }
+  .decision-record__dissent dt { font-weight: 600; margin-block-start: var(--space-3); }
+  .decision-record__dissent dd { margin: 0; }
+  .decision-record__revisit { padding-inline-start: var(--space-5); }
+
+  
 }
 
 @layer utilities {
@@ -1118,17 +1567,41 @@
   }
   .skip-link:focus { inset-block-start: var(--space-3); }
 
+  /* Icon-only affordance in the doc bar: it shows the state you can switch
+     TO (moon while light, sun while dark), so one glyph carries both the
+     current theme and the action. Square and quiet — it must not read as a
+     primary action next to the document title. */
   .theme-toggle {
-    font: inherit;
-    font-size: 0.8125rem;
+    display: grid;
+    place-items: center;
+    inline-size: 2rem;
+    block-size: 2rem;
+    padding: 0;
     background: var(--color-surface);
-    color: var(--color-text);
+    color: var(--color-text-muted);
     border: 1px solid var(--color-border);
     border-radius: var(--radius-sm);
-    padding: 0.35em 0.75em;
     cursor: pointer;
   }
-  .theme-toggle:hover { border-color: var(--color-border-strong); }
+  .theme-toggle:hover {
+    border-color: var(--color-border-strong);
+    color: var(--color-text);
+  }
+  .theme-toggle svg {
+    inline-size: 1rem;
+    block-size: 1rem;
+  }
+  /* Light is the default rendering, so the moon (switch to dark) shows. */
+  .theme-toggle__icon--moon { display: block; }
+  .theme-toggle__icon--sun { display: none; }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) .theme-toggle__icon--sun { display: block; }
+    :root:not([data-theme="light"]) .theme-toggle__icon--moon { display: none; }
+  }
+  :root[data-theme="dark"] .theme-toggle__icon--sun { display: block; }
+  :root[data-theme="dark"] .theme-toggle__icon--moon { display: none; }
+  :root[data-theme="light"] .theme-toggle__icon--sun { display: none; }
+  :root[data-theme="light"] .theme-toggle__icon--moon { display: block; }
 
   .code-copy {
     font: inherit;
@@ -1286,6 +1759,181 @@
     border-inline-start: 3px solid var(--color-accent);
   }
   :root[data-artifact="manual"] .measure { max-width: 38rem; }
+
+  /* A guide reads as a sequence of headed steps, so the separator belongs
+     under the heading, grouping it with the content it introduces. The old
+     rule sat at the *end* of each section, which put the line between a
+     block and the next heading and left every heading floating unattached.
+     Keeping both produced two lines a few pixels apart. */
+  :root[data-artifact="manual"] .section {
+    border-block-end: none;
+    padding-block: var(--space-6);
+  }
+  :root[data-artifact="manual"] .section h2[class*="__title"] {
+    padding-block-end: var(--space-2);
+    border-block-end: 1px solid var(--color-border);
+    margin-block-end: var(--space-4);
+  }
+
+  /* Numbered steps get a chip. The number was rendering as bare text run
+     together with the title ("1저장소를 받고…"), which is both unreadable
+     and the one affordance a procedure actually needs. */
+  :root[data-artifact="manual"] .blk-step__title {
+    display: flex;
+    align-items: baseline;
+    gap: var(--space-3);
+  }
+  :root[data-artifact="manual"] .blk-step__number {
+    flex: none;
+    display: inline-grid;
+    place-items: center;
+    inline-size: 1.75rem;
+    block-size: 1.75rem;
+    border-radius: 999px;
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    color: var(--color-text);
+    font-size: 0.8125rem;
+    font-weight: 600;
+    letter-spacing: 0;
+    /* Baseline alignment on a grid box uses the box, not the digit, so the
+       chip needs a nudge to sit level with the heading's first line. */
+    transform: translateY(0.15em);
+  }
+
+  /* "What you will have when you finish" is the strongest thing a guide can
+     say, and it was rendering as a plain heading and bullets, visually
+     identical to every other section. As a bordered callout it reads as the
+     promise it is. */
+  :root[data-artifact="manual"] .blk-task-map > .measure {
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    padding: var(--space-5);
+    max-width: 42rem;
+  }
+  /* The .section class is repeated here to outrank the generic heading-rule
+     selector above. Without it the callout label kept the hairline meant for
+     section headings, putting a line under a label that introduces a boxed
+     list. (No backticks in these comments: the whole file is one TS template
+     literal and a stray backtick silently ends it.) */
+  :root[data-artifact="manual"] .section .blk-task-map__title {
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.07em;
+    text-transform: uppercase;
+    color: var(--color-text-muted);
+    border-block-end: none;
+    padding-block-end: 0;
+    margin-block-end: var(--space-3);
+  }
+  :root[data-artifact="manual"] .blk-task-map__outcomes {
+    margin-block: 0;
+    font-size: 1.0625rem;
+  }
+  :root[data-artifact="manual"] .blk-task-map__estimate {
+    margin-block-end: 0;
+    padding-block-start: var(--space-3);
+    margin-block-start: var(--space-3);
+    border-block-start: 1px solid var(--color-border);
+    font-size: 0.8125rem;
+    color: var(--color-text-muted);
+  }
+
+  /* The success line is the reader's own verification, so it gets the one
+     affirmative colour the guide uses. */
+  :root[data-artifact="manual"] .blk-completion-check__expected > span:first-child::before {
+    content: "";
+    display: inline-block;
+    inline-size: 0.45em;
+    block-size: 0.8em;
+    margin-inline-end: 0.5em;
+    border-inline-end: 2px solid var(--color-success-text);
+    border-block-end: 2px solid var(--color-success-text);
+    transform: rotate(45deg) translateY(-0.15em);
+  }
+
+  /* Weight is the rail's only ranking signal, so spending it on every item
+     spends it on nothing: fifteen entries at 600 all shout equally. Regular
+     weight for the list, and the active item keeps the pill it already had. */
+  :root[data-artifact="manual"] .side-toc .toc a { font-weight: 450; }
+  :root[data-artifact="manual"] .side-toc .toc a[aria-current="true"] { font-weight: 600; }
+
+  /* Capping the grid stops the guide hugging the left edge with a third of
+     a wide viewport left empty on the right, which read as an unfinished
+     page rather than a deliberate column. */
+  :root[data-artifact="manual"] .layout {
+    max-width: calc(232px + var(--space-7) + 54rem);
+    margin-inline: auto;
+  }
+  /* The rail's divider stopped where its list ended, leaving a vertical line
+     hanging in the middle of the page. A full-height divider on the grid
+     column reads as structure; a partial one reads as a stray border. */
+  :root[data-artifact="manual"] .layout > .side-toc {
+    border-inline-end: none;
+    min-block-size: 100%;
+    box-shadow: 1px 0 0 var(--color-border);
+  }
+
+  /* The deck sat *below* the body size, so the document opened with its
+     hierarchy inverted: the sentence explaining the title was quieter than
+     the paragraphs further down. */
+  :root[data-artifact="manual"] .blk-narrative__subtitle {
+    font-size: 1.25rem;
+    line-height: 1.6;
+    color: var(--color-text-muted);
+    margin-block: var(--space-3) var(--space-6);
+    max-width: 34rem;
+  }
+  /* The deck and the body copy were both set in the muted grey, so the
+     opening had a size difference and no tonal one and neither read as
+     leading the other. The deck stays muted because it is secondary to the
+     title; the body goes to full strength because it is what gets read. */
+  :root[data-artifact="manual"] .blk-narrative__summary { color: var(--color-text); }
+
+  /* The key points were rendering as full-width rows separated by rules,
+     which reads as a table that lost its header rather than a list of
+     claims. Markers and a tighter block make them a list again. */
+  /* Not boxed. The outcome callout below it is boxed, and two rounded
+     surfaces stacked with a gap between them made neither look like the
+     emphasis: the callout has to be the only box in the opening. */
+  :root[data-artifact="manual"] .blk-takeaways {
+    margin-block: var(--space-5) 0;
+    list-style: none;
+  }
+  :root[data-artifact="manual"] .blk-takeaways > li {
+    border: none;
+    padding: 0;
+    position: relative;
+    padding-inline-start: var(--space-4);
+  }
+  :root[data-artifact="manual"] .blk-takeaways > li + li { margin-block-start: var(--space-2); }
+  :root[data-artifact="manual"] .blk-takeaways > li::before {
+    content: "";
+    position: absolute;
+    inset-inline-start: 0;
+    inset-block-start: 0.62em;
+    inline-size: 0.375rem;
+    block-size: 0.375rem;
+    border-radius: 999px;
+    background: var(--color-accent);
+  }
+
+  /* Section padding plus the heading rules was double separation, and it
+     opened voids of nearly 200px between a section's last block and the
+     next heading. The rules carry the boundary now, so the padding only has
+     to keep sections from touching. */
+  :root[data-artifact="manual"] .section { padding-block: var(--space-5); }
+  :root[data-artifact="manual"] .blk-narrative { padding-block-start: var(--space-6); }
+
+  /* These two rails are vertical at every width, not only above 1280px, and
+     their links carry inline padding the heading has to line up with. */
+  :root[data-artifact="manual"] .side-toc .toc__label,
+  :root[data-artifact="dashboard"] .side-toc .toc__label {
+    display: block;
+    padding-inline: 0.65em;
+    margin-block-end: var(--space-2);
+  }
   :root[data-artifact="manual"] .blk-finding,
   :root[data-artifact="manual"] .blk-decision .decision-strip {
     background: color-mix(in oklab, var(--color-accent) 6%, var(--color-surface));
@@ -1391,8 +2039,17 @@
 </head>
 <body>
 <a class="skip-link" href="#main">본문으로 건너뛰기</a>
-<header class="doc no-print">
-  <button type="button" class="theme-toggle" data-forma-theme-toggle hidden>다크 모드 전환</button>
+<header class="doc-bar no-print">
+  <div class="doc-bar__inner">
+    <p class="doc-bar__identity">
+      <span class="doc-bar__mark" aria-hidden="true"></span>
+      <span class="doc-bar__title">Forma 첫 문서 만들기</span>
+    </p>
+    <div class="doc-bar__actions">
+      <span class="doc-bar__tag">public</span>
+      <button type="button" class="theme-toggle" data-forma-theme-toggle hidden aria-label="테마 전환" title="테마 전환"><svg class="theme-toggle__icon theme-toggle__icon--moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 14.5A8.5 8.5 0 0 1 9.5 4a7 7 0 1 0 10.5 10.5Z" /></svg><svg class="theme-toggle__icon theme-toggle__icon--sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4" /><path d="M12 3v2M12 19v2M3 12h2M19 12h2M5.6 5.6l1.4 1.4M17 17l1.4 1.4M18.4 5.6 17 7M7 17l-1.4 1.4" /></svg></button>
+    </div>
+  </div>
 </header>
 <div class="layout">
   <main class="doc" id="main" data-density="comfortable">
@@ -1400,7 +2057,7 @@
 cd forma
 pnpm install</code></pre></div><div class="blk-step__command" data-environments="win"><p class="blk-step__command-meta">PowerShell · win</p><pre class="blk-step__command-shell" tabindex="0"><code>git clone https://github.com/dotoricode/forma.git; cd forma; pnpm install</code></pre></div><div class="blk-step__expected"><p class="blk-step__expected-label">이렇게 보이면 성공</p><p>node_modules/ 가 생기고 설치 오류가 없다.</p></div><p class="blk-step__failure"><span class="blk-step__failure-label">실패하면: </span>pnpm이 없으면 corepack enable 을 먼저 실행한다.</p></div></div></section><section class="section blk-step" id="step-2"><div class="measure"><div class="blk-step__body"><h3 class="blk-step__title"><span class="blk-step__number">2</span>스펙 뼈대를 만든다</h3><div class="blk-step__instruction"><p><code>forma init</code>이 완결된 리포트 뼈대를 하나 써준다. 두 블록짜리 스케치가 아니라 계약을 충족하는 최소 문서다.</p></div><div class="blk-step__command"><p class="blk-step__command-meta">저장소 루트</p><pre class="blk-step__command-shell" tabindex="0"><code>pnpm forma init</code></pre></div><div class="blk-step__expected"><p class="blk-step__expected-label">이렇게 보이면 성공</p><p>현재 디렉터리에 forma.spec.json 이 생긴다.</p></div><div class="blk-step__verify"><p class="blk-step__verify-label">확인 방법</p><p>cat forma.spec.json 으로 열어보면 version이 0.2이고 sections에 6개 블록이 있다.</p></div></div></div></section><section class="section blk-step" id="step-3"><div class="measure"><div class="blk-step__body"><h3 class="blk-step__title"><span class="blk-step__number">3</span>내용을 채우고 검증한다</h3><div class="blk-step__instruction"><p>placeholder 문구를 실제 내용으로 바꾼다. 각 블록이 어떤 자리를 차지하는지는 placeholder가 그대로 말해준다. 다 쓰면 검증한다.</p></div><ol class="blk-step__substeps"><li>cover 블록의 title을 실제 문서 제목으로</li><li>narrative의 question과 summary를 채운다</li><li>finding, recommendation, actions를 실제 내용으로</li></ol><div class="blk-step__command"><p class="blk-step__command-meta">저장소 루트</p><pre class="blk-step__command-shell" tabindex="0"><code>pnpm forma validate forma.spec.json</code></pre></div><div class="blk-step__expected"><p class="blk-step__expected-label">이렇게 보이면 성공</p><p>`forma: &lt;path&gt; is a valid Forma spec` 이 출력된다.</p></div><p class="blk-step__failure"><span class="blk-step__failure-label">실패하면: </span>실패 메시지가 어떤 역할이 비었는지 지목한다. 예를 들어 권고가 없으면 recommendation 역할이 비었다고 나온다.</p></div></div></section><section class="section blk-checkpoint" id="checkpoint-1"><div class="measure"><h3 class="blk-checkpoint__title">여기까지 확인</h3><ul class="blk-checkpoint__list"><li>forma.spec.json 이 검증을 통과한다</li><li>narrative.question 이 실제 질문 문장이다</li><li>verified로 표시한 블록마다 sourceRefs가 있다</li></ul><p class="blk-checkpoint__fallback"><span class="blk-checkpoint__fallback-label">하나라도 아니라면: </span>검증 메시지의 코드를 보고 해당 블록을 고친다. verified-claim-without-evidence 는 근거 없는 단정을 막는 규칙이다.</p></div></section><section class="section blk-step" id="step-4"><div class="measure"><div class="blk-step__body"><h3 class="blk-step__title"><span class="blk-step__number">4</span>렌더한다</h3><div class="blk-step__instruction"><p>검증을 통과한 스펙만 렌더된다. 결과는 폰트까지 포함된 단일 HTML이다.</p></div><div class="blk-step__command"><p class="blk-step__command-meta">저장소 루트</p><pre class="blk-step__command-shell" tabindex="0"><code>pnpm forma render forma.spec.json --out out</code></pre></div><div class="blk-step__expected"><p class="blk-step__expected-label">이렇게 보이면 성공</p><p>out/index.html 이 생기고 바이트 수가 출력된다. 대개 150~190KB 사이인데 7할이 임베딩된 폰트다.</p></div><div class="blk-step__verify"><p class="blk-step__verify-label">확인 방법</p><p>브라우저로 out/index.html 을 열고 개발자 도구 Network 탭에서 요청이 0건인지 본다.</p></div></div></div></section><section class="section blk-decision-tree" id="tree"><div class="measure"><h3 class="blk-decision-tree__question">다음에 무엇을 볼까?</h3><dl class="blk-decision-tree__branches"><dt>어떤 블록을 쓸 수 있는지 알고 싶다</dt><dd>블록 목록과 각 블록의 용도를 본다</dd><dt>결과물이 계속 리포트처럼만 나온다</dt><dd>meta.artifact를 manual이나 dashboard로 바꾼다</dd><dt>브라우저에서 깨져 보인다</dt><dd>아래 문제 해결로 간다 <a href="#trouble">→</a></dd></dl></div></section><section class="section blk-compat-matrix breakout" id="compat"><h2 class="blk-compat-matrix__title">지원 범위</h2><div class="blk-compat-matrix__scroll"><table class="blk-compat-matrix__table"><thead><tr><th scope="col"><span class="visually-hidden">대상</span></th><th scope="col">Chrome 120+</th><th scope="col">Safari 17+</th><th scope="col">Firefox 121+</th></tr></thead><tbody><tr><th scope="row">본문·표·다이어그램</th><td data-status="supported">지원</td><td data-status="supported">지원</td><td data-status="supported">지원</td></tr><tr><th scope="row">test-matrix subgrid 정렬</th><td data-status="supported">지원</td><td data-status="supported">지원</td><td data-status="partial">부분 지원</td></tr><tr><th scope="row">목차 2줄 클램프</th><td data-status="supported">지원</td><td data-status="supported">지원</td><td data-status="supported">지원</td></tr></tbody></table></div></section><section class="section blk-version-note" id="version"><div class="measure"><p class="blk-version-note__range">0.2 이상</p><p class="blk-version-note__note">0.1 스펙도 그대로 렌더된다. 읽을 때 자동 변환되고 계약 검사는 면제된다.</p></div></section><section class="section blk-troubleshooting" id="trouble"><div class="measure"><h2 class="blk-troubleshooting__title">안 될 때</h2><div class="blk-troubleshooting__list"><details class="blk-troubleshooting__entry"><summary>forma validate 가 unfilled-role 로 실패한다</summary><p class="blk-troubleshooting__cause"><span>원인</span> artifact마다 반드시 채워야 하는 의미 역할이 있다.</p><p class="blk-troubleshooting__fix"><span>해결</span> 메시지가 지목한 역할을 채울 블록을 넣는다. report의 recommendation 역할은 decision이나 recommendation 블록이 채운다.</p></details><details class="blk-troubleshooting__entry"><summary>한글이 네모로 보인다</summary><p class="blk-troubleshooting__cause"><span>원인</span> 폰트 subset이 문서에 실제로 쓰인 글자만 담는다.</p><p class="blk-troubleshooting__fix"><span>해결</span> 렌더를 다시 돌린다. 스펙을 고치고 예전 HTML을 그대로 열면 새 글자가 폰트에 없다.</p></details><details class="blk-troubleshooting__entry"><summary>verified-claim-without-evidence 로 막힌다</summary><p class="blk-troubleshooting__cause"><span>원인</span> confidence를 verified로 적었는데 인용한 출처가 없다.</p><p class="blk-troubleshooting__fix"><span>해결</span> sourceRefs나 evidenceRefs를 채우거나, 근거가 없다면 inferred로 바꾼다.</p></details></div></div></section><section class="section blk-completion-check" id="done"><div class="measure"><h2 class="blk-completion-check__title">완료 확인</h2><pre class="blk-completion-check__check" tabindex="0"><code>pnpm forma render forma.spec.json --out out &amp;&amp; open out/index.html</code></pre><p class="blk-completion-check__expected"><span>이렇게 보이면 성공</span> 브라우저에 문서가 뜨고, 콘솔 오류와 네트워크 요청이 모두 0이다.</p></div></section><section class="section blk-next-task" id="next"><div class="measure"><h2 class="blk-next-task__title">다음에 할 것</h2><ul class="blk-next-task__list"><li><span class="blk-next-task__label">artifact를 manual로 바꿔 절차 문서 만들기</span><span class="blk-next-task__why">같은 내용도 구조와 읽는 순서가 달라진다</span></li><li><span class="blk-next-task__label">pnpm qa 로 4개 뷰포트 검사 돌리기</span><span class="blk-next-task__why">접근성과 가로 오버플로를 자동으로 잡는다</span></li></ul></div></section><section class="section blk-source-note" id="sources"><div class="measure"><h2 class="blk-source-note__title">출처</h2><ul><li><span class="blk-source-note__label">README</span><code class="blk-source-note__locator">README.md</code></li><li><span class="blk-source-note__label">스펙 레퍼런스</span><code class="blk-source-note__locator">skills/forma/references/spec-reference.md</code></li></ul></div></section>
   </main>
-  <aside class="side-toc no-print"><nav class="toc" aria-label="섹션 이동"><a href="#task-map">이 문서로 끝낼 수 있는 것</a><a href="#scope">적용 대상</a><a href="#prereq">시작하기 전에</a><a href="#quick">가장 빠른 경로</a><a href="#step-1">1. 저장소를 받고 의존성을 설치한다</a><a href="#step-2">2. 스펙 뼈대를 만든다</a><a href="#step-3">3. 내용을 채우고 검증한다</a><a href="#checkpoint-1">여기까지 확인</a><a href="#step-4">4. 렌더한다</a><a href="#tree">다음에 무엇을 볼까?</a><a href="#compat">지원 범위</a><a href="#trouble">안 될 때</a><a href="#done">완료 확인</a><a href="#next">다음에 할 것</a><a href="#sources">출처</a></nav></aside>
+  <aside class="side-toc no-print"><nav class="toc" aria-label="섹션 이동"><p class="toc__label" aria-hidden="true">이 문서의 목차</p><a href="#task-map">이 문서로 끝낼 수 있는 것</a><a href="#scope">적용 대상</a><a href="#prereq">시작하기 전에</a><a href="#quick">가장 빠른 경로</a><a href="#step-1">1. 저장소를 받고 의존성을 설치한다</a><a href="#step-2">2. 스펙 뼈대를 만든다</a><a href="#step-3">3. 내용을 채우고 검증한다</a><a href="#checkpoint-1">여기까지 확인</a><a href="#step-4">4. 렌더한다</a><a href="#tree">다음에 무엇을 볼까?</a><a href="#compat">지원 범위</a><a href="#trouble">안 될 때</a><a href="#done">완료 확인</a><a href="#next">다음에 할 것</a><a href="#sources">출처</a></nav></aside>
 </div>
 <footer class="doc no-print">
   <p class="blk-source-note">Forma 0.1.0 · public</p>
@@ -1522,7 +2179,67 @@ pnpm install</code></pre></div><div class="blk-step__command" data-environments=
     if (stored) apply(stored);
   }
 
+
+  /* Simulation. The AST walk below mirrors src/spec/formula.ts exactly:
+     literal, variable, and four operators, nothing else. There is no eval,
+     no Function constructor and no identifier lookup, so a formula authored
+     into a spec cannot reach anything but the declared inputs. */
+  function evalFormula(node, vars, depth) {
+    if (depth > 32) throw new Error("formula too deep");
+    if (node.type === "literal") return node.value;
+    if (node.type === "variable") {
+      const v = vars[node.name];
+      if (v === undefined) throw new Error("undeclared variable");
+      return v;
+    }
+    if (node.type !== "operation") throw new Error("unknown node");
+    const l = evalFormula(node.left, vars, depth + 1);
+    const r = evalFormula(node.right, vars, depth + 1);
+    if (node.operator === "add") return l + r;
+    if (node.operator === "subtract") return l - r;
+    if (node.operator === "multiply") return l * r;
+    if (node.operator === "divide") {
+      if (r === 0) throw new Error("divide by zero");
+      return l / r;
+    }
+    throw new Error("unknown operator");
+  }
+
+  function initSimulations() {
+    for (const panel of document.querySelectorAll("[data-forma-simulation]")) {
+      const inputs = Array.from(panel.querySelectorAll("[data-sim-input]"));
+      const outputs = Array.from(panel.querySelectorAll("[data-sim-output]"));
+      if (inputs.length === 0 || outputs.length === 0) continue;
+
+      const recompute = () => {
+        const vars = {};
+        for (const input of inputs) {
+          const name = input.getAttribute("data-sim-input");
+          vars[name] = Number(input.value);
+          const echo = panel.querySelector('[data-sim-echo="' + name + '"]');
+          if (echo) echo.textContent = String(input.value);
+        }
+        for (const output of outputs) {
+          const precision = Number(output.getAttribute("data-sim-precision") || 2);
+          const unit = output.getAttribute("data-sim-unit") || "";
+          try {
+            const node = JSON.parse(output.getAttribute("data-sim-output"));
+            output.textContent = evalFormula(node, vars, 0).toFixed(precision) + unit;
+          } catch {
+            /* A broken formula leaves the build-time value in place rather
+               than replacing a real number with NaN. */
+          }
+        }
+      };
+
+      for (const input of inputs) input.addEventListener("input", recompute);
+      const fallback = panel.querySelector(".blk-simulation__fallback");
+      if (fallback) fallback.hidden = true;
+    }
+  }
+
   initThemeToggle();
+  initSimulations();
   initEnvSelector();
     initCodeCopy();
     initTocActiveState();

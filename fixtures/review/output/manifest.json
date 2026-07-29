@@ -8,5 +8,6 @@
   "title": "네트워크 재연결 로직 변경 리뷰",
   "language": "ko",
   "sectionCount": 8,
-  "bytes": 172243
+  "bytes": 200049,
+  "externalNetworkRequests": 0
 }

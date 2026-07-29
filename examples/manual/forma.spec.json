@@ -1,0 +1,323 @@
+{
+  "version": "0.2",
+  "meta": {
+    "title": "Agent Skill로 Forma 쓰기",
+    "subtitle": "스킬 설치부터 artifact 고르기까지",
+    "artifact": "manual",
+    "purpose": "operate",
+    "audience": "engineering",
+    "language": "ko",
+    "variant": "procedural",
+    "colorMode": "light",
+    "density": "comfortable",
+    "interaction": "islands",
+    "confidentiality": "public"
+  },
+  "sources": [
+    {
+      "id": "skill",
+      "label": "canonical 스킬",
+      "path": "skills/forma/SKILL.md",
+      "kind": "file"
+    },
+    {
+      "id": "targets",
+      "label": "스킬 동기화 대상 목록",
+      "path": "~/.agents/skill-targets.json",
+      "kind": "file"
+    },
+    {
+      "id": "artifacts",
+      "label": "artifact 계약 문서",
+      "path": "skills/forma/references/artifacts.md",
+      "kind": "note"
+    }
+  ],
+  "narrative": {
+    "question": "Forma를 CLI가 아니라 에이전트로 쓰려면 무엇을 하면 되는가?",
+    "summary": "스킬을 동기화하고, 에이전트에게 자료와 목적을 주고, 나온 spec을 검증한 뒤 렌더한다. 에이전트는 HTML을 쓰지 않는다.",
+    "takeaways": [
+      "스킬은 한 곳에서 편집하고 install-skills가 나머지를 복사한다",
+      "artifact를 고르는 것이 이 작업의 핵심 판단이다",
+      "에이전트 결과물이 이상하면 프롬프트가 아니라 spec을 본다"
+    ]
+  },
+  "sections": [
+    {
+      "id": "task-map",
+      "type": "task-map",
+      "outcomes": [
+        "Codex와 Claude Code가 forma 스킬을 인식하게 만든다",
+        "에이전트가 쓴 forma.spec.json을 하나 받는다",
+        "검증을 통과한 spec을 단일 HTML로 렌더한다"
+      ],
+      "estimatedMinutes": 15
+    },
+    {
+      "id": "scope",
+      "type": "audience-scope",
+      "appliesTo": [
+        "Codex CLI 또는 Claude Code를 쓰는 환경",
+        "forma 저장소를 로컬에 받아둔 상태",
+        "Node 20.19 이상"
+      ],
+      "doesNotCover": [
+        "forma CLI 설치 자체 (fixtures/manual/quickstart 문서에 있다)",
+        "Room Mode 실행과 Decision Freeze",
+        "논리 스킬 4종 분리 배포 (아직 없다)"
+      ]
+    },
+    {
+      "id": "prereq",
+      "type": "prerequisite",
+      "items": [
+        {
+          "label": "forma 저장소와 의존성",
+          "check": "pnpm install"
+        },
+        {
+          "label": "Codex 또는 Claude Code",
+          "check": "codex --version"
+        },
+        {
+          "label": "스킬 동기화 대상 목록",
+          "check": "cat ~/.agents/skill-targets.json",
+          "required": false
+        }
+      ],
+      "sourceRefs": [
+        "targets"
+      ]
+    },
+    {
+      "id": "env",
+      "type": "environment-selector",
+      "label": "쓰는 에이전트",
+      "options": [
+        {
+          "id": "claude",
+          "label": "Claude Code"
+        },
+        {
+          "id": "codex",
+          "label": "Codex"
+        }
+      ]
+    },
+    {
+      "id": "quick",
+      "type": "quick-path",
+      "steps": [
+        "pnpm forma install-skills",
+        "에이전트 세션을 새로 시작한다",
+        "자료 경로와 목적을 주고 spec을 쓰게 한다",
+        "pnpm forma build <spec>"
+      ]
+    },
+    {
+      "id": "step-1",
+      "type": "step",
+      "number": 1,
+      "title": "스킬을 동기화한다",
+      "instruction": "canonical은 `skills/forma/` 하나다. 나머지는 전부 생성된 사본이므로 직접 고치면 다음 동기화에서 덮인다. `~/.agents/skill-targets.json`이 있으면 거기 나열된 경로까지 함께 복사하고, 복사 후 checksum이 같은지 확인한다.",
+      "commands": [
+        {
+          "shell": "pnpm forma install-skills",
+          "runIn": "저장소 루트"
+        }
+      ],
+      "expectedResult": "동기화된 경로가 한 줄씩 출력되고 마지막에 checksum이 모든 사본에서 확인됐다고 나온다.",
+      "ifItFails": "targets 파일의 JSON이 깨졌으면 파싱 오류가 그대로 나온다. 파일을 고치고 다시 실행한다.",
+      "sourceRefs": [
+        "skill",
+        "targets"
+      ]
+    },
+    {
+      "id": "step-2",
+      "type": "step",
+      "number": 2,
+      "title": "세션을 새로 시작한다",
+      "instruction": "스킬 목록은 세션 시작 때 읽힌다. 이미 열려 있던 세션은 방금 복사한 스킬을 보지 못한다.",
+      "expectedResult": "Claude Code에서는 `/forma`가, Codex에서는 `$forma`가 목록에 보인다.",
+      "ifItFails": "경로를 확인한다. Claude Code는 `.claude/skills/`와 `~/.claude/skills/`를, Codex는 작업 디렉터리부터 저장소 루트까지의 `.agents/skills/`와 `~/.agents/skills/`를 읽는다.",
+      "sourceRefs": [
+        "skill"
+      ]
+    },
+    {
+      "id": "step-3",
+      "type": "step",
+      "number": 3,
+      "title": "자료와 목적을 주고 spec을 쓰게 한다",
+      "instruction": "에이전트에게 필요한 것은 두 가지다. 읽을 자료가 어디 있는지, 그리고 읽는 사람이 이 문서로 무엇을 해야 하는지. 두 번째를 빼먹으면 artifact 선택이 어긋난다.",
+      "substeps": [
+        {
+          "label": "자료 경로를 준다. 파일이든 디렉터리든 diff든 된다"
+        },
+        {
+          "label": "목적을 한 문장으로 준다. 감시인지, 판단인지, 실행인지, 설명인지"
+        },
+        {
+          "label": "받은 spec을 사람이 한 번 읽는다. 근거 없는 단정이 있으면 여기서 잡힌다"
+        }
+      ],
+      "expectedResult": "`forma.spec.json` 하나가 생긴다. 에이전트는 HTML이나 CSS를 쓰지 않는다.",
+      "ifItFails": "결과물이 계속 리포트 모양이면 목적 문장이 모호했을 가능성이 크다. 3단계 뒤의 분기표를 본다.",
+      "sourceRefs": [
+        "artifacts"
+      ]
+    },
+    {
+      "id": "checkpoint",
+      "type": "checkpoint",
+      "conditions": [
+        "meta.artifact가 목적과 맞는다",
+        "verified로 표시된 블록마다 sourceRefs가 있다",
+        "narrative.question이 실제 질문 문장이다"
+      ],
+      "ifNotMet": "spec을 고친다. 프롬프트를 다시 쓰는 것보다 빠르고, 무엇이 왜 틀렸는지가 파일에 남는다."
+    },
+    {
+      "id": "step-4",
+      "type": "step",
+      "number": 4,
+      "title": "검증하고 렌더한다",
+      "instruction": "`build`는 렌더와 정적 검사를 한 번에 한다. 검증을 통과하지 못한 spec은 렌더되지 않는다.",
+      "commands": [
+        {
+          "shell": "pnpm forma build forma.spec.json --out out",
+          "runIn": "저장소 루트"
+        }
+      ],
+      "expectedResult": "out/index.html이 생기고, design lint에서 위반 0으로 끝난다.",
+      "ifItFails": "unfilled-role로 막히면 artifact가 요구하는 의미 역할이 비어 있다는 뜻이다. 메시지가 지목한 역할을 채울 블록을 넣는다.",
+      "sourceRefs": [
+        "artifacts"
+      ]
+    },
+    {
+      "id": "which",
+      "type": "decision-tree",
+      "question": "어떤 artifact를 고를까?",
+      "branches": [
+        {
+          "condition": "무엇이 변했고 어디가 문제인지 봐야 한다",
+          "action": "dashboard. 지표와 이상치, 그리고 데이터 기준을 함께 싣는다"
+        },
+        {
+          "condition": "판단과 근거를 남겨야 한다",
+          "action": "report. 주장과 그것을 받치는 근거를 분리해서 쓴다"
+        },
+        {
+          "condition": "읽는 사람이 순서대로 무언가를 해야 한다",
+          "action": "manual. 단계와 확인 지점, 안 될 때의 처방을 쓴다"
+        },
+        {
+          "condition": "여러 사람이 이 문서를 놓고 결정해야 한다",
+          "action": "advanced. 반론과 미해결 항목까지 쓰고, 필요하면 Room Mode로 연다"
+        }
+      ]
+    },
+    {
+      "id": "hosts",
+      "type": "compatibility-matrix",
+      "columns": [
+        "Claude Code",
+        "Codex"
+      ],
+      "rows": [
+        {
+          "id": "invoke",
+          "label": "명시적 호출",
+          "cells": {
+            "Claude Code": "supported",
+            "Codex": "supported"
+          }
+        },
+        {
+          "id": "implicit",
+          "label": "자동 호출 차단",
+          "cells": {
+            "Claude Code": "supported",
+            "Codex": "supported"
+          }
+        },
+        {
+          "id": "namespaced",
+          "label": "논리 스킬 4종 분리",
+          "cells": {
+            "Claude Code": "unsupported",
+            "Codex": "unsupported"
+          }
+        }
+      ],
+      "note": "논리 스킬 4종 분리는 아직 없다. unsupported로 적은 것은 계획이 없다는 뜻이 아니라 지금 동작하지 않는다는 뜻이다. 자동 호출 차단은 호스트마다 넣는 곳이 다르다. Claude Code는 SKILL.md frontmatter의 disable-model-invocation, Codex는 스킬 디렉터리 안의 agents/openai.yaml이다.",
+      "sourceRefs": [
+        "skill"
+      ]
+    },
+    {
+      "id": "version",
+      "type": "version-note",
+      "appliesFrom": "0.2",
+      "note": "논리 스킬 4종 분리 배포는 아직 없다. 지금은 forma 스킬 하나가 네 artifact를 모두 다룬다."
+    },
+    {
+      "id": "trouble",
+      "type": "troubleshooting",
+      "entries": [
+        {
+          "symptom": "install-skills가 checksum 불일치로 실패한다",
+          "cause": "복사 도중 일부 경로가 쓰이지 않았거나, 다른 프로세스가 사본을 덮었다.",
+          "fix": "다시 실행한다. 반복되면 실패한 경로의 권한을 확인한다. 사본을 직접 편집한 경우에도 이 오류가 난다."
+        },
+        {
+          "symptom": "verify-skills가 전역 사본만 오래됐다고 한다",
+          "cause": "다른 체크아웃이나 다른 프로세스가 전역 경로를 다른 canonical로 동기화했다.",
+          "fix": "쓰려는 저장소에서 install-skills를 다시 실행한다. 전역 경로는 여러 프로젝트가 공유하므로 마지막에 쓴 쪽이 이긴다."
+        },
+        {
+          "symptom": "에이전트가 스킬을 못 찾는다",
+          "cause": "세션이 스킬 목록을 이미 읽은 상태다.",
+          "fix": "세션을 새로 시작한다. 그래도 안 보이면 스킬 이름이 부모 디렉터리 이름과 같은지 확인한다. Agent Skills 규격의 요구사항이다."
+        },
+        {
+          "symptom": "결과물이 항상 report 모양으로 나온다",
+          "cause": "목적 문장이 모호해서 artifact 추론이 기본값으로 떨어졌다.",
+          "fix": "meta.artifact를 spec에서 직접 지정한다. 추론에 맡기지 않는 편이 확실하다."
+        }
+      ]
+    },
+    {
+      "id": "done",
+      "type": "completion-check",
+      "check": "pnpm forma verify-skills && pnpm forma build forma.spec.json --out out",
+      "expected": "스킬 사본이 canonical과 일치하고, 렌더된 out/index.html이 design lint를 위반 0으로 통과한다."
+    },
+    {
+      "id": "next",
+      "type": "next-task",
+      "tasks": [
+        {
+          "label": "pnpm qa out 으로 4개 뷰포트와 접근성 검사 돌리기",
+          "why": "가로 오버플로와 대비 미달은 눈으로 잘 안 보인다"
+        },
+        {
+          "label": "artifact를 바꿔 같은 자료로 다시 렌더해보기",
+          "why": "같은 내용이 구조와 읽는 순서에서 어떻게 달라지는지 한 번 보면 선택이 쉬워진다"
+        }
+      ]
+    },
+    {
+      "id": "sources",
+      "type": "source-note",
+      "title": "출처",
+      "sourceRefs": [
+        "skill",
+        "targets",
+        "artifacts"
+      ]
+    }
+  ]
+}

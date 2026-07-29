@@ -279,20 +279,49 @@ program
 
 program
   .command("install-skills")
-  .description("Sync the canonical skill into .agents/skills/forma and .claude/skills/forma")
+  .description("Sync the canonical skill to the repo copies and every machine-wide skill target")
   .action(async () => {
-    const result = await installSkills(process.cwd());
-    for (const target of result.targets) console.log(`forma: synced ${target}`);
-    console.log(
-      "forma: start a new Codex/Claude session if the skill list was already loaded.",
-    );
+    try {
+      const result = await installSkills(process.cwd(), { includeGlobalTargets: true });
+      for (const target of result.targets) console.log(`forma: synced ${target}`);
+      for (const target of result.globalTargets) console.log(`forma: synced ${target}`);
+      if (result.globalTargets.length === 0) {
+        console.log(
+          `forma: no ~/.agents/skill-targets.json — synced the repo copies only.`,
+        );
+      }
+      console.log(`forma: checksum ${result.checksum.slice(0, 12)} verified on every copy`);
+      console.log("forma: start a new Codex/Claude session if the skill list was already loaded.");
+    } catch (error) {
+      exitWithError(error);
+    }
+  });
+
+program
+  .command("build-skills")
+  .description("Generate the Claude Code plugin and Codex skill packages from skills-src/")
+  .option("--out <dir>", "output directory", "dist/skills")
+  .action(async (opts: { out: string }) => {
+    try {
+      const { buildSkills } = await import("../skills/build.js");
+      const result = await buildSkills(process.cwd(), opts.out);
+      console.log(`forma: wrote ${result.fileCount} files to ${result.outDir}`);
+      for (const skill of result.skills) {
+        console.log(`  ${skill.invocation.padEnd(20)} ${skill.dir}`);
+      }
+      console.log("");
+      console.log("forma: Claude Code — install the plugin directory under dist/skills/claude/forma");
+      console.log("forma: Codex — copy dist/skills/codex/* into .agents/skills or ~/.codex/skills");
+    } catch (error) {
+      exitWithError(error);
+    }
   });
 
 program
   .command("verify-skills")
   .description("Check installed skill copies match the canonical checksum")
   .action(async () => {
-    const result = await verifySkills(process.cwd());
+    const result = await verifySkills(process.cwd(), { includeGlobalTargets: true });
     if (result.ok) {
       console.log("forma: installed skills match canonical source");
     } else {

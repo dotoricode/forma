@@ -1,0 +1,7 @@
+{
+  "id": "advanced",
+  "description": "Build a Decision Room: an HTML artifact for a group that has to decide something together. It states the question, maps which claim rests on which evidence, argues the strongest case against, lets the room move the numbers, and records the decision with its dissent. Renders portable with zero network requests, or opens a live local session where participants vote and comment. Explicit invocation only.",
+  "whenToUse": "Invoke only when asked by name. This artifact assumes a real decision with real stakeholders and should not be chosen on its own.",
+  "explicitOnly": true,
+  "license": "MIT"
+}

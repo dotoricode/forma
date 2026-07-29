@@ -1,0 +1,273 @@
+{
+  "version": "0.2",
+  "meta": {
+    "title": "Forma는 왜 spec 우선인가",
+    "subtitle": "에이전트에게 HTML을 쓰게 하지 않는 이유",
+    "artifact": "report",
+    "purpose": "explain",
+    "audience": "engineering",
+    "language": "ko",
+    "variant": "technical",
+    "colorMode": "light",
+    "density": "comfortable",
+    "interaction": "static",
+    "confidentiality": "public"
+  },
+  "sources": [
+    {
+      "id": "schema",
+      "label": "Forma Spec 스키마와 검증기",
+      "path": "src/spec/validate.ts",
+      "kind": "file"
+    },
+    {
+      "id": "registry",
+      "label": "블록 레지스트리",
+      "path": "src/blocks/registry.ts",
+      "kind": "file"
+    },
+    {
+      "id": "qa",
+      "label": "브라우저 QA 결과",
+      "path": "fixtures/*/output/qa",
+      "kind": "log"
+    },
+    {
+      "id": "security",
+      "label": "보안 문서",
+      "path": "docs/security.md",
+      "kind": "note"
+    }
+  ],
+  "narrative": {
+    "question": "왜 에이전트가 HTML을 직접 쓰지 않고 spec만 쓰는가?",
+    "summary": "에이전트가 마크업을 쓰면 품질이 프롬프트 운에 좌우되고 같은 입력이 같은 결과를 내지 않는다. spec만 쓰게 하고 렌더를 결정론적 컴파일러에 맡기면 품질을 코드로 고정할 수 있다.",
+    "takeaways": [
+      "품질 규칙을 프롬프트가 아니라 검증기와 lint에 넣으면 회귀를 테스트로 막을 수 있다",
+      "블록 정의 하나를 추가하면 타입·JSON Schema·허용 목록·dispatch가 전부 파생된다",
+      "대가는 표현의 자유다. 블록 어휘에 없는 것은 만들 수 없다"
+    ]
+  },
+  "sections": [
+    {
+      "id": "cover",
+      "type": "cover",
+      "eyebrow": "설계 기록",
+      "title": "Forma는 왜 spec 우선인가",
+      "subtitle": "에이전트에게 HTML을 쓰게 하지 않는 이유",
+      "meta": ["2026-07-28 기준", "spec 0.2", "공개"]
+    },
+    {
+      "id": "thesis",
+      "type": "thesis",
+      "statement": "에이전트가 HTML을 쓰면 품질은 프롬프트 운에 달리고, 같은 입력이 같은 결과를 내지 않는다.",
+      "qualifier": "spec만 쓰게 하고 렌더를 결정론적 컴파일러에 맡기면 품질 규칙을 코드로 고정하고 테스트로 지킬 수 있다.",
+      "confidence": "inferred",
+      "sourceRefs": ["schema", "registry"]
+    },
+    {
+      "id": "exec",
+      "type": "executive-summary",
+      "body": "Forma의 입력은 `forma.spec.json` 하나다. 에이전트는 무엇을 말할지, 어떤 블록에 담을지, 무엇이 그것을 뒷받침하는지를 쓴다. 색·간격·타이포·레이아웃은 쓰지 않는다. 그건 렌더러가 결정한다.\n\n이 경계가 있으면 \"verified라고 표시했는데 근거가 없다\" 같은 문제를 프롬프트로 부탁하는 대신 검증 오류로 만들 수 있다. 실제로 그렇게 하고 있다.",
+      "figures": [
+        { "label": "블록 정의", "value": "59종" },
+        { "label": "통과 테스트", "value": "242개" },
+        { "label": "산출물 외부 요청", "value": "0건" }
+      ],
+      "sourceRefs": ["registry", "qa"]
+    },
+    {
+      "id": "finding-determinism",
+      "type": "headline-finding",
+      "claim": "같은 spec은 같은 HTML을 낸다. 그래서 렌더 결과를 테스트로 고정할 수 있다.",
+      "detail": "렌더 경로에 모델 호출이 없다. 문법 강조는 Shiki가 토큰화하고, 다이어그램은 spec의 노드 목록에서 SVG를 만들고, 시뮬레이터는 닫힌 산술 AST를 평가한다. 어느 단계도 생성 모델을 부르지 않으므로 출력이 흔들릴 여지가 없다.",
+      "severity": "info",
+      "confidence": "verified",
+      "sourceRefs": ["schema", "registry"]
+    },
+    {
+      "id": "evidence",
+      "type": "evidence-stack",
+      "title": "무엇이 이 판단을 뒷받침하나",
+      "supports": "finding-determinism",
+      "items": [
+        {
+          "summary": "품질 규칙이 검증기에 들어가 있다",
+          "detail": "verified로 표시한 주장이 근거를 인용하지 않으면 렌더 전에 막힌다. dashboard가 지표를 실으면서 데이터 기준 블록이 없으면 막힌다. 이건 요청이 아니라 오류다.",
+          "confidence": "verified",
+          "sourceRef": "schema"
+        },
+        {
+          "summary": "블록을 추가하면 파생물이 전부 따라온다",
+          "detail": "정의 하나를 레지스트리 배열에 넣으면 union 타입, JSON Schema, artifact 허용 목록, 렌더 dispatch가 함께 생긴다. 최소 fixture를 테스트에 넣지 않으면 테스트가 실패한다. 의도한 가드다.",
+          "confidence": "verified",
+          "sourceRef": "registry"
+        },
+        {
+          "summary": "산출물이 네트워크에 나가지 않는 것을 브라우저에서 측정한다",
+          "detail": "fixture 8종을 4뷰포트로 열어 document 이외의 요청을 세고, 하나라도 있으면 실패한다. 주장이 아니라 게이트다.",
+          "confidence": "verified",
+          "sourceRef": "qa"
+        }
+      ]
+    },
+    {
+      "id": "finding-cost",
+      "type": "headline-finding",
+      "claim": "대가는 표현의 자유다. 블록 어휘에 없는 것은 만들 수 없다.",
+      "detail": "에이전트가 \"여기에 이런 도표가 있으면 좋겠다\"고 판단해도 해당 블록이 없으면 넣을 방법이 없다. 근사치로 흉내내는 것도 금지돼 있다. 잘못된 모양이 검증을 통과하는 것이 명확한 실패보다 나쁘기 때문이다. 그래서 블록 어휘를 넓히는 일이 이 프로젝트의 주된 작업이 된다.",
+      "severity": "medium",
+      "confidence": "verified",
+      "sourceRefs": ["registry"]
+    },
+    {
+      "id": "options",
+      "type": "option-comparison",
+      "title": "선택지",
+      "criteria": ["결과 재현성", "품질 관리 지점", "표현 자유도", "새 표현 추가 비용"],
+      "options": [
+        {
+          "id": "a",
+          "label": "A. 에이전트가 HTML/CSS 직접 생성",
+          "cells": {
+            "결과 재현성": "낮음 — 같은 입력이 다른 결과",
+            "품질 관리 지점": "프롬프트뿐",
+            "표현 자유도": "매우 높음",
+            "새 표현 추가 비용": "없음"
+          }
+        },
+        {
+          "id": "b",
+          "label": "B. 템플릿 채우기",
+          "cells": {
+            "결과 재현성": "높음",
+            "품질 관리 지점": "템플릿",
+            "표현 자유도": "매우 낮음 — 템플릿 수만큼",
+            "새 표현 추가 비용": "템플릿 신규 작성"
+          }
+        },
+        {
+          "id": "c",
+          "label": "C. spec 우선 컴파일 (현재)",
+          "cells": {
+            "결과 재현성": "높음 — 모델 호출 0",
+            "품질 관리 지점": "검증기·lint·테스트",
+            "표현 자유도": "블록 어휘 범위",
+            "새 표현 추가 비용": "블록 정의 1개 + 최소 fixture"
+          }
+        }
+      ]
+    },
+    {
+      "id": "matrix",
+      "type": "decision-matrix",
+      "title": "가중치 적용",
+      "criteria": [
+        { "id": "repro", "label": "결과 재현성", "weight": 3 },
+        { "id": "control", "label": "품질을 코드로 고정할 수 있는가", "weight": 3 },
+        { "id": "freedom", "label": "표현 자유도", "weight": 1 }
+      ],
+      "options": [
+        { "id": "a", "label": "A. 직접 생성", "scores": { "repro": 1, "control": 1, "freedom": 5 } },
+        { "id": "b", "label": "B. 템플릿", "scores": { "repro": 5, "control": 3, "freedom": 1 } },
+        { "id": "c", "label": "C. spec 우선", "scores": { "repro": 5, "control": 5, "freedom": 3 } }
+      ],
+      "note": "자유도에 가중치 1을 준 것이 이 표의 결론을 사실상 정한다. 내부 기술 문서를 다루는 도구라서 재현성과 통제를 우선한 판단이고, 다른 용도라면 가중치가 달라질 수 있다."
+    },
+    {
+      "id": "recommendation",
+      "type": "recommendation",
+      "statement": "spec 우선을 유지하고, 표현이 부족할 때는 프롬프트를 고치지 말고 블록을 추가한다.",
+      "rationale": "블록 추가 비용이 정의 하나와 최소 fixture 하나로 낮게 유지되고 있다. 이 비용이 낮은 동안에는 자유도 손실을 어휘 확장으로 갚는 것이 재현성을 포기하는 것보다 싸다.",
+      "conditions": [
+        "블록 추가 비용이 올라가면 다시 판단한다. 정의 하나가 여러 파일을 건드리게 되는 순간이 신호다",
+        "마케팅 페이지처럼 표현이 목적인 산출물에는 이 판단을 적용하지 않는다"
+      ],
+      "sourceRefs": ["registry"]
+    },
+    {
+      "id": "implication",
+      "type": "implication",
+      "entries": [
+        {
+          "audience": "에이전트를 쓰는 사람",
+          "effect": "결과물이 마음에 안 들 때 고칠 곳은 프롬프트가 아니라 spec이거나 블록이다."
+        },
+        {
+          "audience": "블록을 추가하는 사람",
+          "effect": "최소 fixture를 테스트에 넣지 않으면 테스트가 실패한다. 우회하지 말고 fixture를 쓰면 된다."
+        },
+        {
+          "audience": "문서를 받는 사람",
+          "effect": "manifest에 spec 해시와 외부 요청 수가 적혀 있어 받은 파일을 직접 검증할 수 있다."
+        }
+      ]
+    },
+    {
+      "id": "risks",
+      "type": "risk-register",
+      "risks": [
+        {
+          "id": "r1",
+          "description": "블록 어휘가 커지면서 스타일시트 전체가 모든 문서에 실린다",
+          "likelihood": "high",
+          "impact": "medium",
+          "mitigation": "실측 중이다. 현재 dashboard 산출물에서 CSS가 35.8%를 차지한다. 쓰는 블록만 싣는 방식이 필요한지 판단할 근거를 모으고 있다",
+          "owner": "미정"
+        },
+        {
+          "id": "r2",
+          "description": "블록이 없어서 표현하지 못한 것을 에이전트가 근사치로 흉내낸다",
+          "likelihood": "medium",
+          "impact": "high",
+          "mitigation": "스킬 문서에 금지로 명시하고, 지원하지 않는 artifact를 report로 fallback시키는 것도 막았다",
+          "owner": "미정"
+        }
+      ]
+    },
+    {
+      "id": "actions",
+      "type": "action-plan",
+      "items": [
+        {
+          "id": "a1",
+          "label": "스타일시트를 문서가 쓰는 블록만 싣도록 만들 수 있는지 확인",
+          "owner": "미정",
+          "blocking": false
+        },
+        {
+          "id": "a2",
+          "label": "후보 축 4개를 렌더러에 연결해 Visual Tournament를 실제 비교로 만들기",
+          "owner": "미정",
+          "blocking": false
+        }
+      ]
+    },
+    {
+      "id": "ledger",
+      "type": "source-ledger",
+      "entries": [
+        {
+          "sourceRef": "schema",
+          "covers": "검증 규칙과 계약 검사",
+          "limits": "규칙이 잡는 것만 잡는다. 내용의 진위는 검사하지 않는다"
+        },
+        {
+          "sourceRef": "registry",
+          "covers": "블록 59종의 정의와 artifact별 허용 목록",
+          "limits": "현재 상태 기준이며 계속 늘어난다"
+        },
+        {
+          "sourceRef": "qa",
+          "covers": "fixture 8종의 브라우저·접근성·오프라인 측정",
+          "limits": "커밋된 산출물을 검사한다. 재렌더하지 않으므로 렌더러 변경 후에는 직접 재렌더해야 한다"
+        },
+        {
+          "sourceRef": "security",
+          "covers": "네트워크 자세와 Room Mode의 예외",
+          "limits": "설계 의도의 기록이며 감사 보고서가 아니다"
+        }
+      ]
+    }
+  ]
+}

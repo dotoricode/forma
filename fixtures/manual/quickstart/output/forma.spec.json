@@ -14,18 +14,8 @@
     "confidentiality": "public"
   },
   "sources": [
-    {
-      "id": "readme",
-      "label": "README",
-      "path": "README.md",
-      "kind": "file"
-    },
-    {
-      "id": "spec-ref",
-      "label": "스펙 레퍼런스",
-      "path": "skills/forma/references/spec-reference.md",
-      "kind": "file"
-    }
+    { "id": "readme", "label": "README", "path": "README.md", "kind": "file" },
+    { "id": "spec-ref", "label": "스펙 레퍼런스", "path": "skills/forma/references/spec-reference.md", "kind": "file" }
   ],
   "narrative": {
     "question": "Forma로 첫 문서를 어떻게 만드나?",
@@ -39,7 +29,6 @@
   "sections": [
     {
       "id": "task-map",
-      "sourceRefs": [],
       "type": "task-map",
       "outcomes": [
         "Forma를 로컬에 설치한다",
@@ -50,13 +39,8 @@
     },
     {
       "id": "scope",
-      "sourceRefs": [],
       "type": "audience-scope",
-      "appliesTo": [
-        "Node 20.19 이상",
-        "pnpm 사용 환경",
-        "macOS / Linux / Windows"
-      ],
+      "appliesTo": ["Node 20.19 이상", "pnpm 사용 환경", "macOS / Linux / Windows"],
       "doesNotCover": [
         "Agent Skill 설치와 호출 (별도 문서)",
         "Decision Room 실행",
@@ -65,47 +49,25 @@
     },
     {
       "id": "prereq",
-      "sourceRefs": [
-        "readme"
-      ],
       "type": "prerequisite",
       "items": [
-        {
-          "label": "Node 20.19 이상",
-          "check": "node --version",
-          "required": true
-        },
-        {
-          "label": "pnpm 10 이상",
-          "check": "pnpm --version",
-          "required": true
-        },
-        {
-          "label": "Playwright 브라우저",
-          "check": "pnpm exec playwright install chromium",
-          "required": false
-        }
-      ]
+        { "label": "Node 20.19 이상", "check": "node --version" },
+        { "label": "pnpm 10 이상", "check": "pnpm --version" },
+        { "label": "Playwright 브라우저", "check": "pnpm exec playwright install chromium", "required": false }
+      ],
+      "sourceRefs": ["readme"]
     },
     {
       "id": "env",
-      "sourceRefs": [],
       "type": "environment-selector",
       "label": "운영체제",
       "options": [
-        {
-          "id": "unix",
-          "label": "macOS / Linux"
-        },
-        {
-          "id": "win",
-          "label": "Windows"
-        }
+        { "id": "unix", "label": "macOS / Linux" },
+        { "id": "win", "label": "Windows" }
       ]
     },
     {
       "id": "quick",
-      "sourceRefs": [],
       "type": "quick-path",
       "steps": [
         "pnpm install",
@@ -115,87 +77,44 @@
     },
     {
       "id": "step-1",
-      "sourceRefs": [],
       "type": "step",
       "number": 1,
       "title": "저장소를 받고 의존성을 설치한다",
       "instruction": "Forma는 아직 npm에 배포되지 않았다. 저장소를 받아서 로컬에서 쓴다.",
-      "environments": [],
       "commands": [
-        {
-          "shell": "git clone https://github.com/dotoricode/forma.git\ncd forma\npnpm install",
-          "runIn": "터미널",
-          "requiresElevation": false,
-          "environments": [
-            "unix"
-          ]
-        },
-        {
-          "shell": "git clone https://github.com/dotoricode/forma.git; cd forma; pnpm install",
-          "runIn": "PowerShell",
-          "requiresElevation": false,
-          "environments": [
-            "win"
-          ]
-        }
+        { "shell": "git clone https://github.com/dotoricode/forma.git\ncd forma\npnpm install", "runIn": "터미널", "environments": ["unix"] },
+        { "shell": "git clone https://github.com/dotoricode/forma.git; cd forma; pnpm install", "runIn": "PowerShell", "environments": ["win"] }
       ],
-      "substeps": [],
       "expectedResult": "node_modules/ 가 생기고 설치 오류가 없다.",
       "onFailure": "pnpm이 없으면 corepack enable 을 먼저 실행한다."
     },
     {
       "id": "step-2",
-      "sourceRefs": [],
       "type": "step",
       "number": 2,
       "title": "스펙 뼈대를 만든다",
       "instruction": "`forma init`이 완결된 리포트 뼈대를 하나 써준다. 두 블록짜리 스케치가 아니라 계약을 충족하는 최소 문서다.",
-      "environments": [],
-      "commands": [
-        {
-          "shell": "pnpm forma init",
-          "runIn": "저장소 루트",
-          "requiresElevation": false,
-          "environments": []
-        }
-      ],
-      "substeps": [],
+      "commands": [{ "shell": "pnpm forma init", "runIn": "저장소 루트" }],
       "expectedResult": "현재 디렉터리에 forma.spec.json 이 생긴다.",
       "verification": "cat forma.spec.json 으로 열어보면 version이 0.2이고 sections에 6개 블록이 있다."
     },
     {
       "id": "step-3",
-      "sourceRefs": [],
       "type": "step",
       "number": 3,
       "title": "내용을 채우고 검증한다",
       "instruction": "placeholder 문구를 실제 내용으로 바꾼다. 각 블록이 어떤 자리를 차지하는지는 placeholder가 그대로 말해준다. 다 쓰면 검증한다.",
-      "environments": [],
-      "commands": [
-        {
-          "shell": "pnpm forma validate forma.spec.json",
-          "runIn": "저장소 루트",
-          "requiresElevation": false,
-          "environments": []
-        }
-      ],
+      "commands": [{ "shell": "pnpm forma validate forma.spec.json", "runIn": "저장소 루트" }],
       "substeps": [
-        {
-          "label": "cover 블록의 title을 실제 문서 제목으로"
-        },
-        {
-          "label": "narrative의 question과 summary를 채운다"
-        },
-        {
-          "label": "finding, recommendation, actions를 실제 내용으로"
-        }
+        { "label": "cover 블록의 title을 실제 문서 제목으로" },
+        { "label": "narrative의 question과 summary를 채운다" },
+        { "label": "finding, recommendation, actions를 실제 내용으로" }
       ],
       "expectedResult": "`forma: <path> is a valid Forma spec` 이 출력된다.",
       "onFailure": "실패 메시지가 어떤 역할이 비었는지 지목한다. 예를 들어 권고가 없으면 recommendation 역할이 비었다고 나온다."
     },
     {
       "id": "checkpoint-1",
-      "sourceRefs": [],
       "type": "checkpoint",
       "conditions": [
         "forma.spec.json 이 검증을 통과한다",
@@ -206,94 +125,42 @@
     },
     {
       "id": "step-4",
-      "sourceRefs": [],
       "type": "step",
       "number": 4,
       "title": "렌더한다",
       "instruction": "검증을 통과한 스펙만 렌더된다. 결과는 폰트까지 포함된 단일 HTML이다.",
-      "environments": [],
-      "commands": [
-        {
-          "shell": "pnpm forma render forma.spec.json --out out",
-          "runIn": "저장소 루트",
-          "requiresElevation": false,
-          "environments": []
-        }
-      ],
-      "substeps": [],
+      "commands": [{ "shell": "pnpm forma render forma.spec.json --out out", "runIn": "저장소 루트" }],
       "expectedResult": "out/index.html 이 생기고 바이트 수가 출력된다. 대개 150~190KB 사이인데 7할이 임베딩된 폰트다.",
       "verification": "브라우저로 out/index.html 을 열고 개발자 도구 Network 탭에서 요청이 0건인지 본다."
     },
     {
       "id": "tree",
-      "sourceRefs": [],
       "type": "decision-tree",
       "question": "다음에 무엇을 볼까?",
       "branches": [
-        {
-          "condition": "어떤 블록을 쓸 수 있는지 알고 싶다",
-          "action": "블록 목록과 각 블록의 용도를 본다"
-        },
-        {
-          "condition": "결과물이 계속 리포트처럼만 나온다",
-          "action": "meta.artifact를 manual이나 dashboard로 바꾼다"
-        },
-        {
-          "condition": "브라우저에서 깨져 보인다",
-          "action": "아래 문제 해결로 간다",
-          "goTo": "trouble"
-        }
+        { "condition": "어떤 블록을 쓸 수 있는지 알고 싶다", "action": "블록 목록과 각 블록의 용도를 본다" },
+        { "condition": "결과물이 계속 리포트처럼만 나온다", "action": "meta.artifact를 manual이나 dashboard로 바꾼다" },
+        { "condition": "브라우저에서 깨져 보인다", "action": "아래 문제 해결로 간다", "goTo": "trouble" }
       ]
     },
     {
       "id": "compat",
-      "sourceRefs": [],
       "type": "compatibility-matrix",
-      "columns": [
-        "Chrome 120+",
-        "Safari 17+",
-        "Firefox 121+"
-      ],
+      "columns": ["Chrome 120+", "Safari 17+", "Firefox 121+"],
       "rows": [
-        {
-          "id": "core",
-          "label": "본문·표·다이어그램",
-          "cells": {
-            "Chrome 120+": "supported",
-            "Safari 17+": "supported",
-            "Firefox 121+": "supported"
-          }
-        },
-        {
-          "id": "subgrid",
-          "label": "test-matrix subgrid 정렬",
-          "cells": {
-            "Chrome 120+": "supported",
-            "Safari 17+": "supported",
-            "Firefox 121+": "partial"
-          }
-        },
-        {
-          "id": "clamp",
-          "label": "목차 2줄 클램프",
-          "cells": {
-            "Chrome 120+": "supported",
-            "Safari 17+": "supported",
-            "Firefox 121+": "supported"
-          }
-        }
+        { "id": "core", "label": "본문·표·다이어그램", "cells": { "Chrome 120+": "supported", "Safari 17+": "supported", "Firefox 121+": "supported" } },
+        { "id": "subgrid", "label": "test-matrix subgrid 정렬", "cells": { "Chrome 120+": "supported", "Safari 17+": "supported", "Firefox 121+": "partial" } },
+        { "id": "clamp", "label": "목차 2줄 클램프", "cells": { "Chrome 120+": "supported", "Safari 17+": "supported", "Firefox 121+": "supported" } }
       ]
     },
     {
       "id": "version",
-      "sourceRefs": [],
       "type": "version-note",
       "appliesFrom": "0.2",
       "note": "0.1 스펙도 그대로 렌더된다. 읽을 때 자동 변환되고 계약 검사는 면제된다."
     },
     {
       "id": "trouble",
-      "sourceRefs": [],
       "type": "troubleshooting",
       "entries": [
         {
@@ -315,29 +182,20 @@
     },
     {
       "id": "done",
-      "sourceRefs": [],
       "type": "completion-check",
       "check": "pnpm forma render forma.spec.json --out out && open out/index.html",
       "expected": "브라우저에 문서가 뜨고, 콘솔 오류와 네트워크 요청이 모두 0이다."
     },
     {
       "id": "next",
-      "sourceRefs": [],
       "type": "next-task",
       "tasks": [
-        {
-          "label": "artifact를 manual로 바꿔 절차 문서 만들기",
-          "why": "같은 내용도 구조와 읽는 순서가 달라진다"
-        },
-        {
-          "label": "pnpm qa 로 4개 뷰포트 검사 돌리기",
-          "why": "접근성과 가로 오버플로를 자동으로 잡는다"
-        }
+        { "label": "artifact를 manual로 바꿔 절차 문서 만들기", "why": "같은 내용도 구조와 읽는 순서가 달라진다" },
+        { "label": "pnpm qa 로 4개 뷰포트 검사 돌리기", "why": "접근성과 가로 오버플로를 자동으로 잡는다" }
       ]
     },
     {
       "id": "sources",
-      "sourceRefs": [],
       "type": "source-note",
       "title": "출처"
     }
