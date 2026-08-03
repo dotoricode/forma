@@ -1,12 +1,15 @@
 /**
- * Agent Skill installation Module.
+ * Agent Skill installation.
  *
- * Callers choose a host and scope. This Module owns package generation,
- * runtime discovery metadata, safe replacement, host installation, and
- * verification. Host-specific behavior lives behind the Codex filesystem and
- * Claude plugin Adapters rather than leaking into the CLI or README.
+ * Callers choose a host and scope. This module owns package generation,
+ * runtime discovery metadata, safe replacement, installation, and
+ * verification.
+ *
+ * Installing is a file copy for both hosts. It shells out to nothing, which
+ * is why there is no command seam here any more: that existed only to drive
+ * `claude plugin marketplace add`, and the plugin went away with the
+ * per-artifact skills.
  */
-import { execFile } from "node:child_process";
 import { createHash } from "node:crypto";
 import {
   cp,
@@ -23,19 +26,28 @@ import { buildSkills, DEFAULT_SKILLS_OUT } from "./build.js";
 
 export type InstallHost = "codex" | "claude";
 export type InstallScope = "user" | "project" | "local";
-export type CommandRunner = (command: string, args: string[]) => Promise<void>;
 
 export const SKILL_TARGETS_FILE = ".agents/skill-targets.json";
 export const RUNTIME_FILE = ".forma-runtime.json";
 export const CHECKSUM_FILE = ".forma-skill-checksum.json";
-export const SKILL_NAMES = [
+/**
+ * One skill. It used to be four, one per artifact, until the artifact choice
+ * moved inside the skill as a proposal the user agrees to. Four entries in a
+ * skill list that all do the same job made the caller pick the artifact
+ * before reading anything, which is the decision they are least equipped to
+ * make up front.
+ */
+export const SKILL_NAMES = ["forma"] as const;
+/** Skill directories earlier releases installed and this one replaces. */
+const LEGACY_SKILL_NAMES = new Set([
   "forma-advanced",
   "forma-dashboard",
   "forma-manual",
   "forma-report",
-] as const;
+]);
+
 /**
- * Checksums emitted by compatibility-router releases that are safe to remove.
+ * Checksums emitted by superseded releases that are safe to remove.
  * Unknown checksums are always preserved and reported.
  */
 const LEGACY_GENERATED_CHECKSUMS = new Set([
@@ -51,8 +63,6 @@ export interface InstallOptions {
   targetRoots?: string[];
   /** Repo-local generated copies can discover the checkout by walking upward. */
   includeRuntimeMetadata?: boolean;
-  /** Injected at the Claude command seam. */
-  runCommand?: CommandRunner;
 }
 
 export interface InstalledSkill {
@@ -89,50 +99,21 @@ export async function installAgentSkills(
   const built = await buildSkills(runtimeDir, outDir);
   const buildRoot = path.resolve(runtimeDir, outDir);
 
-  if (options.host === "claude") {
-    const pluginRoot = path.join(buildRoot, "claude", "forma");
-    await writeRuntimeMetadata(pluginRoot, runtimeDir);
-    const runCommand = options.runCommand ?? runExternalCommand;
-    const marketplaceRoot = path.join(buildRoot, "claude");
-    await runCommand("claude", ["plugin", "validate", marketplaceRoot]);
-    await runCommand("claude", [
-      "plugin",
-      "marketplace",
-      "add",
-      marketplaceRoot,
-      "--scope",
-      scope,
-    ]);
-    await runCommand("claude", [
-      "plugin",
-      "install",
-      "forma@forma",
-      "--scope",
-      scope,
-    ]);
-    return {
-      host: "claude",
-      scope,
-      runtimeDir,
-      skills: built.skills
-        .filter((skill) => skill.host === "claude")
-        .map((skill) => ({
-          name: skill.name,
-          invocation: skill.invocation,
-          path: path.join(pluginRoot, "skills", skill.name),
-        })),
-      removedLegacy: [],
-      preservedLegacy: [],
-    };
-  }
+  // Both hosts install the same way now: copy the built skill directory into
+  // the roots that host reads. Claude used to go through `claude plugin
+  // marketplace add` because a plugin was the only way to namespace four
+  // skills under one name. With a single skill the namespace bought nothing
+  // and cost the bare `/forma`.
+  const hostDir = options.host;
 
   const targetRoots =
-    options.targetRoots ?? [defaultCodexTarget(runtimeDir, options.home ?? homedir(), scope)];
+    options.targetRoots ??
+    [defaultTargetRoot(options.host, runtimeDir, options.home ?? homedir(), scope)];
   if (targetRoots.length === 0) {
-    throw new Error("forma: Codex installation needs at least one skill target");
+    throw new Error(`forma: ${options.host} installation needs at least one skill target`);
   }
 
-  const sourceRoot = path.join(buildRoot, "codex");
+  const sourceRoot = path.join(buildRoot, hostDir);
   const prepared = await prepareCodexPackages(
     sourceRoot,
     options.includeRuntimeMetadata === false ? null : runtimeDir,
@@ -156,11 +137,11 @@ export async function installAgentSkills(
   }
 
   return {
-    host: "codex",
+    host: options.host,
     scope,
     runtimeDir,
     skills: built.skills
-      .filter((skill) => skill.host === "codex")
+      .filter((skill) => skill.host === options.host)
       .map((skill) => ({
         name: skill.name,
         invocation: skill.invocation,
@@ -352,6 +333,20 @@ async function listFiles(dir: string): Promise<string[]> {
   return files.sort();
 }
 
+/**
+ * Cleans up the per-artifact skills a previous release installed.
+ *
+ * The direction of this check reversed. It used to hunt for a directory named
+ * `forma` — the old single router — because the release that replaced it
+ * shipped four `forma-<artifact>` skills. Those four are now the legacy set
+ * and `forma` is the current skill, so looking for `forma` here would delete
+ * what we are installing.
+ *
+ * A directory is only removed when its recorded checksum proves Forma
+ * generated it. Anything a person edited is preserved and reported, because
+ * silently deleting someone else's work to make room is worse than leaving a
+ * stale skill in the list.
+ */
 async function inspectLegacyRouters(
   cwd: string,
   targetRoots: string[],
@@ -360,19 +355,30 @@ async function inspectLegacyRouters(
   const removed: string[] = [];
   const preserved: string[] = [];
   for (const targetRoot of targetRoots) {
-    const legacy = path.join(targetRoot, "forma");
-    if (!(await exists(legacy))) continue;
-    const recorded = await readRecordedChecksum(legacy);
-    if (
-      recorded !== null &&
-      (recorded === expected || LEGACY_GENERATED_CHECKSUMS.has(recorded))
-    ) {
-      removed.push(legacy);
-    } else {
-      preserved.push(legacy);
+    const entries = await readdir(targetRoot, { withFileTypes: true }).catch(() => []);
+    for (const entry of entries) {
+      if (!entry.isDirectory() || !LEGACY_SKILL_NAMES.has(entry.name)) continue;
+      const legacy = path.join(targetRoot, entry.name);
+      const recorded = await readRecordedChecksum(legacy);
+      // Self-consistency is the proof, not a pinned hash. A directory whose
+      // contents still hash to its own recorded checksum was written by Forma
+      // and has not been touched since, whatever release produced it. Pinning
+      // known hashes only worked until the generated content changed, which
+      // is how four generated skills ended up "preserved" and cluttering the
+      // skill list. An edited copy no longer matches and is left alone.
+      const untouched =
+        recorded !== null &&
+        (recorded === expected ||
+          LEGACY_GENERATED_CHECKSUMS.has(recorded) ||
+          recorded === (await hashDirectory(legacy)));
+      if (untouched) {
+        removed.push(legacy);
+      } else {
+        preserved.push(legacy);
+      }
     }
   }
-  return { removed, preserved };
+  return { removed: removed.sort(), preserved: preserved.sort() };
 }
 
 async function legacySourceChecksum(cwd: string): Promise<string | null> {
@@ -387,7 +393,15 @@ async function legacySourceChecksum(cwd: string): Promise<string | null> {
   return hash.digest("hex");
 }
 
-function defaultCodexTarget(cwd: string, home: string, scope: InstallScope): string {
+function defaultTargetRoot(
+  host: InstallHost,
+  cwd: string,
+  home: string,
+  scope: InstallScope,
+): string {
+  if (host === "claude") {
+    return scope === "user" ? path.join(home, ".claude/skills") : path.join(cwd, ".claude/skills");
+  }
   return scope === "user" ? path.join(home, ".codex/skills") : path.join(cwd, ".agents/skills");
 }
 
@@ -408,15 +422,3 @@ async function exists(target: string): Promise<boolean> {
   );
 }
 
-const runExternalCommand: CommandRunner = async (command, args) => {
-  await new Promise<void>((resolve, reject) => {
-    execFile(command, args, (error, stdout, stderr) => {
-      if (!error) {
-        resolve();
-        return;
-      }
-      const detail = stderr.trim() || stdout.trim() || error.message;
-      reject(new Error(`forma: ${command} ${args.join(" ")} failed — ${detail}`));
-    });
-  });
-};

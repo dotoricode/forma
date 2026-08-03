@@ -1,7 +1,0 @@
-{
-  "id": "dashboard",
-  "description": "Build a Signal Grid dashboard: a dense, numeric, state-first HTML artifact that answers what changed, how much, and where the problem is. Use for release gates, health checks, metric reviews, incident status, and any request to monitor or diagnose a system from its numbers. Renders to a single offline file that makes no network requests. Do not use for prose explanations, procedures, or decision write-ups.",
-  "whenToUse": "Trigger on: dashboard, release gate, health check, metrics, KPI, anomaly, what changed, is it safe to ship, crash rate, pass rate, current status, monitoring, diagnose a regression.",
-  "explicitOnly": false,
-  "license": "MIT"
-}

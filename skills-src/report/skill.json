@@ -1,7 +1,0 @@
-{
-  "id": "report",
-  "description": "Build an Editorial Brief report: a conclusion-first HTML artifact that states a judgement, separates the claims from the evidence that backs them, weighs the alternatives, and records the risks. Use for technical reviews, postmortems, architecture assessments, executive summaries, and any request to explain or decide something in writing. Renders to a single offline file that makes no network requests.",
-  "whenToUse": "Trigger on: report, review, postmortem, assessment, findings, recommendation, should we, write this up, explain the tradeoffs, executive summary, root cause.",
-  "explicitOnly": false,
-  "license": "MIT"
-}

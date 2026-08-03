@@ -8,8 +8,6 @@
 import { cp, mkdir, readFile, rm, writeFile } from "node:fs/promises";
 import path from "node:path";
 import {
-  emitClaudeMarketplaceManifest,
-  emitClaudePluginManifest,
   emitForHost,
   type EmittedSkill,
   type Host,
@@ -43,19 +41,10 @@ export async function buildSkills(cwd: string, outDir = DEFAULT_SKILLS_OUT): Pro
   let fileCount = 0;
 
   for (const host of HOSTS) {
-    // Claude gets one plugin directory containing every skill; Codex gets one
-    // directory per skill at the top level.
-    const hostRoot = host === "claude" ? path.join(root, host, "forma") : path.join(root, host);
+    // Both hosts now get one directory per skill at the top level. Claude
+    // stopped being a plugin when Forma collapsed to a single skill.
+    const hostRoot = path.join(root, host);
     await mkdir(hostRoot, { recursive: true });
-
-    if (host === "claude") {
-      const manifest = emitClaudePluginManifest(sources);
-      await writeOne(hostRoot, manifest.path, manifest.contents);
-      fileCount += 1;
-      const marketplace = emitClaudeMarketplaceManifest();
-      await writeOne(path.join(root, host), marketplace.path, marketplace.contents);
-      fileCount += 1;
-    }
 
     for (const source of sources) {
       const emitted = emitForHost(host, source);
@@ -79,11 +68,6 @@ export async function buildSkills(cwd: string, outDir = DEFAULT_SKILLS_OUT): Pro
   return { outDir, skills, fileCount };
 }
 
-async function writeOne(root: string, relativePath: string, contents: string): Promise<void> {
-  const target = path.join(root, relativePath);
-  await mkdir(path.dirname(target), { recursive: true });
-  await writeFile(target, contents, "utf-8");
-}
 
 export class SkillBuildError extends Error {}
 
@@ -134,7 +118,7 @@ export async function verifyBuiltSkills(cwd: string, outDir = DEFAULT_SKILLS_OUT
   const issues: string[] = [];
   const root = path.resolve(cwd, outDir);
   for (const host of HOSTS) {
-    const hostRoot = host === "claude" ? path.join(root, host, "forma") : path.join(root, host);
+    const hostRoot = path.join(root, host);
     for (const source of sources) {
       const emitted = emitForHost(host, source);
       const skillMd = emitted.files.find((file) => file.path.endsWith("SKILL.md"))!;
@@ -147,14 +131,6 @@ export async function verifyBuiltSkills(cwd: string, outDir = DEFAULT_SKILLS_OUT
         issues.push(`${host}: ${skillMd.path} differs from skills-src — re-run build-skills`);
       }
     }
-  }
-  const marketplace = emitClaudeMarketplaceManifest();
-  const marketplaceOnDisk = await readFile(
-    path.join(root, "claude", marketplace.path),
-    "utf-8",
-  ).catch(() => null);
-  if (marketplaceOnDisk !== marketplace.contents) {
-    issues.push("claude: marketplace manifest is missing or differs from skills-src");
   }
   return issues;
 }

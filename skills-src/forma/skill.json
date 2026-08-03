@@ -1,0 +1,7 @@
+{
+  "id": "forma",
+  "description": "Turn complex work into clear, self-contained HTML artifacts: dashboards, reports, manuals, and decision rooms. Reads source material, proposes which kind of document to build and why, agrees it with you, then writes a forma.spec.json that a deterministic renderer compiles into one offline file with zero network requests. Use to understand, review, verify, present, or explain technical material visually. Not for marketing pages or web-app UI.",
+  "whenToUse": "Trigger on: visualize this, explain this, write this up, review, report, dashboard, metrics, runbook, guide, quickstart, troubleshooting, postmortem, assessment, decision, turn these notes into a document, make this readable.",
+  "explicitOnly": false,
+  "license": "MIT"
+}

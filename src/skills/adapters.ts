@@ -14,7 +14,6 @@
 import {
   MAX_DESCRIPTION,
   MAX_NAME,
-  SKILL_NAMESPACE,
   SKILL_NAME_PATTERN,
   type SkillSource,
 } from "./source.js";
@@ -90,14 +89,18 @@ function copies(source: SkillSource, prefix: string): EmittedFile[] {
 }
 
 /**
- * Claude Code: one plugin directory whose skills live under `skills/<id>/`.
- * The frontmatter `name` is the bare id, and the plugin name supplies the
- * prefix, so the command is `/forma:<id>`.
+ * Claude Code: a plain skill directory, not a plugin.
+ *
+ * A plugin namespaces its skills as `plugin:skill`, which for a single skill
+ * called `forma` inside a plugin called `forma` would read `/forma:forma`.
+ * Forma now ships one skill that proposes the artifact itself, so there is
+ * nothing left for a namespace to disambiguate and the bare `/forma` is the
+ * honest command.
  */
 export function emitClaudeSkill(source: SkillSource): EmittedSkill {
   const name = source.meta.id;
   assertName(name);
-  const dir = `skills/${name}/`;
+  const dir = `${name}/`;
   const extra: Array<[string, string]> = [];
   if (source.meta.explicitOnly) {
     // Claude puts invocation control in the frontmatter. Codex does not.
@@ -105,7 +108,7 @@ export function emitClaudeSkill(source: SkillSource): EmittedSkill {
   }
   return {
     host: "claude",
-    invocation: `/${SKILL_NAMESPACE}:${name}`,
+    invocation: `/${name}`,
     name,
     files: [
       { path: `${dir}SKILL.md`, contents: skillMarkdown(name, source, extra) },
@@ -115,13 +118,14 @@ export function emitClaudeSkill(source: SkillSource): EmittedSkill {
 }
 
 /**
- * Codex: one directory per skill, no namespace of its own, so the prefix
- * lives in both the directory name and `name`. Invocation control goes in
- * `agents/openai.yaml` inside the skill, because Codex reads only `name` and
- * `description` from the frontmatter.
+ * Codex: one directory per skill, read by its directory name. With a single
+ * skill both hosts now want the same directory and the same `name`, so the
+ * layouts have converged; what still differs is the frontmatter each host
+ * understands, and where invocation control lives. Codex reads only `name`
+ * and `description`, so its guard goes in `agents/openai.yaml`.
  */
 export function emitCodexSkill(source: SkillSource): EmittedSkill {
-  const name = `${SKILL_NAMESPACE}-${source.meta.id}`;
+  const name = source.meta.id;
   assertName(name);
   const dir = `${name}/`;
   const files: EmittedFile[] = [
@@ -142,46 +146,6 @@ export function emitCodexSkill(source: SkillSource): EmittedSkill {
     });
   }
   return { host: "codex", invocation: `$${name}`, name, files };
-}
-
-/** The plugin manifest Claude Code needs to load the directory as a plugin. */
-export function emitClaudePluginManifest(sources: SkillSource[]): EmittedFile {
-  const manifest = {
-    name: SKILL_NAMESPACE,
-    description:
-      "Turn complex work into clear form: spec-first, self-contained HTML artifacts that make no network requests.",
-    version: "0.1.0",
-    author: { name: "Forma contributors" },
-    // Claude treats these entries as paths relative to the plugin root, not
-    // as skill names. Keeping the `./skills/` prefix is therefore part of the
-    // runtime contract, not presentation.
-    skills: sources.map((source) => `./skills/${source.meta.id}`),
-  };
-  return {
-    path: ".claude-plugin/plugin.json",
-    contents: `${JSON.stringify(manifest, null, 2)}\n`,
-  };
-}
-
-/** The repository-local marketplace used by the Agent-driven installer. */
-export function emitClaudeMarketplaceManifest(): EmittedFile {
-  const marketplace = {
-    name: SKILL_NAMESPACE,
-    description: "Forma Agent Skills for clear, self-contained visual artifacts.",
-    owner: { name: "Forma contributors" },
-    plugins: [
-      {
-        name: SKILL_NAMESPACE,
-        source: `./${SKILL_NAMESPACE}`,
-        description:
-          "Four Agent Skills for turning complex work into polished, self-contained HTML artifacts.",
-      },
-    ],
-  };
-  return {
-    path: ".claude-plugin/marketplace.json",
-    contents: `${JSON.stringify(marketplace, null, 2)}\n`,
-  };
 }
 
 export function emitForHost(host: Host, source: SkillSource): EmittedSkill {

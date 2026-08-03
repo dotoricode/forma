@@ -7,8 +7,7 @@ import { afterEach, describe, expect, it } from "vitest";
 import {
   installAgentSkills,
   syncConfiguredSkills,
-  verifyInstalledSkills,
-  type CommandRunner,
+  verifyInstalledSkills
 } from "../../src/skills/install.js";
 
 const CWD = process.cwd();
@@ -26,7 +25,7 @@ afterEach(async () => {
 });
 
 describe("installAgentSkills", () => {
-  it("installs all four standalone skills into every Codex target", async () => {
+  it("installs the single skill into every Codex target", async () => {
     const root = await tempDir("forma-install-");
     const first = path.join(root, "codex");
     const second = path.join(root, "shared");
@@ -39,12 +38,9 @@ describe("installAgentSkills", () => {
     });
 
     expect(result.skills.map((skill) => skill.invocation).sort()).toEqual([
-      "$forma-advanced",
-      "$forma-dashboard",
-      "$forma-manual",
-      "$forma-report",
+      "$forma",
     ]);
-    for (const name of ["forma-advanced", "forma-dashboard", "forma-manual", "forma-report"]) {
+    for (const name of ["forma"]) {
       for (const target of [first, second]) {
         const skillDir = path.join(target, name);
         const skillMd = await readFile(path.join(skillDir, "SKILL.md"), "utf-8");
@@ -70,7 +66,7 @@ describe("installAgentSkills", () => {
     const outDir = path.join(root, "build");
     await installAgentSkills(CWD, { host: "codex", targetRoots: targets, outDir });
 
-    for (const name of ["forma-advanced", "forma-dashboard", "forma-manual", "forma-report"]) {
+    for (const name of ["forma"]) {
       const checksums = await Promise.all(
         targets.map(async (target) =>
           JSON.parse(
@@ -82,10 +78,12 @@ describe("installAgentSkills", () => {
     }
   }, 60_000);
 
-  it("removes only a checksum-verified generated compatibility router", async () => {
+  it("removes only a checksum-verified generated per-artifact skill", async () => {
     const root = await tempDir("forma-legacy-");
     const target = path.join(root, "codex");
-    const legacy = path.join(target, "forma");
+    // The legacy set reversed: `forma` is now what we install, and the four
+    // `forma-<artifact>` directories are what a previous release left behind.
+    const legacy = path.join(target, "forma-dashboard");
     await mkdir(legacy, { recursive: true });
     await writeFile(
       path.join(legacy, ".forma-skill-checksum.json"),
@@ -116,7 +114,7 @@ describe("installAgentSkills", () => {
       outDir: path.join(root, "build"),
     });
 
-    const wrapper = path.join(target, "forma-report/scripts/validate.mjs");
+    const wrapper = path.join(target, "forma/scripts/validate.mjs");
     const fixture = path.join(CWD, "fixtures/report/technical/forma.spec.json");
     const { stdout } = await execFileAsync(process.execPath, [wrapper, fixture], {
       cwd: workDir,
@@ -130,65 +128,38 @@ describe("installAgentSkills", () => {
     const outDir = path.join(root, "build");
     await installAgentSkills(CWD, { host: "codex", targetRoots: [target], outDir });
 
-    const changed = path.join(target, "forma-report", "SKILL.md");
+    const changed = path.join(target, "forma", "SKILL.md");
     await writeFile(changed, `${await readFile(changed, "utf-8")}\nlocal edit\n`, "utf-8");
 
     await expect(
       installAgentSkills(CWD, { host: "codex", targetRoots: [target], outDir }),
-    ).rejects.toThrow(/modified[\s\S]*forma-report/i);
+    ).rejects.toThrow(/modified[\s\S]*forma/i);
   }, 60_000);
 
-  it("installs the Claude plugin through its local marketplace Adapter", async () => {
+  it("installs the skill by copying it into the Claude skill roots", async () => {
     const root = await tempDir("forma-claude-");
     const outDir = path.join(root, "build");
-    const calls: Array<{ command: string; args: string[] }> = [];
-    const runCommand: CommandRunner = async (command, args) => {
-      calls.push({ command, args });
-    };
+    const target = path.join(root, "claude-skills");
 
     const result = await installAgentSkills(CWD, {
       host: "claude",
       scope: "user",
       outDir,
-      runCommand,
+      targetRoots: [target],
     });
 
-    expect(result.skills.map((skill) => skill.invocation).sort()).toEqual([
-      "/forma:advanced",
-      "/forma:dashboard",
-      "/forma:manual",
-      "/forma:report",
-    ]);
-    expect(calls).toEqual([
-      {
-        command: "claude",
-        args: ["plugin", "validate", path.join(outDir, "claude")],
-      },
-      {
-        command: "claude",
-        args: ["plugin", "marketplace", "add", path.join(outDir, "claude"), "--scope", "user"],
-      },
-      {
-        command: "claude",
-        args: ["plugin", "install", "forma@forma", "--scope", "user"],
-      },
-    ]);
-
-    const marketplace = JSON.parse(
-      await readFile(path.join(outDir, "claude/.claude-plugin/marketplace.json"), "utf-8"),
-    );
-    expect(marketplace.name).toBe("forma");
-    expect(marketplace.plugins[0].source).toBe("./forma");
-    expect(
-      JSON.parse(
-        await readFile(path.join(outDir, "claude/forma/.forma-runtime.json"), "utf-8"),
-      ),
-    ).toEqual({ version: 1, repo: CWD });
+    // Claude used to go through `claude plugin marketplace add`, which existed
+    // only to namespace four skills under one plugin name. One skill needs no
+    // namespace, and the bare /forma is what a plugin would have prevented.
+    expect(result.skills.map((skill) => skill.invocation)).toEqual(["/forma"]);
+    await expect(stat(path.join(target, "forma/SKILL.md"))).resolves.toBeDefined();
+    const skillMd = await readFile(path.join(target, "forma/SKILL.md"), "utf-8");
+    expect(skillMd).toMatch(/^name: "forma"$/m);
   }, 60_000);
 });
 
 describe("syncConfiguredSkills", () => {
-  it("uses the target list as skill roots and installs all four skills under each one", async () => {
+  it("uses the target list as skill roots and installs the skill under each one", async () => {
     const root = await tempDir("forma-configured-");
     const home = path.join(root, "home");
     const outDir = path.join(root, "build");
@@ -212,10 +183,7 @@ describe("syncConfiguredSkills", () => {
       path.join(home, ".claude/skills"),
     ]);
     for (const target of result.targetRoots) {
-      await expect(stat(path.join(target, "forma-dashboard/SKILL.md"))).resolves.toBeDefined();
-      await expect(stat(path.join(target, "forma-report/SKILL.md"))).resolves.toBeDefined();
-      await expect(stat(path.join(target, "forma-manual/SKILL.md"))).resolves.toBeDefined();
-      await expect(stat(path.join(target, "forma-advanced/SKILL.md"))).resolves.toBeDefined();
+      await expect(stat(path.join(target, "forma/SKILL.md"))).resolves.toBeDefined();
     }
   }, 60_000);
 

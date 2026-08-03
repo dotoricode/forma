@@ -333,7 +333,7 @@ program
 
 program
   .command("install-skills")
-  .description("Install all four Forma Agent Skills for Codex or Claude Code")
+  .description("Install the Forma Agent Skill for Codex or Claude Code")
   .option("--host <host>", "codex | claude (omit for maintainer sync)")
   .option("--scope <scope>", "user | project | local", "user")
   .action(async (opts: { host?: string; scope: string }) => {
@@ -346,12 +346,12 @@ program
         }
         for (const target of result.targetRoots) console.log(`forma: synced ${target}`);
         for (const legacy of result.removedLegacy) {
-          console.log(`forma: removed generated compatibility skill ${legacy}`);
+          console.log(`forma: removed superseded per-artifact skill ${legacy}`);
         }
         for (const legacy of result.preservedLegacy) {
-          console.log(`forma: preserved modified compatibility skill ${legacy}`);
+          console.log(`forma: preserved modified skill ${legacy} — move or remove it yourself`);
         }
-        console.log("forma: installed four standalone skills in every configured root.");
+        console.log("forma: installed the forma skill in every configured root.");
         console.log("forma: start a new Agent session if the skill list was already loaded.");
         return;
       }
@@ -363,14 +363,14 @@ program
         console.log(`forma: installed ${skill.invocation.padEnd(20)} ${skill.path}`);
       }
       for (const legacy of result.removedLegacy) {
-        console.log(`forma: removed generated compatibility skill ${legacy}`);
+        console.log(`forma: removed superseded per-artifact skill ${legacy}`);
       }
       for (const legacy of result.preservedLegacy) {
-        console.log(`forma: preserved modified compatibility skill ${legacy}`);
+        console.log(`forma: preserved modified skill ${legacy} — move or remove it yourself`);
       }
       console.log(
         host === "claude"
-          ? "forma: run /reload-plugins in Claude Code."
+          ? "forma: start a new Claude Code session so the skill list reloads."
           : "forma: start a new Codex session if the skill list was already loaded.",
       );
     } catch (error) {
@@ -380,7 +380,7 @@ program
 
 program
   .command("build-skills")
-  .description("Generate the Claude Code plugin and Codex skill packages from skills-src/")
+  .description("Generate the Claude Code and Codex skill packages from skills-src/")
   .option("--out <dir>", "output directory", "dist/agent-skills")
   .action(async (opts: { out: string }) => {
     try {
@@ -392,7 +392,7 @@ program
       }
       console.log("");
       console.log(
-        `forma: Claude Code plugin — ${path.join(result.outDir, "claude/forma")}`,
+        `forma: Claude Code skill — ${path.join(result.outDir, "claude/forma")}`,
       );
       console.log(`forma: Codex skills — ${path.join(result.outDir, "codex")}`);
     } catch (error) {

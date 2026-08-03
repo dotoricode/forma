@@ -5,8 +5,6 @@ import { tmpdir } from "node:os";
 import path from "node:path";
 import { describe, expect, it } from "vitest";
 import {
-  emitClaudeMarketplaceManifest,
-  emitClaudePluginManifest,
   emitClaudeSkill,
   emitCodexSkill,
 } from "../../src/skills/adapters.js";
@@ -30,13 +28,10 @@ const execFileAsync = promisify(execFile);
  * quoted a context budget that does not exist.
  */
 describe("skill sources", () => {
-  it("ships the four logical skills", () => {
-    expect(sources.map((source) => source.meta.id).sort()).toEqual([
-      "advanced",
-      "dashboard",
-      "manual",
-      "report",
-    ]);
+  it("ships exactly one skill", () => {
+    // One skill. The artifact choice moved inside it as a proposal the user
+    // agrees to, so there is nothing for a per-artifact skill list to decide.
+    expect(sources.map((source) => source.meta.id)).toEqual(["forma"]);
   });
 
   it("keeps every description inside the spec's 1024-character cap", () => {
@@ -60,9 +55,10 @@ describe("skill sources", () => {
     }
   });
 
-  it("marks only advanced as explicit-invocation only", () => {
-    const explicit = sources.filter((source) => source.meta.explicitOnly).map((s) => s.meta.id);
-    expect(explicit).toEqual(["advanced"]);
+  it("leaves the single skill implicitly invocable", () => {
+    // advanced used to be explicit-only. That guard moved into the skill body:
+    // it offers the Decision Room rather than routing to it unasked.
+    expect(sources.filter((source) => source.meta.explicitOnly)).toEqual([]);
   });
 
   it("gives every skill the shared references and scripts", () => {
@@ -77,19 +73,20 @@ describe("skill sources", () => {
 });
 
 describe("host adapters diverge where the hosts do", () => {
-  const dashboard = sources.find((source) => source.meta.id === "dashboard")!;
-  const advanced = sources.find((source) => source.meta.id === "advanced")!;
+  const forma = sources.find((source) => source.meta.id === "forma")!;
 
-  it("derives a different name per host from one source id", () => {
-    // This is the constraint that rules out copying a single SKILL.md: the
-    // spec ties `name` to the parent directory, and the directories differ.
-    expect(emitClaudeSkill(dashboard).name).toBe("dashboard");
-    expect(emitCodexSkill(dashboard).name).toBe("forma-dashboard");
+  it("derives the same name for both hosts now that there is one skill", () => {
+    // The spec ties `name` to the parent directory. That forced a per-host
+    // name while four skills shared a Claude plugin namespace; with a single
+    // skill the namespace is gone and the two names converge.
+    // With one skill both hosts want the same directory and the same name.
+    expect(emitClaudeSkill(forma).name).toBe("forma");
+    expect(emitCodexSkill(forma).name).toBe("forma");
   });
 
   it("produces the invocation each host actually uses", () => {
-    expect(emitClaudeSkill(dashboard).invocation).toBe("/forma:dashboard");
-    expect(emitCodexSkill(dashboard).invocation).toBe("$forma-dashboard");
+    expect(emitClaudeSkill(forma).invocation).toBe("/forma");
+    expect(emitCodexSkill(forma).invocation).toBe("$forma");
   });
 
   it("puts every emitted SKILL.md in a directory matching its name", () => {
@@ -102,15 +99,25 @@ describe("host adapters diverge where the hosts do", () => {
     }
   });
 
+  /**
+   * No shipped skill is explicit-only today, so these build a synthetic source.
+   * The mechanism still has to work: it is the one place the two hosts really
+   * diverge, and a test that silently covers nothing would hide a regression
+   * the day a skill needs the guard again.
+   */
+  const explicitOnly = { ...forma, meta: { ...forma.meta, explicitOnly: true } };
+
   it("blocks implicit invocation through frontmatter on Claude", () => {
-    const skillMd = emitClaudeSkill(advanced).files.find((f) => f.path.endsWith("SKILL.md"))!;
+    const skillMd = emitClaudeSkill(explicitOnly).files.find((f) =>
+      f.path.endsWith("SKILL.md"),
+    )!;
     expect(skillMd.contents).toMatch(/^disable-model-invocation: true$/m);
   });
 
   it("blocks implicit invocation through a policy file on Codex", () => {
     // Codex reads only name and description from frontmatter, so the same
     // source flag has to land in a different file entirely.
-    const emitted = emitCodexSkill(advanced);
+    const emitted = emitCodexSkill(explicitOnly);
     const policy = emitted.files.find((file) => file.path.endsWith("agents/openai.yaml"));
     expect(policy?.contents).toContain("allow_implicit_invocation: false");
     const skillMd = emitted.files.find((file) => file.path.endsWith("SKILL.md"))!;
@@ -118,59 +125,38 @@ describe("host adapters diverge where the hosts do", () => {
   });
 
   it("adds no invocation guard to a skill that allows implicit use", () => {
-    const claude = emitClaudeSkill(dashboard).files.find((f) => f.path.endsWith("SKILL.md"))!;
+    const claude = emitClaudeSkill(forma).files.find((f) => f.path.endsWith("SKILL.md"))!;
     expect(claude.contents).not.toContain("disable-model-invocation");
-    expect(emitCodexSkill(dashboard).files.some((f) => f.path.includes("openai.yaml"))).toBe(false);
+    expect(emitCodexSkill(forma).files.some((f) => f.path.includes("openai.yaml"))).toBe(false);
   });
 
   it("quotes the description so a colon in it cannot break the YAML", () => {
     // Every description here contains a colon, which is the one character
     // that silently changes meaning in a bare YAML scalar.
-    const skillMd = emitClaudeSkill(advanced).files.find((f) => f.path.endsWith("SKILL.md"))!;
-    expect(advanced.meta.description).toContain(":");
-    expect(skillMd.contents).toContain(`description: "${advanced.meta.description}"`);
+    const skillMd = emitClaudeSkill(forma).files.find((f) => f.path.endsWith("SKILL.md"))!;
+    expect(forma.meta.description).toContain(":");
+    expect(skillMd.contents).toContain(`description: "${forma.meta.description}"`);
   });
 
-  it("points the plugin manifest at every emitted skill directory", () => {
-    const manifest = JSON.parse(emitClaudePluginManifest(sources).contents);
-    expect(manifest.name).toBe("forma");
-    expect(manifest.author).toEqual({ name: "Forma contributors" });
-    expect(manifest.skills.sort()).toEqual([
-      "./skills/advanced",
-      "./skills/dashboard",
-      "./skills/manual",
-      "./skills/report",
-    ]);
-  });
 
-  it("publishes the generated plugin through a local marketplace", () => {
-    const marketplace = JSON.parse(emitClaudeMarketplaceManifest().contents);
-    expect(marketplace.name).toBe("forma");
-    expect(marketplace.plugins).toEqual([
-      expect.objectContaining({
-        name: "forma",
-        source: "./forma",
-      }),
-    ]);
-  });
 });
 
 describe("built output", () => {
   it("writes both hosts and verifies clean straight after a build", async () => {
     const result = await buildSkills(CWD, "dist/skills-test");
-    expect(result.skills).toHaveLength(8);
+    expect(result.skills).toHaveLength(2);
     expect(await verifyBuiltSkills(CWD, "dist/skills-test")).toEqual([]);
 
     const claude = await readFile(
-      path.join(CWD, "dist/skills-test/claude/forma/skills/report/SKILL.md"),
+      path.join(CWD, "dist/skills-test/claude/forma/SKILL.md"),
       "utf-8",
     );
-    expect(claude).toMatch(/^name: "report"$/m);
+    expect(claude).toMatch(/^name: "forma"$/m);
     const codex = await readFile(
-      path.join(CWD, "dist/skills-test/codex/forma-report/SKILL.md"),
+      path.join(CWD, "dist/skills-test/codex/forma/SKILL.md"),
       "utf-8",
     );
-    expect(codex).toMatch(/^name: "forma-report"$/m);
+    expect(codex).toMatch(/^name: "forma"$/m);
   }, 60_000);
 
   it("runs a generated wrapper from its emitted package location", async () => {
@@ -178,11 +164,11 @@ describe("built output", () => {
     const installedRoot = await mkdtemp(path.join(tmpdir(), "forma-installed-skill-"));
     try {
       await cp(
-        path.join(CWD, "dist/skills-test/codex/forma-report"),
-        path.join(installedRoot, "forma-report"),
+        path.join(CWD, "dist/skills-test/codex/forma"),
+        path.join(installedRoot, "forma"),
         { recursive: true },
       );
-      const wrapper = path.join(installedRoot, "forma-report/scripts/validate.mjs");
+      const wrapper = path.join(installedRoot, "forma/scripts/validate.mjs");
       const fixture = path.join(CWD, "fixtures/report/technical/forma.spec.json");
       const { stdout } = await execFileAsync(process.execPath, [wrapper, fixture], {
         cwd: CWD,
