@@ -97,8 +97,8 @@ the two most important structural rules:
 The artifacts also have distinct writing voices. Signal Grid is terse and
 operational; Editorial Brief makes complete claims; Guided Path uses direct
 imperatives and observable outcomes; Decision Room separates claim,
-counterclaim, assumption, and recorded dissent. The canonical instructions
-live in `skills-src/{dashboard,report,manual,advanced}/instructions.md`.
+counterclaim, assumption, and recorded dissent. The per-artifact playbooks live in
+`skills-src/forma/references/artifacts/{dashboard,report,manual,advanced}.md`.
 
 The stylesheet hooks are `data-artifact` and `data-variant` on `<html>`,
 kept separate so a rule can address every report without repeating itself

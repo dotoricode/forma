@@ -1,14 +1,17 @@
 # CLAUDE.md
 
 - Design system source of truth: `DESIGN.md`.
-- Canonical Agent Skill: `skills/forma/` (synced to `.claude/skills/forma/`
-  via `pnpm forma install-skills` — edit the canonical copy only).
+- Canonical Agent Skill source: `skills-src/` (one skill, `forma`, plus
+  `_shared/` references). `pnpm forma build-skills` generates the host
+  packages and `pnpm forma install-skills` installs them. Edit `skills-src/`
+  only — everything under `.claude/skills/`, `.agents/skills/`, and `dist/`
+  is generated.
 - Build: `pnpm build`. Test: `pnpm test`. Full browser QA: `pnpm qa`.
   Performance: `pnpm lighthouse`. Design lint: `pnpm lint:design`.
 - Confidentiality/security: never call an external LLM API or send
   document content to a third-party network endpoint (fonts are
   self-hosted and subset locally — see
-  `skills/forma/references/typography.md`). Rendered HTML makes zero
+  `skills-src/_shared/references/typography.md`). Rendered HTML makes zero
   network requests. See `docs/security.md`.
 
 ## Agent skills

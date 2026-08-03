@@ -44,5 +44,7 @@ Specs written against 0.1 still render. They are migrated on read
 `colorMode`) and are exempt from the composition contract, with warnings
 naming what a 0.2 rewrite would add.
 
-Run `forma validate <path>` before rendering — the schema is strict and
-rejects unknown fields.
+Run `forma validate <path>` before rendering. The schema validates the fields
+it knows about; unknown fields are **stripped, not rejected**, so a typo in a
+field name fails silently by dropping your value. Check the rendered output
+for anything you wrote that did not appear.
